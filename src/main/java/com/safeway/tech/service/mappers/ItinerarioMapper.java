@@ -5,7 +5,7 @@ import com.safeway.tech.api.dto.itinerario.ItinerarioEscolaResponse;
 import com.safeway.tech.api.dto.itinerario.ItinerarioResponse;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteStudent;
-import com.safeway.tech.domain.models.ItinerarioEscola;
+import com.safeway.tech.domain.models.RouteSchool;
 
 public class ItinerarioMapper {
 
@@ -35,14 +35,14 @@ public class ItinerarioMapper {
         );
     }
 
-    public static ItinerarioEscolaResponse toEscolaResponse(ItinerarioEscola itinerarioEscola) {
+    public static ItinerarioEscolaResponse toEscolaResponse(RouteSchool routeSchool) {
         return new ItinerarioEscolaResponse(
-                itinerarioEscola.getSchool().getId(),
-                itinerarioEscola.getSchool().getNome(),
-                itinerarioEscola.getAddress().getCidade(),
-                itinerarioEscola.getOrdemParada(),
-                itinerarioEscola.getAddress().getId(),
-                itinerarioEscola.getOrdemGlobal()
+                routeSchool.getSchool().getId(),
+                routeSchool.getSchool().getNome(),
+                routeSchool.getAddress().getCidade(),
+                routeSchool.getOrdemParada(),
+                routeSchool.getAddress().getId(),
+                routeSchool.getOrdemGlobal()
         );
     }
 }

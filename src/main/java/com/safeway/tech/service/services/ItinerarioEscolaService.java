@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.itinerario.ItinerarioEscolaRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.Route;
-import com.safeway.tech.domain.models.ItinerarioEscola;
+import com.safeway.tech.domain.models.RouteSchool;
 import com.safeway.tech.infra.exception.EnderecoNotFoundException;
 import com.safeway.tech.infra.exception.ItinerarioEscolaNotFound;
 import com.safeway.tech.infra.exception.ItinerarioNotFoundException;
@@ -29,11 +29,11 @@ public class ItinerarioEscolaService {
     private final EscolaService escolaService;
     private final EnderecoService enderecoService;
 
-    public List<ItinerarioEscola> buscarPorItinerarioId(UUID itinerarioId) {
+    public List<RouteSchool> buscarPorItinerarioId(UUID itinerarioId) {
         return itinerarioEscolaRepository.findByItinerarioId(itinerarioId);
     }
 
-    public void salvarTodos(List<ItinerarioEscola> escolas) {
+    public void salvarTodos(List<RouteSchool> escolas) {
         itinerarioEscolaRepository.saveAll(escolas);
     }
 
@@ -66,7 +66,7 @@ public class ItinerarioEscolaService {
                     throw new ItinerarioEscolaNotFound("School já está vinculada a este itinerário");
                 });
 
-        ItinerarioEscola entity = new ItinerarioEscola();
+        RouteSchool entity = new RouteSchool();
         entity.setRoute(route);
         entity.setSchool(school);
         entity.setAddress(address);
@@ -77,7 +77,7 @@ public class ItinerarioEscolaService {
 
     @Transactional
     public void removerEscola(UUID itinerarioId, UUID escolaId) {
-        ItinerarioEscola entity = itinerarioEscolaRepository
+        RouteSchool entity = itinerarioEscolaRepository
                 .findByItinerarioIdAndEscolaIdEscola(itinerarioId, escolaId)
                 .orElseThrow(() -> new RuntimeException("School não encontrada no itinerário"));
 
@@ -86,14 +86,14 @@ public class ItinerarioEscolaService {
 
     @Transactional
     public void reordenar(UUID itinerarioId, List<UUID> novaOrdemEscolaIds) {
-        List<ItinerarioEscola> atuais = itinerarioEscolaRepository.findByItinerarioId(itinerarioId);
+        List<RouteSchool> atuais = itinerarioEscolaRepository.findByItinerarioId(itinerarioId);
 
-        Map<UUID, ItinerarioEscola> map = atuais.stream()
+        Map<UUID, RouteSchool> map = atuais.stream()
                 .collect(Collectors.toMap(e -> e.getSchool().getId(), e -> e));
 
         int ordem = 1;
         for (UUID id : novaOrdemEscolaIds) {
-            ItinerarioEscola ie = map.get(id);
+            RouteSchool ie = map.get(id);
             if (ie != null) {
                 ie.setOrdemParada(ordem++);
             }

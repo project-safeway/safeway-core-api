@@ -5,7 +5,7 @@ import com.safeway.tech.api.dto.itinerario.ItinerarioUpdateRequest;
 import com.safeway.tech.api.dto.itinerario.ItinerarioUpdateRequest.ItinerarioParadaUpdate;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteStudent;
-import com.safeway.tech.domain.models.ItinerarioEscola;
+import com.safeway.tech.domain.models.RouteSchool;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.infra.exception.ItinerarioNotFoundException;
 import com.safeway.tech.repository.ItinerarioRepository;
@@ -78,12 +78,12 @@ public class ItinerarioService {
 
         if (request.paradas() != null && !request.paradas().isEmpty()) {
             List<RouteStudent> alunosAtuais = itinerarioAlunoService.buscarPorItinerarioId(route.getId());
-            List<ItinerarioEscola> escolasAtuais = itinerarioEscolaService.buscarPorItinerarioId(route.getId());
+            List<RouteSchool> escolasAtuais = itinerarioEscolaService.buscarPorItinerarioId(route.getId());
 
             Map<UUID, RouteStudent> alunosPorId = alunosAtuais.stream()
                     .collect(Collectors.toMap(a -> a.getStudent().getId(), a -> a));
 
-            Map<UUID, ItinerarioEscola> escolasPorId = escolasAtuais.stream()
+            Map<UUID, RouteSchool> escolasPorId = escolasAtuais.stream()
                     .collect(Collectors.toMap(e -> e.getSchool().getId(), e -> e));
 
             for (ItinerarioParadaUpdate parada : request.paradas()) {
@@ -97,7 +97,7 @@ public class ItinerarioService {
                         ia.setOrdemEmbarque(parada.ordemEspecifica());
                     }
                 } else if ("ESCOLA".equalsIgnoreCase(parada.tipo())) {
-                    ItinerarioEscola ie = escolasPorId.get(parada.id());
+                    RouteSchool ie = escolasPorId.get(parada.id());
                     if (ie != null) {
                         ie.setOrdemGlobal(parada.ordemGlobal());
                         ie.setOrdemParada(parada.ordemEspecifica());

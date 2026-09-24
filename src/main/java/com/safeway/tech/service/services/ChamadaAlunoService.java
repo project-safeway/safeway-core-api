@@ -1,9 +1,9 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.domain.enums.StatusChamadaEnum;
+import com.safeway.tech.domain.enums.AttendanceStatusEnum;
 import com.safeway.tech.domain.enums.StatusPresencaEnum;
 import com.safeway.tech.domain.models.Student;
-import com.safeway.tech.domain.models.Chamada;
+import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.domain.models.ChamadaAluno;
 import com.safeway.tech.repository.ChamadaAlunoRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +24,9 @@ public class ChamadaAlunoService {
 
     @Transactional
     public void registrarPresenca(Map<UUID, StatusPresencaEnum> presencas, UUID idChamada) {
-        Chamada chamada = chamadaService.buscarPorId(idChamada);
+        Attendance attendance = chamadaService.buscarPorId(idChamada);
 
-        if (!StatusChamadaEnum.EM_ANDAMENTO.equals(chamada.getStatus())) {
+        if (!AttendanceStatusEnum.IN_PROGRESS.equals(attendance.getStatus())) {
             throw new RuntimeException("Chamada não está em andamento");
         }
 
@@ -37,10 +37,10 @@ public class ChamadaAlunoService {
             Student student = alunoService.buscarPorId(idAluno);
 
             ChamadaAluno chamadaAluno = chamadaAlunoRepository
-                    .findByChamadaAndAluno(chamada, student)
+                    .findByChamadaAndAluno(attendance, student)
                     .orElseGet(() -> {
                         ChamadaAluno ca = new ChamadaAluno();
-                        ca.setChamada(chamada);
+                        ca.setAttendance(attendance);
                         ca.setStudent(student);
                         return ca;
                     });

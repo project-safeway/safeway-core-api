@@ -2,7 +2,7 @@ package com.safeway.tech.service.mappers;
 
 import com.safeway.tech.api.dto.chamada.ChamadaAlunoResponse;
 import com.safeway.tech.api.dto.chamada.ChamadaResponse;
-import com.safeway.tech.domain.models.Chamada;
+import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.domain.models.ChamadaAluno;
 
 import java.util.ArrayList;
@@ -10,18 +10,18 @@ import java.util.List;
 
 public class ChamadaMapper {
 
-    public static ChamadaResponse toResponse(Chamada chamada) {
+    public static ChamadaResponse toResponse(Attendance attendance) {
         List<ChamadaAlunoResponse> alunosResponse = new ArrayList<>();
-        if (chamada.getAlunos() != null && !chamada.getAlunos().isEmpty()) {
-            alunosResponse = chamada.getAlunos().stream()
+        if (attendance.getAlunos() != null && !attendance.getAlunos().isEmpty()) {
+            alunosResponse = attendance.getAlunos().stream()
                     .map(ChamadaMapper::toAlunoResponse)
                     .toList();
         }
 
         return new ChamadaResponse(
-                chamada.getId(),
-                ItinerarioMapper.toResponse(chamada.getRoute()),
-                chamada.getStatus(),
+                attendance.getId(),
+                ItinerarioMapper.toResponse(attendance.getRoute()),
+                attendance.getStatus(),
                 alunosResponse
         );
     }

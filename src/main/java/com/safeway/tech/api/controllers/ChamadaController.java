@@ -1,9 +1,9 @@
 package com.safeway.tech.api.controllers;
 
 import com.safeway.tech.api.dto.chamada.ChamadaResponse;
-import com.safeway.tech.domain.enums.StatusChamadaEnum;
+import com.safeway.tech.domain.enums.AttendanceStatusEnum;
 import com.safeway.tech.domain.enums.StatusPresencaEnum;
-import com.safeway.tech.domain.models.Chamada;
+import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.service.mappers.ChamadaMapper;
 import com.safeway.tech.service.services.ChamadaAlunoService;
 import com.safeway.tech.service.services.ChamadaService;
@@ -38,15 +38,15 @@ public class ChamadaController {
 
     @PostMapping("/iniciar/{id}")
     public ResponseEntity<ChamadaResponse> iniciarChamada(@PathVariable UUID id) {
-        Chamada chamada = chamadaService.iniciarChamada(id);
-        ChamadaResponse response = ChamadaMapper.toResponse(chamada);
+        Attendance attendance = chamadaService.iniciarChamada(id);
+        ChamadaResponse response = ChamadaMapper.toResponse(attendance);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/alterar/{id}")
-    public ResponseEntity<ChamadaResponse> alterarChamada(@PathVariable UUID id, @PathParam("status") StatusChamadaEnum status) {
-        Chamada chamada = chamadaService.atualizarChamada(id, status);
-        ChamadaResponse response = ChamadaMapper.toResponse(chamada);
+    public ResponseEntity<ChamadaResponse> alterarChamada(@PathVariable UUID id, @PathParam("status") AttendanceStatusEnum status) {
+        Attendance attendance = chamadaService.atualizarChamada(id, status);
+        ChamadaResponse response = ChamadaMapper.toResponse(attendance);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -61,7 +61,7 @@ public class ChamadaController {
     @GetMapping("/historico/{id}")
     public ResponseEntity<Page<ChamadaResponse>> historicoChamada(
             @PathVariable UUID id,
-            @RequestParam(required = false) List<StatusChamadaEnum> status,
+            @RequestParam(required = false) List<AttendanceStatusEnum> status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id,desc") String[] sort) {
@@ -78,7 +78,7 @@ public class ChamadaController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
 
-        Page<Chamada> chamadas = chamadaService.buscarHistoricoChamadas(id, status, pageable);
+        Page<Attendance> chamadas = chamadaService.buscarHistoricoChamadas(id, status, pageable);
         Page<ChamadaResponse> response = chamadas.map(ChamadaMapper::toResponse);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

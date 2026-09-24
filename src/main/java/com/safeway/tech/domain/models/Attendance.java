@@ -1,6 +1,7 @@
 package com.safeway.tech.domain.models;
 
-import com.safeway.tech.domain.enums.StatusChamadaEnum;
+import com.safeway.tech.domain.enums.AttendanceStatusEnum;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,15 +13,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "chamadas")
+@Table(name = "attendances")
 @Getter @Setter
 @NoArgsConstructor
-public class Chamada extends BaseEntity {
+public class Attendance extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    private StatusChamadaEnum status;
+    @Column(nullable = false)
+    private AttendanceStatusEnum status;
 
     @ManyToOne
-    @JoinColumn(name = "itinerario_id", nullable = false)
+    @JoinColumn(name = "route_id", nullable = false)
     private Route route;
 }

@@ -25,7 +25,7 @@ public class ChamadaAluno extends BaseEntity {
     private LocalDateTime data;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Chamada chamada;
+    private Attendance attendance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Student student;

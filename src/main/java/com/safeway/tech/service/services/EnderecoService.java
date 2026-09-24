@@ -2,7 +2,7 @@ package com.safeway.tech.service.services;
 
 import com.google.maps.model.LatLng;
 import com.safeway.tech.api.dto.endereco.EnderecoRequest;
-import com.safeway.tech.domain.models.Endereco;
+import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Responsavel;
 import com.safeway.tech.infra.exception.EnderecoNotFoundException;
 import com.safeway.tech.repository.EnderecoRepository;
@@ -25,71 +25,71 @@ public class EnderecoService {
     private final GeocodingService geocodingService;
     private final CurrentUserService currentUserService;
 
-    public Endereco buscarPorId(UUID id) {
+    public Address buscarPorId(UUID id) {
         return enderecoRepository.findById(id)
                 .orElseThrow(() -> new EnderecoNotFoundException("Endereço com ID " + id + " não encontrado"));
     }
 
     @Transactional(readOnly = true)
-    public List<Endereco> listarEnderecosDisponiveis(UUID alunoId) {
+    public List<Address> listarEnderecosDisponiveis(UUID alunoId) {
         UUID userId = currentUserService.getCurrentUserId();
         List<Responsavel> responsaveis = responsavelRepository.findByAlunosIdAndUsuarioIdUsuario(alunoId, userId);
 
         return responsaveis.stream()
-                .map(Responsavel::getEndereco)
+                .map(Responsavel::getAddress)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public Endereco criar(EnderecoRequest request) {
-        Endereco endereco = new Endereco();
+    public Address criar(EnderecoRequest request) {
+        Address address = new Address();
 
-        aplicarDados(endereco, request);
+        aplicarDados(address, request);
 
-        calcularCoordenadas(endereco);
-        return enderecoRepository.save(endereco);
+        calcularCoordenadas(address);
+        return enderecoRepository.save(address);
     }
 
-    public Endereco atualizar(UUID id, EnderecoRequest request) {
-        Endereco endereco = buscarPorId(id);
+    public Address atualizar(UUID id, EnderecoRequest request) {
+        Address address = buscarPorId(id);
 
-        aplicarDados(endereco, request);
-        calcularCoordenadas(endereco);
+        aplicarDados(address, request);
+        calcularCoordenadas(address);
 
-        return enderecoRepository.save(endereco);
+        return enderecoRepository.save(address);
     }
 
     public void desativar(UUID id) {
-        Endereco endereco = buscarPorId(id);
-        endereco.setAtivo(false);
-        enderecoRepository.save(endereco);
+        Address address = buscarPorId(id);
+        address.setAtivo(false);
+        enderecoRepository.save(address);
     }
 
-    private void aplicarDados(Endereco endereco, EnderecoRequest request) {
-        endereco.setLogradouro(request.logradouro());
-        endereco.setNumero(request.numero());
-        endereco.setComplemento(request.complemento());
-        endereco.setBairro(request.bairro());
-        endereco.setCidade(request.cidade());
-        endereco.setUf(request.uf());
-        endereco.setCep(request.cep());
-        endereco.setTipo(request.tipo());
+    private void aplicarDados(Address address, EnderecoRequest request) {
+        address.setLogradouro(request.logradouro());
+        address.setNumero(request.numero());
+        address.setComplemento(request.complemento());
+        address.setBairro(request.bairro());
+        address.setCidade(request.cidade());
+        address.setUf(request.uf());
+        address.setCep(request.cep());
+        address.setTipo(request.tipo());
     }
 
-    private void calcularCoordenadas(Endereco endereco) {
+    private void calcularCoordenadas(Address address) {
         String enderecoCompleto = String.format("%s, %s, %s, %s, %s, %s",
-                endereco.getLogradouro(),
-                endereco.getNumero(),
-                endereco.getBairro(),
-                endereco.getCidade(),
-                endereco.getUf(),
-                endereco.getCep()
+                address.getLogradouro(),
+                address.getNumero(),
+                address.getBairro(),
+                address.getCidade(),
+                address.getUf(),
+                address.getCep()
         );
 
         LatLng coordenadas = geocodingService.obterCoordenadas(enderecoCompleto);
-        endereco.setLatitude(coordenadas.lat);
-        endereco.setLongitude(coordenadas.lng);
+        address.setLatitude(coordenadas.lat);
+        address.setLongitude(coordenadas.lng);
     }
 
 }

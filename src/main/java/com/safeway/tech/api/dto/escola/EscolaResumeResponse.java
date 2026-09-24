@@ -1,11 +1,11 @@
 package com.safeway.tech.api.dto.escola;
 
 import com.safeway.tech.api.dto.endereco.EnderecoResponse;
-import com.safeway.tech.domain.enums.NivelEnsinoEnum;
+import com.safeway.tech.domain.enums.EducationLevelEnum;
 
 public record EscolaResumeResponse(
         String nome,
-        NivelEnsinoEnum nivelEnsino,
+        EducationLevelEnum nivelEnsino,
         EnderecoResponse endereco
 ) {
 }

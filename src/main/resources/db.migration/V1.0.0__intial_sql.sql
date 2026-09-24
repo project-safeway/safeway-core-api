@@ -100,7 +100,6 @@ CREATE TABLE guardians (
     deleted_at DATETIME,
 
     name VARCHAR(100) NOT NULL,
-    cpf CHAR(14),
 
     primary_phone_number CHAR(15) NOT NULL,
     secondary_phone_number CHAR(15),

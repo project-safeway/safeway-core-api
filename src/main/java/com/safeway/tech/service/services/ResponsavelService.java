@@ -1,9 +1,9 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.responsavel.ResponsavelRequest;
-import com.safeway.tech.domain.models.Endereco;
-import com.safeway.tech.domain.models.Responsavel;
-import com.safeway.tech.domain.models.Usuario;
+import com.safeway.tech.domain.models.Address;
+import com.safeway.tech.domain.models.Guardian;
+import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.ResponsavelNotFoundException;
 import com.safeway.tech.repository.ResponsavelRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,63 +23,63 @@ public class ResponsavelService {
     private final EnderecoService enderecoService;
     private final CurrentUserService currentUserService;
 
-    public Responsavel buscarPorId(UUID id) {
+    public Guardian buscarPorId(UUID id) {
         UUID userId = currentUserService.getCurrentUserId();
         return responsavelRepository.findByIdResponsavelAndIdUsuario(id, userId)
                 .orElseThrow(() -> new ResponsavelNotFoundException("O responsável com ID " + id + "não foi encontrado"));
     }
 
-    public Optional<Responsavel> buscarPorCpfAndUsuario(String cpf, UUID userId) {
+    public Optional<Guardian> buscarPorCpfAndUsuario(String cpf, UUID userId) {
         return responsavelRepository.findByCpfAndIdUsuario(cpf, userId);
     }
 
-    public List<Responsavel> listarResponsaveis() {
+    public List<Guardian> listarResponsaveis() {
         UUID userId = currentUserService.getCurrentUserId();
         return responsavelRepository.findAllByIdUsuario(userId);
     }
 
     @Transactional
-    public Responsavel criarResponsavel(ResponsavelRequest request) {
-        Responsavel responsavel = new Responsavel();
-        aplicaDados(responsavel, request);
+    public Guardian criarResponsavel(ResponsavelRequest request) {
+        Guardian guardian = new Guardian();
+        aplicaDados(guardian, request);
 
-        Endereco endereco = enderecoService.criar(request.endereco());
-        responsavel.setEndereco(endereco);
+        Address address = enderecoService.criar(request.endereco());
+        guardian.setAddress(address);
 
         UUID userId = currentUserService.getCurrentUserId();
-        Usuario usuario = usuarioService.buscarPorId(userId);
-        responsavel.setUsuario(usuario);
+        User user = usuarioService.buscarPorId(userId);
+        guardian.setUser(user);
 
-        return responsavelRepository.save(responsavel);
+        return responsavelRepository.save(guardian);
     }
 
     @Transactional
-    public Responsavel alterarResponsavel(ResponsavelRequest request, UUID idResponsavel) {
-        Responsavel responsavel = buscarPorId(idResponsavel);
-        aplicaDados(responsavel, request);
+    public Guardian alterarResponsavel(ResponsavelRequest request, UUID idResponsavel) {
+        Guardian guardian = buscarPorId(idResponsavel);
+        aplicaDados(guardian, request);
 
         if (request.endereco() != null) {
-            Endereco enderecoAtual = responsavel.getEndereco();
-            Endereco endereco = enderecoAtual != null && enderecoAtual.getId() != null
-                    ? enderecoService.atualizar(enderecoAtual.getId(), request.endereco())
+            Address addressAtual = guardian.getAddress();
+            Address address = addressAtual != null && addressAtual.getId() != null
+                    ? enderecoService.atualizar(addressAtual.getId(), request.endereco())
                     : enderecoService.criar(request.endereco());
-            responsavel.setEndereco(endereco);
+            guardian.setAddress(address);
         }
 
-        return responsavelRepository.save(responsavel);
+        return responsavelRepository.save(guardian);
     }
 
     public void desativar(UUID id) {
-        Responsavel responsavel = buscarPorId(id);
-        responsavel.setAtivo(false);
-        responsavelRepository.save(responsavel);
+        Guardian guardian = buscarPorId(id);
+        guardian.setAtivo(false);
+        responsavelRepository.save(guardian);
     }
 
-    private void aplicaDados(Responsavel responsavel, ResponsavelRequest request) {
-        responsavel.setNome(request.nome());
-        responsavel.setCpf(request.cpf());
-        responsavel.setTel1(request.tel1());
-        responsavel.setTel2(request.tel2());
-        responsavel.setEmail(request.email());
+    private void aplicaDados(Guardian guardian, ResponsavelRequest request) {
+        guardian.setNome(request.nome());
+        guardian.setCpf(request.cpf());
+        guardian.setTel1(request.tel1());
+        guardian.setTel2(request.tel2());
+        guardian.setEmail(request.email());
     }
 }

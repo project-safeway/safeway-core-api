@@ -1,9 +1,9 @@
 package com.safeway.tech.api.controllers;
 
-import com.safeway.tech.api.dto.endereco.EnderecoRequest;
-import com.safeway.tech.api.dto.endereco.EnderecoResponse;
+import com.safeway.tech.api.dto.address.AddressRequest;
+import com.safeway.tech.api.dto.address.AddressResponse;
 import com.safeway.tech.domain.models.Address;
-import com.safeway.tech.service.mappers.EnderecoMapper;
+import com.safeway.tech.service.mappers.AddressMapper;
 import com.safeway.tech.service.services.EnderecoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,26 +28,26 @@ public class EnderecoController {
     private final EnderecoService enderecoService;
 
     @PostMapping
-    public ResponseEntity<EnderecoResponse> criar(@Valid @RequestBody EnderecoRequest request) {
+    public ResponseEntity<AddressResponse> criar(@Valid @RequestBody AddressRequest request) {
         Address address = enderecoService.criar(request);
-        EnderecoResponse response = EnderecoMapper.toResponse(address);
+        AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EnderecoResponse> buscar(@PathVariable UUID id) {
+    public ResponseEntity<AddressResponse> buscar(@PathVariable UUID id) {
         Address address = enderecoService.buscarPorId(id);
-        EnderecoResponse response = EnderecoMapper.toResponse(address);
+        AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EnderecoResponse> atualizar(
+    public ResponseEntity<AddressResponse> atualizar(
             @PathVariable UUID id,
-            @Valid @RequestBody EnderecoRequest request
+            @Valid @RequestBody AddressRequest request
     ) {
         Address address = enderecoService.atualizar(id, request);
-        EnderecoResponse response = EnderecoMapper.toResponse(address);
+        AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

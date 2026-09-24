@@ -2,11 +2,11 @@ package com.safeway.tech.service.services.implementations;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.safeway.tech.client.GoogleOptimizationClient;
-import com.safeway.tech.api.dto.rotas.Localizacao;
-import com.safeway.tech.api.dto.rotas.MetricasRota;
-import com.safeway.tech.api.dto.rotas.ParadaOtimizada;
-import com.safeway.tech.api.dto.rotas.RotasRequest;
-import com.safeway.tech.api.dto.rotas.RotasResponse;
+import com.safeway.tech.api.dto.route.google.Localizacao;
+import com.safeway.tech.api.dto.route.google.MetricasRota;
+import com.safeway.tech.api.dto.route.google.ParadaOtimizada;
+import com.safeway.tech.api.dto.route.google.RotasRequest;
+import com.safeway.tech.api.dto.route.google.RotasResponse;
 import com.safeway.tech.service.services.RotasService;
 import org.springframework.stereotype.Service;
 

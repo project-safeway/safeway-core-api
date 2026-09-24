@@ -1,6 +1,6 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.transporte.TransporteRequest;
+import com.safeway.tech.api.dto.transport.TransportRequest;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
@@ -37,7 +37,7 @@ public class TransporteService {
         return transporteRepository.findAllByIdUsuario(userId);
     }
 
-    public Transport salvarTransporte(TransporteRequest request) {
+    public Transport salvarTransporte(TransportRequest request) {
         Transport transport = new Transport();
 
         aplicarDados(transport, request);
@@ -50,7 +50,7 @@ public class TransporteService {
         return transporteRepository.save(transport);
     }
 
-    public Transport atualizarTransporte(UUID idTransporte, TransporteRequest request) {
+    public Transport atualizarTransporte(UUID idTransporte, TransportRequest request) {
         Transport transport = buscarPorId(idTransporte);
 
         aplicarDados(transport, request);
@@ -63,7 +63,7 @@ public class TransporteService {
         transporteRepository.delete(transport);
     }
 
-    private void aplicarDados(Transport transport, TransporteRequest request) {
+    private void aplicarDados(Transport transport, TransportRequest request) {
         transport.setPlaca(request.placa());
         transport.setModelo(request.modelo());
         transport.setCapacidade(request.capacidade());

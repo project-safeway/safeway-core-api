@@ -1,6 +1,6 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.itinerario.ItinerarioEscolaRequest;
+import com.safeway.tech.api.dto.route.ItinerarioEscolaRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.Route;

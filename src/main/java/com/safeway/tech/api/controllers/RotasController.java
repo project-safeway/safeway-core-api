@@ -1,7 +1,7 @@
 package com.safeway.tech.api.controllers;
 
-import com.safeway.tech.api.dto.rotas.RotasRequest;
-import com.safeway.tech.api.dto.rotas.RotasResponse;
+import com.safeway.tech.api.dto.route.google.RotasRequest;
+import com.safeway.tech.api.dto.route.google.RotasResponse;
 import com.safeway.tech.service.services.RotasCompostasService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;

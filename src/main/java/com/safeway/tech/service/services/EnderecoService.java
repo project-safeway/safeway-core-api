@@ -1,7 +1,7 @@
 package com.safeway.tech.service.services;
 
 import com.google.maps.model.LatLng;
-import com.safeway.tech.api.dto.endereco.EnderecoRequest;
+import com.safeway.tech.api.dto.address.AddressRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.infra.exception.EnderecoNotFoundException;
@@ -42,7 +42,7 @@ public class EnderecoService {
     }
 
     @Transactional
-    public Address criar(EnderecoRequest request) {
+    public Address criar(AddressRequest request) {
         Address address = new Address();
 
         aplicarDados(address, request);
@@ -51,7 +51,7 @@ public class EnderecoService {
         return enderecoRepository.save(address);
     }
 
-    public Address atualizar(UUID id, EnderecoRequest request) {
+    public Address atualizar(UUID id, AddressRequest request) {
         Address address = buscarPorId(id);
 
         aplicarDados(address, request);
@@ -66,7 +66,7 @@ public class EnderecoService {
         enderecoRepository.save(address);
     }
 
-    private void aplicarDados(Address address, EnderecoRequest request) {
+    private void aplicarDados(Address address, AddressRequest request) {
         address.setLogradouro(request.logradouro());
         address.setNumero(request.numero());
         address.setComplemento(request.complemento());

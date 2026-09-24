@@ -1,9 +1,9 @@
 package com.safeway.tech.api.controllers;
 
-import com.safeway.tech.api.dto.responsavel.ResponsavelRequest;
-import com.safeway.tech.api.dto.responsavel.ResponsavelResponse;
+import com.safeway.tech.api.dto.guardian.GuardianRequest;
+import com.safeway.tech.api.dto.guardian.GuardianResponse;
 import com.safeway.tech.domain.models.Guardian;
-import com.safeway.tech.service.mappers.ResponsavelMapper;
+import com.safeway.tech.service.mappers.GuardianMapper;
 import com.safeway.tech.service.services.ResponsavelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,23 +29,23 @@ public class ResponsavelController {
     private final ResponsavelService responsavelService;
 
     @PostMapping
-    public ResponseEntity<ResponsavelResponse> salvarResponsavel(@RequestBody @Valid ResponsavelRequest request) {
+    public ResponseEntity<GuardianResponse> salvarResponsavel(@RequestBody @Valid GuardianRequest request) {
         Guardian guardian = responsavelService.criarResponsavel(request);
-        ResponsavelResponse response = ResponsavelMapper.toResponse(guardian);
+        GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<ResponsavelResponse>> listarResponsaveis() {
+    public ResponseEntity<List<GuardianResponse>> listarResponsaveis() {
         List<Guardian> responsaveis = responsavelService.listarResponsaveis();
-        List<ResponsavelResponse> response = responsaveis.stream().map(ResponsavelMapper::toResponse).toList();
+        List<GuardianResponse> response = responsaveis.stream().map(GuardianMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponsavelResponse> retornarUm(@PathVariable UUID id) {
+    public ResponseEntity<GuardianResponse> retornarUm(@PathVariable UUID id) {
         Guardian guardian = responsavelService.buscarPorId(id);
-        ResponsavelResponse response = ResponsavelMapper.toResponse(guardian);
+        GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -56,11 +56,11 @@ public class ResponsavelController {
     }
 
     @PutMapping("/{idResponsavel}")
-    public ResponseEntity<ResponsavelResponse> alterarResponsavel(
-            @RequestBody @Valid ResponsavelRequest novoResponsavel,
+    public ResponseEntity<GuardianResponse> alterarResponsavel(
+            @RequestBody @Valid GuardianRequest novoResponsavel,
             @PathVariable UUID idResponsavel) {
         Guardian guardian = responsavelService.alterarResponsavel(novoResponsavel, idResponsavel);
-        ResponsavelResponse response = ResponsavelMapper.toResponse(guardian);
+        GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

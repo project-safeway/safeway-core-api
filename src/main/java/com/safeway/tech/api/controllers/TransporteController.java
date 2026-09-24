@@ -1,12 +1,12 @@
 package com.safeway.tech.api.controllers;
 
-import com.safeway.tech.api.dto.transporte.AlunoTransporteResponse;
-import com.safeway.tech.api.dto.transporte.TransporteRequest;
-import com.safeway.tech.api.dto.transporte.TransporteResponse;
+import com.safeway.tech.api.dto.transport.StudentTransportResponse;
+import com.safeway.tech.api.dto.transport.TransportRequest;
+import com.safeway.tech.api.dto.transport.TransportResponse;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
-import com.safeway.tech.service.mappers.AlunoMapper;
-import com.safeway.tech.service.mappers.TransporteMapper;
+import com.safeway.tech.service.mappers.StudentMapper;
+import com.safeway.tech.service.mappers.TransportMapper;
 import com.safeway.tech.service.services.TransporteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,37 +32,37 @@ public class TransporteController {
     private final TransporteService transporteService;
 
     @GetMapping
-    public ResponseEntity<List<TransporteResponse>> listarTransportes() {
+    public ResponseEntity<List<TransportResponse>> listarTransportes() {
         List<Transport> transports = transporteService.listarTransportes();
-        List<TransporteResponse> response = transports.stream().map(TransporteMapper::toResponse).toList();
+        List<TransportResponse> response = transports.stream().map(TransportMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{idTransporte}")
-    public ResponseEntity<TransporteResponse> retornarUm(@PathVariable UUID idTransporte) {
+    public ResponseEntity<TransportResponse> retornarUm(@PathVariable UUID idTransporte) {
         Transport transport = transporteService.buscarPorId(idTransporte);
-        TransporteResponse response = TransporteMapper.toResponse(transport);
+        TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{idTransporte}/alunos")
-    public ResponseEntity<List<AlunoTransporteResponse>> listarAlunosDoTransporte(@PathVariable UUID idTransporte) {
+    public ResponseEntity<List<StudentTransportResponse>> listarAlunosDoTransporte(@PathVariable UUID idTransporte) {
         List<Student> studentTransporte = transporteService.listarAlunos(idTransporte);
-        List<AlunoTransporteResponse> response = studentTransporte.stream().map(AlunoMapper::toTransporteResponse).toList();
+        List<StudentTransportResponse> response = studentTransporte.stream().map(StudentMapper::toTransportResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping
-    public ResponseEntity<TransporteResponse> salvarTransporte(@RequestBody @Valid TransporteRequest request) {
+    public ResponseEntity<TransportResponse> salvarTransporte(@RequestBody @Valid TransportRequest request) {
         Transport transport = transporteService.salvarTransporte(request);
-        TransporteResponse response = TransporteMapper.toResponse(transport);
+        TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{idTransporte}")
-    public ResponseEntity<TransporteResponse> alterarTransporte(@RequestBody @Valid TransporteRequest request, @PathVariable UUID idTransporte) {
+    public ResponseEntity<TransportResponse> alterarTransporte(@RequestBody @Valid TransportRequest request, @PathVariable UUID idTransporte) {
         Transport transport = transporteService.atualizarTransporte(idTransporte, request);
-        TransporteResponse response = TransporteMapper.toResponse(transport);
+        TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

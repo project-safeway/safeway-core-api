@@ -1,7 +1,7 @@
 package com.safeway.tech.api.controllers;
 
-import com.safeway.tech.api.dto.usuario.UsuarioFeignResponse;
-import com.safeway.tech.api.dto.usuario.UsuarioResponse;
+import com.safeway.tech.api.dto.user.UserFeignResponse;
+import com.safeway.tech.api.dto.user.UserResponse;
 import com.safeway.tech.domain.models.User;
 import com.safeway.tech.service.services.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -25,18 +25,18 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    private UsuarioResponse toResponse(User u) {
-        return UsuarioResponse.fromEntity(u);
+    private UserResponse toResponse(User u) {
+        return UserResponse.fromEntity(u);
     }
 
     @PostMapping
-    public UsuarioResponse salvarUsuario(@RequestBody User user) {
+    public UserResponse salvarUsuario(@RequestBody User user) {
         User salvo = usuarioService.salvarUsuario(user);
         return toResponse(salvo);
     }
 
     @GetMapping
-    public List<UsuarioResponse> listarUsuarios() {
+    public List<UserResponse> listarUsuarios() {
         return usuarioService.listarUsuarios()
                 .stream()
                 .map(this::toResponse)
@@ -44,7 +44,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{idUsuario}")
-    public UsuarioResponse retornarUm(@PathVariable UUID idUsuario) {
+    public UserResponse retornarUm(@PathVariable UUID idUsuario) {
         return toResponse(usuarioService.buscarPorId(idUsuario));
     }
 
@@ -54,7 +54,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{idUsuario}")
-    public UsuarioResponse alterarUsuario(@RequestBody User novoUser, @PathVariable UUID idUsuario) {
+    public UserResponse alterarUsuario(@RequestBody User novoUser, @PathVariable UUID idUsuario) {
         User atualizado = usuarioService.alterarUsuario(novoUser, idUsuario);
         return toResponse(atualizado);
     }
@@ -66,8 +66,8 @@ public class UsuarioController {
      */
 
     @GetMapping("/feign/{idUsuario}")
-    public UsuarioFeignResponse buscarUsuario(@PathVariable UUID idUsuario) {
+    public UserFeignResponse buscarUsuario(@PathVariable UUID idUsuario) {
         User user = usuarioService.buscarPorId(idUsuario);
-        return UsuarioFeignResponse.fromEntity(user);
+        return UserFeignResponse.fromEntity(user);
     }
 }

@@ -1,8 +1,8 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.itinerario.ItinerarioRequest;
-import com.safeway.tech.api.dto.itinerario.ItinerarioUpdateRequest;
-import com.safeway.tech.api.dto.itinerario.ItinerarioUpdateRequest.ItinerarioParadaUpdate;
+import com.safeway.tech.api.dto.route.ItinerarioRequest;
+import com.safeway.tech.api.dto.route.ItinerarioUpdateRequest;
+import com.safeway.tech.api.dto.route.ItinerarioUpdateRequest.ItinerarioParadaUpdate;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.RouteSchool;

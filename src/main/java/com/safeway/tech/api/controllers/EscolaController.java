@@ -1,12 +1,12 @@
 package com.safeway.tech.api.controllers;
 
-import com.safeway.tech.api.dto.endereco.EnderecoResponse;
-import com.safeway.tech.api.dto.escola.EscolaRequest;
-import com.safeway.tech.api.dto.escola.EscolaResponse;
+import com.safeway.tech.api.dto.address.AddressResponse;
+import com.safeway.tech.api.dto.school.SchoolRequest;
+import com.safeway.tech.api.dto.school.SchoolResponse;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
-import com.safeway.tech.service.mappers.EnderecoMapper;
-import com.safeway.tech.service.mappers.EscolaMapper;
+import com.safeway.tech.service.mappers.AddressMapper;
+import com.safeway.tech.service.mappers.SchoolMapper;
 import com.safeway.tech.service.services.EscolaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,41 +32,41 @@ public class EscolaController {
     private final EscolaService escolaService;
 
     @PostMapping
-    public ResponseEntity<EscolaResponse> cadastrarEscola(
-            @Valid @RequestBody EscolaRequest request) {
+    public ResponseEntity<SchoolResponse> cadastrarEscola(
+            @Valid @RequestBody SchoolRequest request) {
 
         School school = escolaService.cadastrarEscola(request);
-        EscolaResponse response = EscolaMapper.toResponse(school);
+        SchoolResponse response = SchoolMapper.toResponse(school);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<EscolaResponse>> listarEscolasComAlunos() {
+    public ResponseEntity<List<SchoolResponse>> listarEscolasComAlunos() {
         List<School> schools = escolaService.listarEscolasComAlunos();
-        List<EscolaResponse> response = schools.stream().map(EscolaMapper::toResponse).toList();
+        List<SchoolResponse> response = schools.stream().map(SchoolMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EscolaResponse> buscarEscolaPorId(@PathVariable UUID id) {
+    public ResponseEntity<SchoolResponse> buscarEscolaPorId(@PathVariable UUID id) {
         School school = escolaService.buscarPorId(id);
-        EscolaResponse response = EscolaMapper.toResponse(school);
+        SchoolResponse response = SchoolMapper.toResponse(school);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}/endereco")
-    public ResponseEntity<EnderecoResponse> buscarEnderecoEscola(@PathVariable UUID id) {
+    public ResponseEntity<AddressResponse> buscarEnderecoEscola(@PathVariable UUID id) {
         Address address = escolaService.buscarEnderecoDaEscola(id);
-        EnderecoResponse response = EnderecoMapper.toResponse(address);
+        AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EscolaResponse> atualizarEscola(
+    public ResponseEntity<SchoolResponse> atualizarEscola(
             @PathVariable UUID id,
-            @Valid @RequestBody EscolaRequest request) {
+            @Valid @RequestBody SchoolRequest request) {
         School school = escolaService.atualizarEscola(id, request);
-        EscolaResponse response = EscolaMapper.toResponse(school);
+        SchoolResponse response = SchoolMapper.toResponse(school);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

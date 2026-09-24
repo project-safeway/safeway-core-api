@@ -1,6 +1,6 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.responsavel.ResponsavelRequest;
+import com.safeway.tech.api.dto.guardian.GuardianRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.domain.models.User;
@@ -39,7 +39,7 @@ public class ResponsavelService {
     }
 
     @Transactional
-    public Guardian criarResponsavel(ResponsavelRequest request) {
+    public Guardian criarResponsavel(GuardianRequest request) {
         Guardian guardian = new Guardian();
         aplicaDados(guardian, request);
 
@@ -54,7 +54,7 @@ public class ResponsavelService {
     }
 
     @Transactional
-    public Guardian alterarResponsavel(ResponsavelRequest request, UUID idResponsavel) {
+    public Guardian alterarResponsavel(GuardianRequest request, UUID idResponsavel) {
         Guardian guardian = buscarPorId(idResponsavel);
         aplicaDados(guardian, request);
 
@@ -75,7 +75,7 @@ public class ResponsavelService {
         responsavelRepository.save(guardian);
     }
 
-    private void aplicaDados(Guardian guardian, ResponsavelRequest request) {
+    private void aplicaDados(Guardian guardian, GuardianRequest request) {
         guardian.setNome(request.nome());
         guardian.setCpf(request.cpf());
         guardian.setTel1(request.tel1());

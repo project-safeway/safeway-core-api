@@ -1,7 +1,7 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.aluno.AlunoRequest;
-import com.safeway.tech.api.dto.responsavel.ResponsavelRequest;
+import com.safeway.tech.api.dto.student.StudentRequest;
+import com.safeway.tech.api.dto.guardian.GuardianRequest;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.Guardian;
@@ -38,7 +38,7 @@ public class AlunoService {
     }
 
     @Transactional
-    public Student criarAluno(AlunoRequest request) {
+    public Student criarAluno(StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
         User user = usuarioService.buscarPorId(userId);
 
@@ -57,10 +57,10 @@ public class AlunoService {
         student.setUsuario(user);
         student.setTransport(transport);
 
-        for (ResponsavelRequest responsavelRequest : request.responsaveis()) {
+        for (GuardianRequest guardianRequest : request.responsaveis()) {
             Guardian guardian = responsavelService
-                    .buscarPorCpfAndUsuario(responsavelRequest.cpf(), userId)
-                    .orElseGet(() -> responsavelService.criarResponsavel(responsavelRequest));
+                    .buscarPorCpfAndUsuario(guardianRequest.cpf(), userId)
+                    .orElseGet(() -> responsavelService.criarResponsavel(guardianRequest));
 
             student.adicionarResponsavel(guardian);
         }
@@ -72,7 +72,7 @@ public class AlunoService {
     }
 
     @Transactional
-    public Student atualizarAluno(UUID alunoId, AlunoRequest request) {
+    public Student atualizarAluno(UUID alunoId, StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
         User user = usuarioService.buscarPorId(userId);
 
@@ -111,7 +111,7 @@ public class AlunoService {
         return alunoRepository.findByAtivoTrueAndIdUsuario(userId);
     }
 
-    private void aplicarDados(Student student, AlunoRequest request) {
+    private void aplicarDados(Student student, StudentRequest request) {
         student.setNome(request.nome());
         student.setProfessor(request.professor());
         student.setDtNascimento(request.dtNascimento());
@@ -121,10 +121,10 @@ public class AlunoService {
         student.setDiaVencimento(request.diaVencimento());
     }
 
-    private void atualizarResponsaveis(Student student, List<ResponsavelRequest> requests, UUID userId) {
+    private void atualizarResponsaveis(Student student, List<GuardianRequest> requests, UUID userId) {
         List<Guardian> novosResponsaveis = new ArrayList<>();
 
-        for (ResponsavelRequest request : requests) {
+        for (GuardianRequest request : requests) {
             Guardian guardian = responsavelService.buscarPorCpfAndUsuario(request.cpf(), userId)
                     .orElseGet(() -> responsavelService.criarResponsavel(request));
             novosResponsaveis.add(guardian);

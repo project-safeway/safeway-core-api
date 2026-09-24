@@ -1,6 +1,6 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.escola.EscolaRequest;
+import com.safeway.tech.api.dto.school.SchoolRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.User;
@@ -43,7 +43,7 @@ public class EscolaService {
     }
 
     @Transactional
-    public School cadastrarEscola(EscolaRequest request) {
+    public School cadastrarEscola(SchoolRequest request) {
         School school = new School();
         aplicarDados(school, request);
 
@@ -58,7 +58,7 @@ public class EscolaService {
     }
 
     @Transactional
-    public School atualizarEscola(UUID escolaId, EscolaRequest request) {
+    public School atualizarEscola(UUID escolaId, SchoolRequest request) {
         School school = buscarPorId(escolaId);
 
         aplicarDados(school, request);
@@ -75,7 +75,7 @@ public class EscolaService {
         escolaRepository.save(school);
     }
 
-    private void aplicarDados(School school, EscolaRequest request) {
+    private void aplicarDados(School school, SchoolRequest request) {
         school.setNome(request.nome());
         school.setNivelEnsino(request.nivelEnsino());
     }

@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.itinerario.ItinerarioAlunoResponse;
 import com.safeway.tech.api.dto.itinerario.ItinerarioEscolaResponse;
 import com.safeway.tech.api.dto.itinerario.ItinerarioResponse;
 import com.safeway.tech.domain.models.Route;
-import com.safeway.tech.domain.models.ItinerarioAluno;
+import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.ItinerarioEscola;
 
 public class ItinerarioMapper {
@@ -22,16 +22,16 @@ public class ItinerarioMapper {
         );
     }
 
-    public static ItinerarioAlunoResponse toAlunoResponse(ItinerarioAluno itinerarioAluno) {
+    public static ItinerarioAlunoResponse toAlunoResponse(RouteStudent routeStudent) {
         return new ItinerarioAlunoResponse(
-                itinerarioAluno.getStudent().getId(),
-                itinerarioAluno.getStudent().getNome(),
-                itinerarioAluno.getOrdemEmbarque(),
-                itinerarioAluno.getAddress().getId(),
-                itinerarioAluno.getOrdemGlobal(),
-                itinerarioAluno.getStudent().getSchool().getNome(),
-                itinerarioAluno.getStudent().getResponsaveis().getFirst().getNome(),
-                itinerarioAluno.getStudent().getSala()
+                routeStudent.getStudent().getId(),
+                routeStudent.getStudent().getNome(),
+                routeStudent.getOrdemEmbarque(),
+                routeStudent.getAddress().getId(),
+                routeStudent.getOrdemGlobal(),
+                routeStudent.getStudent().getSchool().getNome(),
+                routeStudent.getStudent().getResponsaveis().getFirst().getNome(),
+                routeStudent.getStudent().getSala()
         );
     }
 

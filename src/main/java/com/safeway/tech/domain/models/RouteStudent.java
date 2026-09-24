@@ -11,27 +11,27 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "itinerario_alunos")
+@Table(name = "route_students")
 @Getter @Setter
 @NoArgsConstructor
-public class ItinerarioAluno extends BaseEntity {
+public class RouteStudent extends BaseEntity {
 
-    @Column(name = "ordem_embarque")
-    private Integer ordemEmbarque;
+    @Column(name = "boarding_order")
+    private Integer boardingOrder;
 
-    @Column(name = "ordem_global")
-    private Integer ordemGlobal;
+    @Column(name = "general_order")
+    private Integer generalOrder;
 
     @ManyToOne
-    @JoinColumn(name = "itinerario_id", nullable = false)
+    @JoinColumn(name = "route_id", nullable = false)
     private Route route;
 
     @ManyToOne
-    @JoinColumn(name = "aluno_id", nullable = false)
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "endereco_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
 }

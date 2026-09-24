@@ -1,11 +1,11 @@
 package com.safeway.tech.domain.models;
 
 import com.safeway.tech.domain.enums.UserRole;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -14,18 +14,15 @@ import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "users")
 @Getter @Setter
 @NoArgsConstructor
-public class Usuario extends BaseEntity {
-
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Transporte transporte;
+public class User extends BaseEntity {
 
     @Column(nullable = false, length = 100)
-    private String nome;
+    private String name;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(name = "password_hash", nullable = false)
@@ -35,13 +32,13 @@ public class Usuario extends BaseEntity {
     @Column(nullable = false, length = 10)
     private UserRole role;
 
-    @Column(nullable = false, length = 15)
-    private String tel1;
+    @Column(name = "primary_phone_number", nullable = false, length = 15)
+    private String primaryPhoneNumber;
 
-    @Column(length = 15)
-    private String tel2;
+    @Column(name = "secondary_phone_number", length = 15)
+    private String secondaryPhoneNumber;
 
-    public boolean isLoginCorrect(String senha, PasswordEncoder passwordEncoder) {
-        return passwordEncoder.matches(senha, this.passwordHash);
-    }
+    @OneToOne
+    @JoinColumn(name = "transport_id")
+    private Transporte transport;
 }

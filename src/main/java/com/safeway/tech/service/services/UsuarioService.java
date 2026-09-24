@@ -1,6 +1,6 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.domain.models.Usuario;
+import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.UsuarioNotFoundException;
 import com.safeway.tech.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,25 +15,25 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
 
-    public List<Usuario> listarUsuarios() {
+    public List<User> listarUsuarios() {
         return usuarioRepository.findAll();
     }
 
-    public Usuario buscarPorId(UUID idUsuario) {
+    public User buscarPorId(UUID idUsuario) {
         return usuarioRepository.getReferenceById(idUsuario);
     }
 
-    public Usuario salvarUsuario(Usuario usuario) {
-        return usuarioRepository.save(usuario);
+    public User salvarUsuario(User user) {
+        return usuarioRepository.save(user);
     }
 
-    public Usuario alterarUsuario(Usuario novoUsuario, UUID idUsuario) {
-        Usuario usuario = usuarioRepository.findById(idUsuario).orElseThrow(RuntimeException::new);
-        usuario.setNome(novoUsuario.getNome());
-        usuario.setEmail(novoUsuario.getEmail());
-        usuario.setTel1(novoUsuario.getTel1());
-        usuario.setTel2(novoUsuario.getTel2());
-        return usuarioRepository.save(usuario);
+    public User alterarUsuario(User novoUser, UUID idUsuario) {
+        User user = usuarioRepository.findById(idUsuario).orElseThrow(RuntimeException::new);
+        user.setNome(novoUser.getNome());
+        user.setEmail(novoUser.getEmail());
+        user.setTel1(novoUser.getTel1());
+        user.setTel2(novoUser.getTel2());
+        return usuarioRepository.save(user);
     }
 
     public void excluir(UUID idUsuario) {

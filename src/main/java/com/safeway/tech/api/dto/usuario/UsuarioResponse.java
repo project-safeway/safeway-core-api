@@ -1,7 +1,7 @@
 package com.safeway.tech.api.dto.usuario;
 
 import com.safeway.tech.api.dto.transporte.TransporteResponse;
-import com.safeway.tech.domain.models.Usuario;
+import com.safeway.tech.domain.models.User;
 import com.safeway.tech.service.mappers.TransporteMapper;
 
 import java.util.UUID;
@@ -15,7 +15,7 @@ public record UsuarioResponse(
         TransporteResponse transporte,
         String role
 ) {
-    public static UsuarioResponse fromEntity(Usuario u) {
+    public static UsuarioResponse fromEntity(User u) {
         return new UsuarioResponse(
                 u.getId(),
                 u.getNome(),

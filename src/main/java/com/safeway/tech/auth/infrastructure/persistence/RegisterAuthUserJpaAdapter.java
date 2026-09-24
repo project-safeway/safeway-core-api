@@ -5,7 +5,7 @@ import com.safeway.tech.auth.core.model.RegisteredAuthUser;
 import com.safeway.tech.auth.core.port.RegisterAuthUserPort;
 import com.safeway.tech.domain.enums.UserRole;
 import com.safeway.tech.domain.models.Transporte;
-import com.safeway.tech.domain.models.Usuario;
+import com.safeway.tech.domain.models.User;
 import com.safeway.tech.repository.TransporteRepository;
 import com.safeway.tech.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,19 +32,19 @@ public class RegisterAuthUserJpaAdapter implements RegisterAuthUserPort {
     @Override
     @Transactional
     public RegisteredAuthUser create(RegisterAuthUserData data) {
-        Usuario usuario = new Usuario();
-        usuario.setNome(data.nome());
-        usuario.setEmail(data.email());
-        usuario.setPasswordHash(data.passwordHash());
-        usuario.setRole(UserRole.COMMON);
-        usuario.setTel1(data.telefone());
-        Usuario savedUser = usuarioRepository.save(usuario);
+        User user = new User();
+        user.setNome(data.nome());
+        user.setEmail(data.email());
+        user.setPasswordHash(data.passwordHash());
+        user.setRole(UserRole.COMMON);
+        user.setTel1(data.telefone());
+        User savedUser = usuarioRepository.save(user);
 
         Transporte transporte = new Transporte();
         transporte.setPlaca(data.transportePlaca());
         transporte.setModelo(data.transporteModelo());
         transporte.setCapacidade(data.transporteCapacidade());
-        transporte.setUsuario(savedUser);
+        transporte.setUser(savedUser);
         Transporte savedTransporte = transporteRepository.save(transporte);
 
         return new RegisteredAuthUser(savedUser.getId(), savedTransporte.getId());

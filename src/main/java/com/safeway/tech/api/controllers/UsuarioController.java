@@ -2,7 +2,7 @@ package com.safeway.tech.api.controllers;
 
 import com.safeway.tech.api.dto.usuario.UsuarioFeignResponse;
 import com.safeway.tech.api.dto.usuario.UsuarioResponse;
-import com.safeway.tech.domain.models.Usuario;
+import com.safeway.tech.domain.models.User;
 import com.safeway.tech.service.services.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,13 +25,13 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    private UsuarioResponse toResponse(Usuario u) {
+    private UsuarioResponse toResponse(User u) {
         return UsuarioResponse.fromEntity(u);
     }
 
     @PostMapping
-    public UsuarioResponse salvarUsuario(@RequestBody Usuario usuario) {
-        Usuario salvo = usuarioService.salvarUsuario(usuario);
+    public UsuarioResponse salvarUsuario(@RequestBody User user) {
+        User salvo = usuarioService.salvarUsuario(user);
         return toResponse(salvo);
     }
 
@@ -54,8 +54,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/{idUsuario}")
-    public UsuarioResponse alterarUsuario(@RequestBody Usuario novoUsuario, @PathVariable UUID idUsuario) {
-        Usuario atualizado = usuarioService.alterarUsuario(novoUsuario, idUsuario);
+    public UsuarioResponse alterarUsuario(@RequestBody User novoUser, @PathVariable UUID idUsuario) {
+        User atualizado = usuarioService.alterarUsuario(novoUser, idUsuario);
         return toResponse(atualizado);
     }
 
@@ -67,7 +67,7 @@ public class UsuarioController {
 
     @GetMapping("/feign/{idUsuario}")
     public UsuarioFeignResponse buscarUsuario(@PathVariable UUID idUsuario) {
-        Usuario usuario = usuarioService.buscarPorId(idUsuario);
-        return UsuarioFeignResponse.fromEntity(usuario);
+        User user = usuarioService.buscarPorId(idUsuario);
+        return UsuarioFeignResponse.fromEntity(user);
     }
 }

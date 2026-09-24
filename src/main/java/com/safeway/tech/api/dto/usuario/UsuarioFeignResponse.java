@@ -1,6 +1,6 @@
 package com.safeway.tech.api.dto.usuario;
 
-import com.safeway.tech.domain.models.Usuario;
+import com.safeway.tech.domain.models.User;
 
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ public record UsuarioFeignResponse(
         Boolean ativo
 ) {
 
-    public static UsuarioFeignResponse fromEntity(Usuario entity) {
+    public static UsuarioFeignResponse fromEntity(User entity) {
         return new UsuarioFeignResponse(
                 entity.getId(),
                 entity.getNome(),

@@ -14,21 +14,13 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "transportes")
+@Table(name = "transports")
 @Getter @Setter
 @NoArgsConstructor
-public class Transporte extends BaseEntity {
+public class Transport extends BaseEntity {
 
     @Column(nullable = false, length = 7)
-    private String placa;
-
-    private String modelo;
-    private Integer capacidade;
-
-    @OneToMany(mappedBy = "transporte", fetch = FetchType.EAGER)
-    private List<Aluno> alunosTransportes;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fkUsuario", nullable = false)
-    private Usuario usuario;
+    private String licensePlate;
+    private String model;
+    private Integer capacity;
 }

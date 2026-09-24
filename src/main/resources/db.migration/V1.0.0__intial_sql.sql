@@ -18,14 +18,8 @@ CREATE TABLE users (
     primary_phone_number CHAR(15) NOT NULL,
     secondary_phone_number CHAR(15),
 
-    transport_id CHAR(36),
-
     PRIMARY KEY (id),
     UNIQUE KEY uk_users_email (email),
-
-    CONSTRAINT fk_users_transport
-        FOREIGN KEY (transport_id)
-            REFERENCES transports(id)
 );
 
 
@@ -71,7 +65,7 @@ CREATE TABLE transports (
 
     license_plate CHAR(7) NOT NULL,
     model VARCHAR(255),
-    capacity INT,
+    capacity TINYINT,
 
     PRIMARY KEY (id),
     UNIQUE KEY uk_transports_license_plate (license_plate)
@@ -182,7 +176,7 @@ CREATE TABLE students (
     classroom VARCHAR(20),
 
     monthly_fee DECIMAL(10, 2),
-    due_date TINYINT,
+    due_date TINYINT CHECK (due_date BETWEEN 1 AND 31),
 
     school_id CHAR(36) NOT NULL,
     transport_id CHAR(36) NOT NULL,

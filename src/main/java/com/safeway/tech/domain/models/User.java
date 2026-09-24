@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name = "users")
@@ -40,5 +39,5 @@ public class User extends BaseEntity {
 
     @OneToOne
     @JoinColumn(name = "transport_id")
-    private Transporte transport;
+    private Transport transport;
 }

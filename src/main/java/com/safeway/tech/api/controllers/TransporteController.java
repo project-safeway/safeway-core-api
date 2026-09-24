@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.transporte.AlunoTransporteResponse;
 import com.safeway.tech.api.dto.transporte.TransporteRequest;
 import com.safeway.tech.api.dto.transporte.TransporteResponse;
 import com.safeway.tech.domain.models.Aluno;
-import com.safeway.tech.domain.models.Transporte;
+import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.service.mappers.AlunoMapper;
 import com.safeway.tech.service.mappers.TransporteMapper;
 import com.safeway.tech.service.services.TransporteService;
@@ -33,15 +33,15 @@ public class TransporteController {
 
     @GetMapping
     public ResponseEntity<List<TransporteResponse>> listarTransportes() {
-        List<Transporte> transportes = transporteService.listarTransportes();
-        List<TransporteResponse> response = transportes.stream().map(TransporteMapper::toResponse).toList();
+        List<Transport> transports = transporteService.listarTransportes();
+        List<TransporteResponse> response = transports.stream().map(TransporteMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{idTransporte}")
     public ResponseEntity<TransporteResponse> retornarUm(@PathVariable UUID idTransporte) {
-        Transporte transporte = transporteService.buscarPorId(idTransporte);
-        TransporteResponse response = TransporteMapper.toResponse(transporte);
+        Transport transport = transporteService.buscarPorId(idTransporte);
+        TransporteResponse response = TransporteMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -54,15 +54,15 @@ public class TransporteController {
 
     @PostMapping
     public ResponseEntity<TransporteResponse> salvarTransporte(@RequestBody @Valid TransporteRequest request) {
-        Transporte transporte = transporteService.salvarTransporte(request);
-        TransporteResponse response = TransporteMapper.toResponse(transporte);
+        Transport transport = transporteService.salvarTransporte(request);
+        TransporteResponse response = TransporteMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{idTransporte}")
     public ResponseEntity<TransporteResponse> alterarTransporte(@RequestBody @Valid TransporteRequest request, @PathVariable UUID idTransporte) {
-        Transporte transporte = transporteService.atualizarTransporte(idTransporte, request);
-        TransporteResponse response = TransporteMapper.toResponse(transporte);
+        Transport transport = transporteService.atualizarTransporte(idTransporte, request);
+        TransporteResponse response = TransporteMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

@@ -2,8 +2,8 @@ package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.transporte.TransporteRequest;
 import com.safeway.tech.domain.models.Aluno;
-import com.safeway.tech.domain.models.Transporte;
-import com.safeway.tech.domain.models.Usuario;
+import com.safeway.tech.domain.models.Transport;
+import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.TransporteNotFoundException;
 import com.safeway.tech.repository.TransporteRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,52 +20,52 @@ public class TransporteService {
     private final UsuarioService usuarioService;
     private final CurrentUserService currentUserService;
 
-    public Transporte buscarPorId(UUID idTransporte) {
+    public Transport buscarPorId(UUID idTransporte) {
         UUID userId = currentUserService.getCurrentUserId();
 
         return transporteRepository.findByIdAndUsuarioId(idTransporte, userId)
-                .orElseThrow(() -> new TransporteNotFoundException("Transporte não encontrado"));
+                .orElseThrow(() -> new TransporteNotFoundException("Transport não encontrado"));
     }
 
     public List<Aluno> listarAlunos(UUID idTransporte) {
-        Transporte transporte = buscarPorId(idTransporte);
-        return transporte.getAlunosTransportes();
+        Transport transport = buscarPorId(idTransporte);
+        return transport.getAlunosTransportes();
     }
 
-    public List<Transporte> listarTransportes() {
+    public List<Transport> listarTransportes() {
         UUID userId = currentUserService.getCurrentUserId();
         return transporteRepository.findAllByIdUsuario(userId);
     }
 
-    public Transporte salvarTransporte(TransporteRequest request) {
-        Transporte transporte = new Transporte();
+    public Transport salvarTransporte(TransporteRequest request) {
+        Transport transport = new Transport();
 
-        aplicarDados(transporte, request);
+        aplicarDados(transport, request);
 
         UUID userId = currentUserService.getCurrentUserId();
-        Usuario usuario = usuarioService.buscarPorId(userId);
+        User user = usuarioService.buscarPorId(userId);
 
-        transporte.setUsuario(usuario);
+        transport.setUser(user);
 
-        return transporteRepository.save(transporte);
+        return transporteRepository.save(transport);
     }
 
-    public Transporte atualizarTransporte(UUID idTransporte, TransporteRequest request) {
-        Transporte transporte = buscarPorId(idTransporte);
+    public Transport atualizarTransporte(UUID idTransporte, TransporteRequest request) {
+        Transport transport = buscarPorId(idTransporte);
 
-        aplicarDados(transporte, request);
+        aplicarDados(transport, request);
 
-        return transporteRepository.save(transporte);
+        return transporteRepository.save(transport);
     }
 
     public void excluirTransporte(UUID idTransporte) {
-        Transporte transporte = buscarPorId(idTransporte);
-        transporteRepository.delete(transporte);
+        Transport transport = buscarPorId(idTransporte);
+        transporteRepository.delete(transport);
     }
 
-    private void aplicarDados(Transporte transporte, TransporteRequest request) {
-        transporte.setPlaca(request.placa());
-        transporte.setModelo(request.modelo());
-        transporte.setCapacidade(request.capacidade());
+    private void aplicarDados(Transport transport, TransporteRequest request) {
+        transport.setPlaca(request.placa());
+        transport.setModelo(request.modelo());
+        transport.setCapacidade(request.capacidade());
     }
 }

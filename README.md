@@ -135,7 +135,7 @@ POST /auth/login
 ### Principais tabelas
 
 `users` · `students` · `schools` · `addresses` · `transports` · `guardians` · `chamadas` ·
-`itinerarios` · `mensalidades_aluno` · `pagamentos`
+`routes` · `mensalidades_aluno` · `pagamentos`
 
 ---
 

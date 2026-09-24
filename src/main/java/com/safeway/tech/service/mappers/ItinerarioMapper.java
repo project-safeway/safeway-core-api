@@ -3,22 +3,22 @@ package com.safeway.tech.service.mappers;
 import com.safeway.tech.api.dto.itinerario.ItinerarioAlunoResponse;
 import com.safeway.tech.api.dto.itinerario.ItinerarioEscolaResponse;
 import com.safeway.tech.api.dto.itinerario.ItinerarioResponse;
-import com.safeway.tech.domain.models.Itinerario;
+import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.ItinerarioAluno;
 import com.safeway.tech.domain.models.ItinerarioEscola;
 
 public class ItinerarioMapper {
 
-    public static ItinerarioResponse toResponse(Itinerario itinerario) {
+    public static ItinerarioResponse toResponse(Route route) {
         return new ItinerarioResponse(
-                itinerario.getId(),
-                itinerario.getNome(),
-                itinerario.getHorarioInicio(),
-                itinerario.getHorarioFim(),
-                itinerario.getTipoViagem(),
-                itinerario.getAtivo(),
-                itinerario.getAlunos().stream().map(ItinerarioMapper::toAlunoResponse).toList(),
-                itinerario.getEscolas().stream().map(ItinerarioMapper::toEscolaResponse).toList()
+                route.getId(),
+                route.getNome(),
+                route.getHorarioInicio(),
+                route.getHorarioFim(),
+                route.getTipoViagem(),
+                route.getAtivo(),
+                route.getAlunos().stream().map(ItinerarioMapper::toAlunoResponse).toList(),
+                route.getEscolas().stream().map(ItinerarioMapper::toEscolaResponse).toList()
         );
     }
 

@@ -1,7 +1,7 @@
 package com.safeway.tech.api.dto.itinerario;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.safeway.tech.domain.enums.TipoViagemEnum;
+import com.safeway.tech.domain.enums.RouteTypeEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,6 +12,6 @@ public record ItinerarioRequest(
         @NotBlank String nome,
         Time horarioInicio,
         Time horarioFim,
-        @NotNull TipoViagemEnum tipoViagem
+        @NotNull RouteTypeEnum tipoViagem
 ) {
 }

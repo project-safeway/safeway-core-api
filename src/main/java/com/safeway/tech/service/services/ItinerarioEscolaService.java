@@ -3,7 +3,7 @@ package com.safeway.tech.service.services;
 import com.safeway.tech.api.dto.itinerario.ItinerarioEscolaRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
-import com.safeway.tech.domain.models.Itinerario;
+import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.ItinerarioEscola;
 import com.safeway.tech.infra.exception.EnderecoNotFoundException;
 import com.safeway.tech.infra.exception.ItinerarioEscolaNotFound;
@@ -39,7 +39,7 @@ public class ItinerarioEscolaService {
 
     @Transactional
     public void adicionarEscola(UUID itinerarioId, ItinerarioEscolaRequest request) throws BadRequestException {
-        Itinerario itinerario = itinerarioRepository.findById(itinerarioId)
+        Route route = itinerarioRepository.findById(itinerarioId)
                 .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
 
         School school = escolaService.buscarPorId(request.escolaId());
@@ -67,7 +67,7 @@ public class ItinerarioEscolaService {
                 });
 
         ItinerarioEscola entity = new ItinerarioEscola();
-        entity.setItinerario(itinerario);
+        entity.setRoute(route);
         entity.setSchool(school);
         entity.setAddress(address);
         entity.setOrdemParada(request.ordemParada());

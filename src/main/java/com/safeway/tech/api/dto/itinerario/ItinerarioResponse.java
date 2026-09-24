@@ -1,6 +1,6 @@
 package com.safeway.tech.api.dto.itinerario;
 
-import com.safeway.tech.domain.enums.TipoViagemEnum;
+import com.safeway.tech.domain.enums.RouteTypeEnum;
 
 import java.sql.Time;
 import java.util.List;
@@ -11,7 +11,7 @@ public record ItinerarioResponse(
         String nome,
         Time horarioInicio,
         Time horarioFim,
-        TipoViagemEnum tipoViagem,
+        RouteTypeEnum tipoViagem,
         Boolean ativo,
         List<ItinerarioAlunoResponse> alunos,
         List<ItinerarioEscolaResponse> escolas

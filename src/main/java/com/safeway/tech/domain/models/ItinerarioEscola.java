@@ -24,7 +24,7 @@ public class ItinerarioEscola extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itinerario_id", nullable = false)
-    private Itinerario itinerario;
+    private Route route;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "escola_id", nullable = false)

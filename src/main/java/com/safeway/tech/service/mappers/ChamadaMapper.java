@@ -20,7 +20,7 @@ public class ChamadaMapper {
 
         return new ChamadaResponse(
                 chamada.getId(),
-                ItinerarioMapper.toResponse(chamada.getItinerario()),
+                ItinerarioMapper.toResponse(chamada.getRoute()),
                 chamada.getStatus(),
                 alunosResponse
         );

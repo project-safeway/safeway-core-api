@@ -2,7 +2,7 @@ package com.safeway.tech.service.services;
 
 import com.safeway.tech.domain.enums.StatusChamadaEnum;
 import com.safeway.tech.domain.models.Chamada;
-import com.safeway.tech.domain.models.Itinerario;
+import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.repository.ChamadaRepository;
 import com.safeway.tech.repository.specification.ChamadaSpecs;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +38,10 @@ public class ChamadaService {
             return chamadaExistente;
         }
 
-        Itinerario itinerario = itinerarioService.buscarPorId(idItinerario);
+        Route route = itinerarioService.buscarPorId(idItinerario);
 
         Chamada chamada = new Chamada();
-        chamada.setItinerario(itinerario);
+        chamada.setRoute(route);
         chamada.setStatus(StatusChamadaEnum.EM_ANDAMENTO);
 
         chamada = chamadaRepository.save(chamada);

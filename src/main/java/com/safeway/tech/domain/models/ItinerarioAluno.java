@@ -24,7 +24,7 @@ public class ItinerarioAluno extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "itinerario_id", nullable = false)
-    private Itinerario itinerario;
+    private Route route;
 
     @ManyToOne
     @JoinColumn(name = "aluno_id", nullable = false)

@@ -1,6 +1,6 @@
 package com.safeway.tech.repository;
 
-import com.safeway.tech.domain.models.Itinerario;
+import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.ItinerarioAluno;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,5 +29,5 @@ public interface ItinerarioAlunoRepository extends JpaRepository<ItinerarioAluno
             @Param("itinerarioId") UUID itinerarioId);
 
     @Query("SELECT ia FROM ItinerarioAluno ia WHERE ia.itinerario = :itinerario ORDER BY ia.ordemEmbarque ASC")
-    List<ItinerarioAluno> findByItinerarioOrderByOrdemEmbarqueAsc(@Param("itinerario") Itinerario itinerario);
+    List<ItinerarioAluno> findByItinerarioOrderByOrdemEmbarqueAsc(@Param("itinerario") Route route);
 }

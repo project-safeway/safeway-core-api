@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.itinerario.AlunoComLocalizacao;
 import com.safeway.tech.api.dto.itinerario.ItinerarioAlunoRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Student;
-import com.safeway.tech.domain.models.Itinerario;
+import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.ItinerarioAluno;
 import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.infra.exception.AlunoNotFoundException;
@@ -44,7 +44,7 @@ public class ItinerarioAlunoService {
 
     @Transactional
     public void adicionarAluno(UUID itinerarioId, ItinerarioAlunoRequest request) {
-        Itinerario itinerario = itinerarioRepository.findById(itinerarioId)
+        Route route = itinerarioRepository.findById(itinerarioId)
                 .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
 
         Student student = alunoService.buscarPorId(request.alunoId());
@@ -88,7 +88,7 @@ public class ItinerarioAlunoService {
         }
 
         ItinerarioAluno entity = new ItinerarioAluno();
-        entity.setItinerario(itinerario);
+        entity.setRoute(route);
         entity.setStudent(student);
         entity.setAddress(address);
         entity.setOrdemEmbarque(request.ordemEmbarque());
@@ -106,14 +106,14 @@ public class ItinerarioAlunoService {
     }
 
     @Transactional
-    public void sincronizarAlunos(Itinerario itinerario, List<ItinerarioAlunoRequest> novos) {
+    public void sincronizarAlunos(Route route, List<ItinerarioAlunoRequest> novos) {
         // Remove todos os vínculos anteriores
-        itinerarioAlunoRepository.deleteAllByItinerarioId(itinerario.getId());
+        itinerarioAlunoRepository.deleteAllByItinerarioId(route.getId());
 
         // Cria novos vínculos — atribui endereco e valida se pertence ao responsável
         List<ItinerarioAluno> entidades = novos.stream().map(dto -> {
             ItinerarioAluno ia = new ItinerarioAluno();
-            ia.setItinerario(itinerario);
+            ia.setRoute(route);
 
             Student student = alunoService.buscarPorId(dto.alunoId());
 
@@ -174,10 +174,10 @@ public class ItinerarioAlunoService {
 
     @Transactional
     public List<AlunoComLocalizacao> buscarAlunosComLocalizacao(UUID itinerarioId) {
-        Itinerario itinerario = itinerarioRepository.findById(itinerarioId)
+        Route route = itinerarioRepository.findById(itinerarioId)
                 .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
 
-        return itinerarioAlunoRepository.findByItinerarioOrderByOrdemEmbarqueAsc(itinerario).stream()
+        return itinerarioAlunoRepository.findByItinerarioOrderByOrdemEmbarqueAsc(route).stream()
                 .filter(ia -> ia.getAddress() != null && ia.getAddress().getLatitude() != null && ia.getAddress().getLongitude() != null)
                 .map(ia -> {
                     Address address = ia.getAddress();

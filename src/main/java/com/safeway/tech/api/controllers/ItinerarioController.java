@@ -6,7 +6,7 @@ import com.safeway.tech.api.dto.itinerario.ItinerarioEscolaRequest;
 import com.safeway.tech.api.dto.itinerario.ItinerarioRequest;
 import com.safeway.tech.api.dto.itinerario.ItinerarioResponse;
 import com.safeway.tech.api.dto.itinerario.ItinerarioUpdateRequest;
-import com.safeway.tech.domain.models.Itinerario;
+import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.service.mappers.ItinerarioMapper;
 import com.safeway.tech.service.services.ItinerarioAlunoService;
 import com.safeway.tech.service.services.ItinerarioEscolaService;
@@ -42,22 +42,22 @@ public class ItinerarioController {
     public ResponseEntity<ItinerarioResponse> criar(
             @Valid @RequestBody ItinerarioRequest request
     ) {
-        Itinerario itinerario = itinerarioService.criar(request);
-        ItinerarioResponse response = ItinerarioMapper.toResponse(itinerario);
+        Route route = itinerarioService.criar(request);
+        ItinerarioResponse response = ItinerarioMapper.toResponse(route);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<ItinerarioResponse>> listarTodos() {
-        List<Itinerario> itinerarios = itinerarioService.listarTodos();
-        List<ItinerarioResponse> response = itinerarios.stream().map(ItinerarioMapper::toResponse).toList();
+        List<Route> routes = itinerarioService.listarTodos();
+        List<ItinerarioResponse> response = routes.stream().map(ItinerarioMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ItinerarioResponse> buscarPorId(@PathVariable UUID id) {
-        Itinerario itinerario = itinerarioService.buscarPorId(id);
-        ItinerarioResponse response = ItinerarioMapper.toResponse(itinerario);
+        Route route = itinerarioService.buscarPorId(id);
+        ItinerarioResponse response = ItinerarioMapper.toResponse(route);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -72,8 +72,8 @@ public class ItinerarioController {
             @PathVariable UUID id,
             @Valid @RequestBody ItinerarioUpdateRequest request
     ) {
-        Itinerario itinerario = itinerarioService.atualizar(id, request);
-        ItinerarioResponse response = ItinerarioMapper.toResponse(itinerario);
+        Route route = itinerarioService.atualizar(id, request);
+        ItinerarioResponse response = ItinerarioMapper.toResponse(route);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

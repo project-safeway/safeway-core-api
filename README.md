@@ -111,7 +111,7 @@ POST /auth/register
 ```json
 {
   "nome": "Usuario Teste",
-  "email": "usuario@teste.com",
+  "email": "user@teste.com",
   "senha": "senha123",
   "tel1": "11999999999"
 }
@@ -123,7 +123,7 @@ POST /auth/login
 
 ```json
 {
-  "email": "usuario@teste.com",
+  "email": "user@teste.com",
   "senha": "senha123"
 }
 ```

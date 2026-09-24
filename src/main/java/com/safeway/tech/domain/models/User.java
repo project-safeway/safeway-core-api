@@ -29,7 +29,7 @@ public class User extends BaseEntity {
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false)
     private UserRole role;
 
     @Column(name = "primary_phone_number", nullable = false, length = 15)

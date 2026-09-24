@@ -2,7 +2,7 @@ package com.safeway.tech.auth.infrastructure.persistence;
 
 import com.safeway.tech.auth.core.model.AuthUser;
 import com.safeway.tech.auth.core.port.LoadAuthUserPort;
-import com.safeway.tech.domain.models.Usuario;
+import com.safeway.tech.domain.models.User;
 import com.safeway.tech.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,14 +21,14 @@ public class LoadAuthUserJpaAdapter implements LoadAuthUserPort {
                 .map(this::toAuthUser);
     }
 
-    private AuthUser toAuthUser(Usuario usuario) {
+    private AuthUser toAuthUser(User user) {
         return new AuthUser(
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getPasswordHash(),
-                usuario.getRole().name(),
-                usuario.getTransporte().getId()
+                user.getId(),
+                user.getNome(),
+                user.getEmail(),
+                user.getPasswordHash(),
+                user.getRole().name(),
+                user.getTransporte().getId()
         );
     }
 }

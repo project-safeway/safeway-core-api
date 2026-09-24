@@ -2,7 +2,7 @@ package com.safeway.tech.api.controllers;
 
 import com.safeway.tech.api.dto.chamada.ChamadaResponse;
 import com.safeway.tech.domain.enums.AttendanceStatusEnum;
-import com.safeway.tech.domain.enums.StatusPresencaEnum;
+import com.safeway.tech.domain.enums.PresenceStatusEnum;
 import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.service.mappers.ChamadaMapper;
 import com.safeway.tech.service.services.ChamadaAlunoService;
@@ -53,7 +53,7 @@ public class ChamadaController {
     @PutMapping("/{id}/registrar-presenca")
     public ResponseEntity<Void> registrarPresenca(
             @PathVariable UUID id,
-            @RequestBody Map<UUID, StatusPresencaEnum> presencas) {
+            @RequestBody Map<UUID, PresenceStatusEnum> presencas) {
         chamadaAlunoService.registrarPresenca(presencas, id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

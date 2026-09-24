@@ -1,10 +1,10 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.domain.enums.AttendanceStatusEnum;
-import com.safeway.tech.domain.enums.StatusPresencaEnum;
+import com.safeway.tech.domain.enums.PresenceStatusEnum;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Attendance;
-import com.safeway.tech.domain.models.ChamadaAluno;
+import com.safeway.tech.domain.models.AttendanceStudent;
 import com.safeway.tech.repository.ChamadaAlunoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,32 +23,32 @@ public class ChamadaAlunoService {
     private final ChamadaService chamadaService;
 
     @Transactional
-    public void registrarPresenca(Map<UUID, StatusPresencaEnum> presencas, UUID idChamada) {
+    public void registrarPresenca(Map<UUID, PresenceStatusEnum> presencas, UUID idChamada) {
         Attendance attendance = chamadaService.buscarPorId(idChamada);
 
         if (!AttendanceStatusEnum.IN_PROGRESS.equals(attendance.getStatus())) {
             throw new RuntimeException("Chamada não está em andamento");
         }
 
-        for (Map.Entry<UUID, StatusPresencaEnum> entry : presencas.entrySet()) {
+        for (Map.Entry<UUID, PresenceStatusEnum> entry : presencas.entrySet()) {
             UUID idAluno = entry.getKey();
-            StatusPresencaEnum status = entry.getValue();
+            PresenceStatusEnum status = entry.getValue();
 
             Student student = alunoService.buscarPorId(idAluno);
 
-            ChamadaAluno chamadaAluno = chamadaAlunoRepository
+            AttendanceStudent attendanceStudent = chamadaAlunoRepository
                     .findByChamadaAndAluno(attendance, student)
                     .orElseGet(() -> {
-                        ChamadaAluno ca = new ChamadaAluno();
+                        AttendanceStudent ca = new AttendanceStudent();
                         ca.setAttendance(attendance);
                         ca.setStudent(student);
                         return ca;
                     });
 
-            chamadaAluno.setPresenca(status);
-            chamadaAluno.setData(LocalDateTime.now());
+            attendanceStudent.setPresenca(status);
+            attendanceStudent.setData(LocalDateTime.now());
 
-            chamadaAlunoRepository.save(chamadaAluno);
+            chamadaAlunoRepository.save(attendanceStudent);
         }
     }
 

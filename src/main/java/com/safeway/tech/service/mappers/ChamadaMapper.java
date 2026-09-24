@@ -3,7 +3,7 @@ package com.safeway.tech.service.mappers;
 import com.safeway.tech.api.dto.chamada.ChamadaAlunoResponse;
 import com.safeway.tech.api.dto.chamada.ChamadaResponse;
 import com.safeway.tech.domain.models.Attendance;
-import com.safeway.tech.domain.models.ChamadaAluno;
+import com.safeway.tech.domain.models.AttendanceStudent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +26,11 @@ public class ChamadaMapper {
         );
     }
 
-    public static ChamadaAlunoResponse toAlunoResponse(ChamadaAluno chamadaAluno) {
+    public static ChamadaAlunoResponse toAlunoResponse(AttendanceStudent attendanceStudent) {
         return new ChamadaAlunoResponse(
-                AlunoMapper.toResponse(chamadaAluno.getStudent()),
-                chamadaAluno.getPresenca(),
-                chamadaAluno.getData()
+                AlunoMapper.toResponse(attendanceStudent.getStudent()),
+                attendanceStudent.getPresenca(),
+                attendanceStudent.getData()
         );
     }
 

@@ -18,8 +18,14 @@ CREATE TABLE users (
     primary_phone_number CHAR(15) NOT NULL,
     secondary_phone_number CHAR(15),
 
+    transport_id CHAR(36),
+
     PRIMARY KEY (id),
-    UNIQUE KEY uk_users_email (email)
+    UNIQUE KEY uk_users_email (email),
+
+    CONSTRAINT fk_users_transport
+        FOREIGN KEY (transport_id)
+            REFERENCES transports(id)
 );
 
 

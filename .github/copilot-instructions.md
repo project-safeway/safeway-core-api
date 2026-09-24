@@ -1,7 +1,7 @@
 # Copilot Instructions - Safeway Back-end
 
 Objetivo
-- API principal do Safeway para gestao de transporte escolar, cadastro de alunos, chamada, itinerarios, eventos e integracoes.
+- API principal do Safeway para gestao de transporte escolar, cadastro de alunos, chamada, itinerarios e integracoes.
 
 Arquitetura e stack
 - Java 21, Spring Boot 3.

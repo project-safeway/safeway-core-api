@@ -19,7 +19,6 @@ otimização de rotas com Google Maps, e muito mais.
 | **Itinerários**  | Criação de itinerários com alunos e escolas associados          |
 | **Rotas**        | Otimização de rotas via Google Maps / Route Optimization API    |
 | **Transportes**  | Cadastro de veículos (modelo, placa, capacidade)                |
-| **Eventos**      | Agenda de eventos com prioridade e tipo                         |
 | **Endereços**    | Gerenciamento de endereços com geocodificação                   |
 | **Financeiro**   | Mensalidades, pagamentos de funcionários e controle de despesas |
 | **Usuários**     | Gestão de contas e perfis de acesso                             |
@@ -135,7 +134,7 @@ POST /auth/login
 
 ### Principais tabelas
 
-`usuarios` · `alunos` · `escolas` · `enderecos` · `transportes` · `responsaveis` · `chamadas` · `eventos` ·
+`usuarios` · `alunos` · `escolas` · `enderecos` · `transportes` · `responsaveis` · `chamadas` ·
 `itinerarios` · `mensalidades_aluno` · `pagamentos`
 
 ---

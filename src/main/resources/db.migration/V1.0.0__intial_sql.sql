@@ -403,13 +403,15 @@ CREATE TABLE guardian_invitations (
     id CHAR(36) NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
-    expires_at DATETIME,
+    deleted_at DATETIME,
 
     token VARCHAR(255) NOT NULL,
 
     type ENUM('GENERIC','STUDENT_SPECIFIC') NOT NULL,
 
     status ENUM('PENDING', 'COMPLETED', 'EXPIRED', 'CANCELLED') NOT NULL,
+
+    expires_at DATETIME,
 
     transport_id CHAR(36) NOT NULL,
     student_id CHAR(36),

@@ -3,7 +3,7 @@ package com.safeway.tech.service.services;
 import com.google.maps.model.LatLng;
 import com.safeway.tech.api.dto.endereco.EnderecoRequest;
 import com.safeway.tech.domain.models.Address;
-import com.safeway.tech.domain.models.Responsavel;
+import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.infra.exception.EnderecoNotFoundException;
 import com.safeway.tech.repository.EnderecoRepository;
 import com.safeway.tech.repository.ResponsavelRepository;
@@ -33,10 +33,10 @@ public class EnderecoService {
     @Transactional(readOnly = true)
     public List<Address> listarEnderecosDisponiveis(UUID alunoId) {
         UUID userId = currentUserService.getCurrentUserId();
-        List<Responsavel> responsaveis = responsavelRepository.findByAlunosIdAndUsuarioIdUsuario(alunoId, userId);
+        List<Guardian> responsaveis = responsavelRepository.findByAlunosIdAndUsuarioIdUsuario(alunoId, userId);
 
         return responsaveis.stream()
-                .map(Responsavel::getAddress)
+                .map(Guardian::getAddress)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

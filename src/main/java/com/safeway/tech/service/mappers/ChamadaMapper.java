@@ -28,7 +28,7 @@ public class ChamadaMapper {
 
     public static ChamadaAlunoResponse toAlunoResponse(ChamadaAluno chamadaAluno) {
         return new ChamadaAlunoResponse(
-                AlunoMapper.toResponse(chamadaAluno.getAluno()),
+                AlunoMapper.toResponse(chamadaAluno.getStudent()),
                 chamadaAluno.getPresenca(),
                 chamadaAluno.getData()
         );

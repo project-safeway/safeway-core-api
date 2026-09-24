@@ -1,7 +1,7 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.transporte.TransporteRequest;
-import com.safeway.tech.domain.models.Aluno;
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.TransporteNotFoundException;
@@ -27,7 +27,7 @@ public class TransporteService {
                 .orElseThrow(() -> new TransporteNotFoundException("Transport não encontrado"));
     }
 
-    public List<Aluno> listarAlunos(UUID idTransporte) {
+    public List<Student> listarAlunos(UUID idTransporte) {
         Transport transport = buscarPorId(idTransporte);
         return transport.getAlunosTransportes();
     }

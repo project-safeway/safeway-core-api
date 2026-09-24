@@ -1,8 +1,8 @@
 package com.safeway.tech.infra.messaging.publishers;
 
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.infra.messaging.config.RabbitMQProperties;
 import com.safeway.tech.infra.messaging.event.AlunoEvent;
-import com.safeway.tech.domain.models.Aluno;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,18 +19,18 @@ public class EventPublisher {
     private final RabbitTemplate rabbitTemplate;
     private final RabbitMQProperties rabbitMQProperties;
 
-    public void publicarAlunoCriado(Aluno aluno) {
-        log.info("Publicando evento de aluno criado: {}", aluno.getId());
+    public void publicarAlunoCriado(Student student) {
+        log.info("Publicando evento de student criado: {}", student.getId());
 
         try {
             AlunoEvent event = new AlunoEvent(
                     UUID.randomUUID(),
-                    aluno.getId(),
-                    aluno.getUsuario().getId(),
-                    aluno.getNome(),
-                    aluno.getValorMensalidade(),
-                    aluno.getDiaVencimento(),
-                    aluno.getAtivo(),
+                    student.getId(),
+                    student.getUsuario().getId(),
+                    student.getNome(),
+                    student.getValorMensalidade(),
+                    student.getDiaVencimento(),
+                    student.getAtivo(),
                     "ALUNO_CRIADO",
                     LocalDateTime.now()
             );
@@ -41,24 +41,24 @@ public class EventPublisher {
                     event
             );
 
-            log.info("Evento de aluno criado publicado com sucesso: {}", event.alunoId());
+            log.info("Evento de student criado publicado com sucesso: {}", event.alunoId());
         } catch (Exception e) {
-            log.error("Erro ao publicar evento de aluno criado", e);
+            log.error("Erro ao publicar evento de student criado", e);
         }
     }
 
-    public void publicarAlunoAtualizado(Aluno aluno) {
-        log.info("Publicando evento de aluno atualizado: {}", aluno.getId());
+    public void publicarAlunoAtualizado(Student student) {
+        log.info("Publicando evento de student atualizado: {}", student.getId());
 
         try {
             AlunoEvent event = new AlunoEvent(
                     UUID.randomUUID(),
-                    aluno.getId(),
-                    aluno.getUsuario().getId(),
-                    aluno.getNome(),
-                    aluno.getValorMensalidade(),
-                    aluno.getDiaVencimento(),
-                    aluno.getAtivo(),
+                    student.getId(),
+                    student.getUsuario().getId(),
+                    student.getNome(),
+                    student.getValorMensalidade(),
+                    student.getDiaVencimento(),
+                    student.getAtivo(),
                     "ALUNO_ATUALIZADO",
                     LocalDateTime.now()
             );
@@ -69,24 +69,24 @@ public class EventPublisher {
                     event
             );
 
-            log.info("Evento de aluno atualizado publicado com sucesso: {}", event.alunoId());
+            log.info("Evento de student atualizado publicado com sucesso: {}", event.alunoId());
         } catch (Exception e) {
-            log.error("Erro ao publicar evento de aluno atualizado", e);
+            log.error("Erro ao publicar evento de student atualizado", e);
         }
     }
 
-    public void publicarAlunoInativado(Aluno aluno) {
-        log.info("Publicando evento de aluno inativado: {}", aluno.getId());
+    public void publicarAlunoInativado(Student student) {
+        log.info("Publicando evento de student inativado: {}", student.getId());
 
         try {
             AlunoEvent event = new AlunoEvent(
                     UUID.randomUUID(),
-                    aluno.getId(),
-                    aluno.getUsuario().getId(),
-                    aluno.getNome(),
-                    aluno.getValorMensalidade(),
-                    aluno.getDiaVencimento(),
-                    aluno.getAtivo(),
+                    student.getId(),
+                    student.getUsuario().getId(),
+                    student.getNome(),
+                    student.getValorMensalidade(),
+                    student.getDiaVencimento(),
+                    student.getAtivo(),
                     "ALUNO_INATIVADO",
                     LocalDateTime.now()
             );
@@ -97,9 +97,9 @@ public class EventPublisher {
                     event
             );
 
-            log.info("Evento de aluno inativado publicado com sucesso: {}", event.alunoId());
+            log.info("Evento de student inativado publicado com sucesso: {}", event.alunoId());
         } catch (Exception e) {
-            log.error("Erro ao publicar evento de aluno inativado", e);
+            log.error("Erro ao publicar evento de student inativado", e);
         }
     }
 

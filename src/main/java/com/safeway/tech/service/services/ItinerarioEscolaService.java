@@ -1,8 +1,8 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.itinerario.ItinerarioEscolaRequest;
-import com.safeway.tech.domain.models.Endereco;
-import com.safeway.tech.domain.models.Escola;
+import com.safeway.tech.domain.models.Address;
+import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.Itinerario;
 import com.safeway.tech.domain.models.ItinerarioEscola;
 import com.safeway.tech.infra.exception.EnderecoNotFoundException;
@@ -42,34 +42,34 @@ public class ItinerarioEscolaService {
         Itinerario itinerario = itinerarioRepository.findById(itinerarioId)
                 .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
 
-        Escola escola = escolaService.buscarPorId(request.escolaId());
+        School school = escolaService.buscarPorId(request.escolaId());
 
-        Endereco endereco;
+        Address address;
         if (request.enderecoId() != null) {
-            endereco = enderecoService.buscarPorId(request.enderecoId());
+            address = enderecoService.buscarPorId(request.enderecoId());
         } else {
-            endereco = escola.getEndereco();
+            address = school.getAddress();
         }
 
-        if (endereco.getLatitude() == null || endereco.getLongitude() == null) {
-            throw new EnderecoNotFoundException("Endereço da escola não possui latitude/longitude válidas");
+        if (address.getLatitude() == null || address.getLongitude() == null) {
+            throw new EnderecoNotFoundException("Endereço da school não possui latitude/longitude válidas");
         }
-        double lat = endereco.getLatitude();
-        double lng = endereco.getLongitude();
+        double lat = address.getLatitude();
+        double lng = address.getLongitude();
         if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
             // TODO: Alteração para exception personalizada
-            throw new BadRequestException("Coordenadas do endereço da escola inválidas: " + lat + ", " + lng);
+            throw new BadRequestException("Coordenadas do endereço da school inválidas: " + lat + ", " + lng);
         }
 
-        itinerarioEscolaRepository.findByItinerarioIdAndEscolaIdEscola(itinerarioId, escola.getId())
+        itinerarioEscolaRepository.findByItinerarioIdAndEscolaIdEscola(itinerarioId, school.getId())
                 .ifPresent(e -> {
-                    throw new ItinerarioEscolaNotFound("Escola já está vinculada a este itinerário");
+                    throw new ItinerarioEscolaNotFound("School já está vinculada a este itinerário");
                 });
 
         ItinerarioEscola entity = new ItinerarioEscola();
         entity.setItinerario(itinerario);
-        entity.setEscola(escola);
-        entity.setEndereco(endereco);
+        entity.setSchool(school);
+        entity.setAddress(address);
         entity.setOrdemParada(request.ordemParada());
 
         itinerarioEscolaRepository.save(entity);
@@ -79,7 +79,7 @@ public class ItinerarioEscolaService {
     public void removerEscola(UUID itinerarioId, UUID escolaId) {
         ItinerarioEscola entity = itinerarioEscolaRepository
                 .findByItinerarioIdAndEscolaIdEscola(itinerarioId, escolaId)
-                .orElseThrow(() -> new RuntimeException("Escola não encontrada no itinerário"));
+                .orElseThrow(() -> new RuntimeException("School não encontrada no itinerário"));
 
         itinerarioEscolaRepository.delete(entity);
     }
@@ -89,7 +89,7 @@ public class ItinerarioEscolaService {
         List<ItinerarioEscola> atuais = itinerarioEscolaRepository.findByItinerarioId(itinerarioId);
 
         Map<UUID, ItinerarioEscola> map = atuais.stream()
-                .collect(Collectors.toMap(e -> e.getEscola().getId(), e -> e));
+                .collect(Collectors.toMap(e -> e.getSchool().getId(), e -> e));
 
         int ordem = 1;
         for (UUID id : novaOrdemEscolaIds) {

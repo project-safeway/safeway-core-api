@@ -2,6 +2,8 @@ package com.safeway.tech.domain.models;
 
 import com.safeway.tech.domain.enums.StatusPresencaEnum;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -12,18 +14,19 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "chamada_aluno")
+@Table(name = "chamada_alunos")
 @Getter @Setter
 @NoArgsConstructor
 public class ChamadaAluno extends BaseEntity {
+
+    @Enumerated(EnumType.STRING)
+    private StatusPresencaEnum presenca;
+
+    private LocalDateTime data;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Chamada chamada;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Aluno aluno;
-
-    private StatusPresencaEnum presenca;
-
-    private LocalDateTime data;
+    private Student student;
 }

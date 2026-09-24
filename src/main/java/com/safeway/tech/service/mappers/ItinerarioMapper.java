@@ -24,24 +24,24 @@ public class ItinerarioMapper {
 
     public static ItinerarioAlunoResponse toAlunoResponse(ItinerarioAluno itinerarioAluno) {
         return new ItinerarioAlunoResponse(
-                itinerarioAluno.getAluno().getId(),
-                itinerarioAluno.getAluno().getNome(),
+                itinerarioAluno.getStudent().getId(),
+                itinerarioAluno.getStudent().getNome(),
                 itinerarioAluno.getOrdemEmbarque(),
-                itinerarioAluno.getEndereco().getId(),
+                itinerarioAluno.getAddress().getId(),
                 itinerarioAluno.getOrdemGlobal(),
-                itinerarioAluno.getAluno().getEscola().getNome(),
-                itinerarioAluno.getAluno().getResponsaveis().getFirst().getNome(),
-                itinerarioAluno.getAluno().getSala()
+                itinerarioAluno.getStudent().getSchool().getNome(),
+                itinerarioAluno.getStudent().getResponsaveis().getFirst().getNome(),
+                itinerarioAluno.getStudent().getSala()
         );
     }
 
     public static ItinerarioEscolaResponse toEscolaResponse(ItinerarioEscola itinerarioEscola) {
         return new ItinerarioEscolaResponse(
-                itinerarioEscola.getEscola().getId(),
-                itinerarioEscola.getEscola().getNome(),
-                itinerarioEscola.getEndereco().getCidade(),
+                itinerarioEscola.getSchool().getId(),
+                itinerarioEscola.getSchool().getNome(),
+                itinerarioEscola.getAddress().getCidade(),
                 itinerarioEscola.getOrdemParada(),
-                itinerarioEscola.getEndereco().getId(),
+                itinerarioEscola.getAddress().getId(),
                 itinerarioEscola.getOrdemGlobal()
         );
     }

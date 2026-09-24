@@ -20,6 +20,6 @@ public class ResponsavelAluno extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "aluno_id", nullable = false)
-    private Aluno aluno;
+    private Student student;
 
 }

@@ -4,8 +4,8 @@ import com.safeway.tech.api.dto.aluno.AlunoFeignResponse;
 import com.safeway.tech.api.dto.aluno.AlunoRequest;
 import com.safeway.tech.api.dto.aluno.AlunoResponse;
 import com.safeway.tech.api.dto.endereco.EnderecoResponse;
-import com.safeway.tech.domain.models.Aluno;
-import com.safeway.tech.domain.models.Endereco;
+import com.safeway.tech.domain.models.Student;
+import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.facade.AlunoFacade;
 import com.safeway.tech.service.mappers.AlunoMapper;
 import com.safeway.tech.service.mappers.EnderecoMapper;
@@ -48,8 +48,8 @@ public class AlunoController {
     public ResponseEntity<List<EnderecoResponse>> listarEnderecosDoAluno(
             @PathVariable UUID alunoId
     ) {
-        List<Endereco> enderecos = enderecoService.listarEnderecosDisponiveis(alunoId);
-        List<EnderecoResponse> response = enderecos.stream().map(EnderecoMapper::toResponse).toList();
+        List<Address> addresses = enderecoService.listarEnderecosDisponiveis(alunoId);
+        List<EnderecoResponse> response = addresses.stream().map(EnderecoMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -82,22 +82,22 @@ public class AlunoController {
 
     @GetMapping("/feign/{alunoId}")
     public ResponseEntity<AlunoFeignResponse> buscarAlunoPorId(@PathVariable UUID alunoId) {
-        Aluno aluno = alunoService.buscarPorId(alunoId);
-        AlunoFeignResponse response = AlunoMapper.toFeignResponse(aluno);
+        Student student = alunoService.buscarPorId(alunoId);
+        AlunoFeignResponse response = AlunoMapper.toFeignResponse(student);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/ativos")
     public ResponseEntity<List<AlunoFeignResponse>> buscarTodosAtivos() {
-        List<Aluno> alunos = alunoService.buscarTodosAtivos();
-        List<AlunoFeignResponse> response = alunos.stream().map(AlunoMapper::toFeignResponse).toList();
+        List<Student> students = alunoService.buscarTodosAtivos();
+        List<AlunoFeignResponse> response = students.stream().map(AlunoMapper::toFeignResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/lote")
     public ResponseEntity<List<AlunoFeignResponse>> buscarPorIdEmLote(@RequestBody List<UUID> ids) {
-        List<Aluno> alunos = alunoService.buscarPorIdEmLote(ids);
-        List<AlunoFeignResponse> response = alunos.stream().map(AlunoMapper::toFeignResponse).toList();
+        List<Student> students = alunoService.buscarPorIdEmLote(ids);
+        List<AlunoFeignResponse> response = students.stream().map(AlunoMapper::toFeignResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

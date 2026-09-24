@@ -2,7 +2,7 @@ package com.safeway.tech.facade;
 
 import com.safeway.tech.api.dto.aluno.AlunoRequest;
 import com.safeway.tech.api.dto.aluno.AlunoResponse;
-import com.safeway.tech.domain.models.Aluno;
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.service.mappers.AlunoMapper;
 import com.safeway.tech.service.services.AlunoService;
 import lombok.RequiredArgsConstructor;
@@ -23,22 +23,22 @@ public class AlunoFacade {
     @Cacheable(cacheNames = "alunos", key = "#alunoId + ':' + @currentUserService.getCurrentUserId()")
     @Transactional(readOnly = true)
     public AlunoResponse buscarPorId(UUID alunoId) {
-        Aluno aluno = alunoService.buscarPorId(alunoId);
-        return AlunoMapper.toResponse(aluno);
+        Student student = alunoService.buscarPorId(alunoId);
+        return AlunoMapper.toResponse(student);
     }
 
     @CachePut(cacheNames = "alunos", key = "#result.id() + ':' + @currentUserService.getCurrentUserId()")
     @Transactional
     public AlunoResponse criarAluno(AlunoRequest request) {
-        Aluno aluno = alunoService.criarAluno(request);
-        return AlunoMapper.toResponse(aluno);
+        Student student = alunoService.criarAluno(request);
+        return AlunoMapper.toResponse(student);
     }
 
     @CachePut(cacheNames = "alunos", key = "#alunoId + ':' + @currentUserService.getCurrentUserId()")
     @Transactional
     public AlunoResponse atualizarAluno(UUID alunoId, AlunoRequest request) {
-        Aluno aluno = alunoService.atualizarAluno(alunoId, request);
-        return AlunoMapper.toResponse(aluno);
+        Student student = alunoService.atualizarAluno(alunoId, request);
+        return AlunoMapper.toResponse(student);
     }
 
     @CacheEvict(cacheNames = "alunos", key = "#alunoId + ':' + @currentUserService.getCurrentUserId()", beforeInvocation = true)

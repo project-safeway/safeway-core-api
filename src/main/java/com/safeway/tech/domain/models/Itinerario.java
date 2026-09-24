@@ -6,25 +6,18 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Time;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "itinerario")
+@Table(name = "itinerarios")
 @Getter @Setter
 @NoArgsConstructor
 public class Itinerario extends BaseEntity {
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_transporte", nullable = false)
-    private Transporte transporte;
 
     private String nome;
 
@@ -36,12 +29,7 @@ public class Itinerario extends BaseEntity {
 
     private TipoViagemEnum tipoViagem;
 
-    @OneToMany(mappedBy = "itinerario", orphanRemoval = true)
-    private List<ItinerarioAluno> alunos = new ArrayList<>();
-
-    @OneToMany(mappedBy = "itinerario", orphanRemoval = true)
-    private List<ItinerarioEscola> escolas = new ArrayList<>();
-
-    @OneToMany(mappedBy = "itinerario")
-    private List<Chamada> chamadas = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "transporte_id", nullable = false)
+    private Transport transport;
 }

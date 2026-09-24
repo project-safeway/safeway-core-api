@@ -3,7 +3,7 @@ package com.safeway.tech.api.controllers;
 import com.safeway.tech.api.dto.transporte.AlunoTransporteResponse;
 import com.safeway.tech.api.dto.transporte.TransporteRequest;
 import com.safeway.tech.api.dto.transporte.TransporteResponse;
-import com.safeway.tech.domain.models.Aluno;
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.service.mappers.AlunoMapper;
 import com.safeway.tech.service.mappers.TransporteMapper;
@@ -47,8 +47,8 @@ public class TransporteController {
 
     @GetMapping("/{idTransporte}/alunos")
     public ResponseEntity<List<AlunoTransporteResponse>> listarAlunosDoTransporte(@PathVariable UUID idTransporte) {
-        List<Aluno> alunoTransporte = transporteService.listarAlunos(idTransporte);
-        List<AlunoTransporteResponse> response = alunoTransporte.stream().map(AlunoMapper::toTransporteResponse).toList();
+        List<Student> studentTransporte = transporteService.listarAlunos(idTransporte);
+        List<AlunoTransporteResponse> response = studentTransporte.stream().map(AlunoMapper::toTransporteResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

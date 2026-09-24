@@ -1,6 +1,6 @@
 package com.safeway.tech.repository;
 
-import com.safeway.tech.domain.models.Aluno;
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Chamada;
 import com.safeway.tech.domain.models.ChamadaAluno;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,5 +15,5 @@ public interface ChamadaAlunoRepository extends JpaRepository<ChamadaAluno, UUID
     @Query("SELECT ca FROM ChamadaAluno ca WHERE ca.chamada = :chamada AND ca.aluno = :aluno")
     Optional<ChamadaAluno> findByChamadaAndAluno(
             @Param("chamada") Chamada chamada,
-            @Param("aluno") Aluno aluno);
+            @Param("student") Student student);
 }

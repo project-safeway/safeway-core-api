@@ -2,11 +2,11 @@ package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.aluno.AlunoRequest;
 import com.safeway.tech.api.dto.responsavel.ResponsavelRequest;
-import com.safeway.tech.domain.models.Aluno;
-import com.safeway.tech.domain.models.Escola;
-import com.safeway.tech.domain.models.Responsavel;
-import com.safeway.tech.domain.models.Transporte;
-import com.safeway.tech.domain.models.Usuario;
+import com.safeway.tech.domain.models.Student;
+import com.safeway.tech.domain.models.School;
+import com.safeway.tech.domain.models.Guardian;
+import com.safeway.tech.domain.models.Transport;
+import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.AlunoNotFoundException;
 import com.safeway.tech.infra.exception.OperationNotAllowedException;
 import com.safeway.tech.infra.messaging.publishers.EventPublisher;
@@ -31,113 +31,113 @@ public class AlunoService {
     private final EventPublisher eventPublisher;
     private final CurrentUserService currentUserService;
 
-    public Aluno buscarPorId(UUID alunoId) {
+    public Student buscarPorId(UUID alunoId) {
         UUID userId = currentUserService.getCurrentUserId();
         return alunoRepository.findByIdAndUsuarioId(alunoId, userId)
-                .orElseThrow(() -> new AlunoNotFoundException("Aluno não encontrado"));
+                .orElseThrow(() -> new AlunoNotFoundException("Student não encontrado"));
     }
 
     @Transactional
-    public Aluno criarAluno(AlunoRequest request) {
+    public Student criarAluno(AlunoRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
-        Usuario usuario = usuarioService.buscarPorId(userId);
+        User user = usuarioService.buscarPorId(userId);
 
-        if (!usuario.getAtivo()) {
+        if (!user.getAtivo()) {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
         UUID transporteId = currentUserService.getCurrentTransporteId();
-        Transporte transporte = transporteService.buscarPorId(transporteId);
+        Transport transport = transporteService.buscarPorId(transporteId);
 
-        Escola escola = escolaService.buscarPorId(request.escolaId());
+        School school = escolaService.buscarPorId(request.escolaId());
 
-        Aluno aluno = new Aluno();
-        aplicarDados(aluno, request);
-        aluno.setEscola(escola);
-        aluno.setUsuario(usuario);
-        aluno.setTransporte(transporte);
+        Student student = new Student();
+        aplicarDados(student, request);
+        student.setSchool(school);
+        student.setUsuario(user);
+        student.setTransport(transport);
 
         for (ResponsavelRequest responsavelRequest : request.responsaveis()) {
-            Responsavel responsavel = responsavelService
+            Guardian guardian = responsavelService
                     .buscarPorCpfAndUsuario(responsavelRequest.cpf(), userId)
                     .orElseGet(() -> responsavelService.criarResponsavel(responsavelRequest));
 
-            aluno.adicionarResponsavel(responsavel);
+            student.adicionarResponsavel(guardian);
         }
 
-        aluno = alunoRepository.save(aluno);
+        student = alunoRepository.save(student);
 
-        eventPublisher.publicarAlunoCriado(aluno);
-        return aluno;
+        eventPublisher.publicarAlunoCriado(student);
+        return student;
     }
 
     @Transactional
-    public Aluno atualizarAluno(UUID alunoId, AlunoRequest request) {
+    public Student atualizarAluno(UUID alunoId, AlunoRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
-        Usuario usuario = usuarioService.buscarPorId(userId);
+        User user = usuarioService.buscarPorId(userId);
 
-        if (!usuario.getAtivo()) {
+        if (!user.getAtivo()) {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
-        Escola escola = escolaService.buscarPorId(request.escolaId());
+        School school = escolaService.buscarPorId(request.escolaId());
 
-        Aluno aluno = buscarPorId(alunoId);
-        aplicarDados(aluno, request);
-        aluno.setEscola(escola);
+        Student student = buscarPorId(alunoId);
+        aplicarDados(student, request);
+        student.setSchool(school);
 
-        atualizarResponsaveis(aluno, request.responsaveis(), userId);
-        aluno = alunoRepository.save(aluno);
+        atualizarResponsaveis(student, request.responsaveis(), userId);
+        student = alunoRepository.save(student);
 
-        eventPublisher.publicarAlunoAtualizado(aluno);
-        return aluno;
+        eventPublisher.publicarAlunoAtualizado(student);
+        return student;
     }
 
     @Transactional
     public void deletarAluno(UUID alunoId) {
-        Aluno aluno = buscarPorId(alunoId);
-        aluno.setAtivo(false);
-        alunoRepository.save(aluno);
-        eventPublisher.publicarAlunoInativado(aluno);
+        Student student = buscarPorId(alunoId);
+        student.setAtivo(false);
+        alunoRepository.save(student);
+        eventPublisher.publicarAlunoInativado(student);
     }
 
-    public List<Aluno> buscarPorIdEmLote(List<UUID> ids) {
+    public List<Student> buscarPorIdEmLote(List<UUID> ids) {
         UUID userId = currentUserService.getCurrentUserId();
         return alunoRepository.findByIdInAndIdUsuario(ids, userId);
     }
 
-    public List<Aluno> buscarTodosAtivos() {
+    public List<Student> buscarTodosAtivos() {
         UUID userId = currentUserService.getCurrentUserId();
         return alunoRepository.findByAtivoTrueAndIdUsuario(userId);
     }
 
-    private void aplicarDados(Aluno aluno, AlunoRequest request) {
-        aluno.setNome(request.nome());
-        aluno.setProfessor(request.professor());
-        aluno.setDtNascimento(request.dtNascimento());
-        aluno.setSerie(request.serie());
-        aluno.setSala(request.sala());
-        aluno.setValorMensalidade(request.valorMensalidade());
-        aluno.setDiaVencimento(request.diaVencimento());
+    private void aplicarDados(Student student, AlunoRequest request) {
+        student.setNome(request.nome());
+        student.setProfessor(request.professor());
+        student.setDtNascimento(request.dtNascimento());
+        student.setSerie(request.serie());
+        student.setSala(request.sala());
+        student.setValorMensalidade(request.valorMensalidade());
+        student.setDiaVencimento(request.diaVencimento());
     }
 
-    private void atualizarResponsaveis(Aluno aluno, List<ResponsavelRequest> requests, UUID userId) {
-        List<Responsavel> novosResponsaveis = new ArrayList<>();
+    private void atualizarResponsaveis(Student student, List<ResponsavelRequest> requests, UUID userId) {
+        List<Guardian> novosResponsaveis = new ArrayList<>();
 
         for (ResponsavelRequest request : requests) {
-            Responsavel responsavel = responsavelService.buscarPorCpfAndUsuario(request.cpf(), userId)
+            Guardian guardian = responsavelService.buscarPorCpfAndUsuario(request.cpf(), userId)
                     .orElseGet(() -> responsavelService.criarResponsavel(request));
-            novosResponsaveis.add(responsavel);
+            novosResponsaveis.add(guardian);
         }
 
-        for (Responsavel responsavelAtual : new ArrayList<>(aluno.getResponsaveis())) {
-            if (!novosResponsaveis.contains(responsavelAtual)) {
-                aluno.removerResponsavel(responsavelAtual);
+        for (Guardian guardianAtual : new ArrayList<>(student.getResponsaveis())) {
+            if (!novosResponsaveis.contains(guardianAtual)) {
+                student.removerResponsavel(guardianAtual);
             }
         }
 
-        for (Responsavel responsavel : novosResponsaveis) {
-            aluno.adicionarResponsavel(responsavel);
+        for (Guardian guardian : novosResponsaveis) {
+            student.adicionarResponsavel(guardian);
         }
     }
 }

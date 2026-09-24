@@ -2,7 +2,7 @@ package com.safeway.tech.service.services;
 
 import com.safeway.tech.domain.enums.StatusChamadaEnum;
 import com.safeway.tech.domain.enums.StatusPresencaEnum;
-import com.safeway.tech.domain.models.Aluno;
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Chamada;
 import com.safeway.tech.domain.models.ChamadaAluno;
 import com.safeway.tech.repository.ChamadaAlunoRepository;
@@ -34,14 +34,14 @@ public class ChamadaAlunoService {
             UUID idAluno = entry.getKey();
             StatusPresencaEnum status = entry.getValue();
 
-            Aluno aluno = alunoService.buscarPorId(idAluno);
+            Student student = alunoService.buscarPorId(idAluno);
 
             ChamadaAluno chamadaAluno = chamadaAlunoRepository
-                    .findByChamadaAndAluno(chamada, aluno)
+                    .findByChamadaAndAluno(chamada, student)
                     .orElseGet(() -> {
                         ChamadaAluno ca = new ChamadaAluno();
                         ca.setChamada(chamada);
-                        ca.setAluno(aluno);
+                        ca.setStudent(student);
                         return ca;
                     });
 

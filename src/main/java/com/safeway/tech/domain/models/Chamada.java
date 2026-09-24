@@ -15,18 +15,15 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "chamada")
+@Table(name = "chamadas")
 @Getter @Setter
 @NoArgsConstructor
 public class Chamada extends BaseEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "fk_itinerario", nullable = false)
-    private Itinerario itinerario;
-
     @Enumerated(EnumType.STRING)
     private StatusChamadaEnum status;
 
-    @OneToMany(mappedBy = "chamada")
-    private List<ChamadaAluno> alunos;
+    @ManyToOne
+    @JoinColumn(name = "itinerario_id", nullable = false)
+    private Itinerario itinerario;
 }

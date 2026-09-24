@@ -6,7 +6,7 @@ import com.safeway.tech.api.dto.itinerario.ItinerarioUpdateRequest.ItinerarioPar
 import com.safeway.tech.domain.models.Itinerario;
 import com.safeway.tech.domain.models.ItinerarioAluno;
 import com.safeway.tech.domain.models.ItinerarioEscola;
-import com.safeway.tech.domain.models.Transporte;
+import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.infra.exception.ItinerarioNotFoundException;
 import com.safeway.tech.repository.ItinerarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -56,8 +56,8 @@ public class ItinerarioService {
         itinerario.setTipoViagem(request.tipoViagem());
 
         UUID transporteId = currentUserService.getCurrentTransporteId();
-        Transporte transporte = transporteService.buscarPorId(transporteId);
-        itinerario.setTransporte(transporte);
+        Transport transport = transporteService.buscarPorId(transporteId);
+        itinerario.setTransport(transport);
 
         return itinerarioRepository.save(itinerario);
     }
@@ -81,10 +81,10 @@ public class ItinerarioService {
             List<ItinerarioEscola> escolasAtuais = itinerarioEscolaService.buscarPorItinerarioId(itinerario.getId());
 
             Map<UUID, ItinerarioAluno> alunosPorId = alunosAtuais.stream()
-                    .collect(Collectors.toMap(a -> a.getAluno().getId(), a -> a));
+                    .collect(Collectors.toMap(a -> a.getStudent().getId(), a -> a));
 
             Map<UUID, ItinerarioEscola> escolasPorId = escolasAtuais.stream()
-                    .collect(Collectors.toMap(e -> e.getEscola().getId(), e -> e));
+                    .collect(Collectors.toMap(e -> e.getSchool().getId(), e -> e));
 
             for (ItinerarioParadaUpdate parada : request.paradas()) {
                 if (parada == null || parada.id() == null) {

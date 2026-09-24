@@ -202,8 +202,6 @@ back-end/
 │   │       ├── application.properties
 │   │       └── keys/               # Chaves RSA (pub.key, pri.key)
 │   └── test/                       # Testes
-├── schema.sql                      # Schema completo do banco
-├── teste-endpoints.md              # Exemplos de teste dos endpoints
 ├── pom.xml                         # Dependências Maven
 ├── mvnw / mvnw.cmd                 # Maven Wrapper
 └── README.md

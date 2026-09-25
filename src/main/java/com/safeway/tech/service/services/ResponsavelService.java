@@ -43,7 +43,7 @@ public class ResponsavelService {
         Guardian guardian = new Guardian();
         aplicaDados(guardian, request);
 
-        Address address = addressService.criar(request.endereco());
+        Address address = addressService.create(request.endereco());
         guardian.setAddress(address);
 
         UUID userId = currentUserService.getCurrentUserId();
@@ -61,8 +61,8 @@ public class ResponsavelService {
         if (request.endereco() != null) {
             Address addressAtual = guardian.getAddress();
             Address address = addressAtual != null && addressAtual.getId() != null
-                    ? addressService.atualizar(addressAtual.getId(), request.endereco())
-                    : addressService.criar(request.endereco());
+                    ? addressService.update(addressAtual.getId(), request.endereco())
+                    : addressService.create(request.endereco());
             guardian.setAddress(address);
         }
 

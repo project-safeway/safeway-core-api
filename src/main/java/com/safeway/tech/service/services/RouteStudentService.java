@@ -52,7 +52,7 @@ public class RouteStudentService {
         // Determinar endereço: usar request.enderecoId() se presente, caso contrário tentar fallback
         Address address;
         if (request.enderecoId() != null) {
-            address = addressService.buscarPorId(request.enderecoId());
+            address = addressService.findById(request.enderecoId());
 
             boolean enderecoPerenceAoResponsavel = student.getResponsaveis().stream()
                     .anyMatch(r -> r.getEndereco() != null && r.getEndereco().getId().equals(address.getId()));
@@ -120,7 +120,7 @@ public class RouteStudentService {
             // Determinar endereco: prefer dto.enderecoId(), senão fallback para primeiro endereco de responsavel
             Address address;
             if (dto.enderecoId() != null) {
-                address = addressService.buscarPorId(dto.enderecoId());
+                address = addressService.findById(dto.enderecoId());
             } else {
                 address = student.getResponsaveis().stream()
                         .map(Guardian::getAddress)

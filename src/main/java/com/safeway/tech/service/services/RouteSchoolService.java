@@ -46,7 +46,7 @@ public class RouteSchoolService {
 
         Address address;
         if (request.enderecoId() != null) {
-            address = addressService.buscarPorId(request.enderecoId());
+            address = addressService.findById(request.enderecoId());
         } else {
             address = school.getAddress();
         }

@@ -29,14 +29,14 @@ public class AddressController {
 
     @PostMapping
     public ResponseEntity<AddressResponse> criar(@Valid @RequestBody AddressRequest request) {
-        Address address = addressService.criar(request);
+        Address address = addressService.create(request);
         AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AddressResponse> buscar(@PathVariable UUID id) {
-        Address address = addressService.buscarPorId(id);
+        Address address = addressService.findById(id);
         AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -46,14 +46,14 @@ public class AddressController {
             @PathVariable UUID id,
             @Valid @RequestBody AddressRequest request
     ) {
-        Address address = addressService.atualizar(id, request);
+        Address address = addressService.update(id, request);
         AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativar(@PathVariable UUID id) {
-        addressService.desativar(id);
+        addressService.deactivate(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

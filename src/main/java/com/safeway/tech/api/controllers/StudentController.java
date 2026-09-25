@@ -46,7 +46,7 @@ public class StudentController {
     public ResponseEntity<List<AddressResponse>> listarEnderecosDoAluno(
             @PathVariable UUID alunoId
     ) {
-        List<Address> addresses = addressService.listarEnderecosDisponiveis(alunoId);
+        List<Address> addresses = addressService.availableAddress(alunoId);
         List<AddressResponse> response = addresses.stream().map(AddressMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

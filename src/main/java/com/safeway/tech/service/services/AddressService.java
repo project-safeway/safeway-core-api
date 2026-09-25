@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -25,13 +26,13 @@ public class AddressService {
     private final GeocodingService geocodingService;
     private final CurrentUserService currentUserService;
 
-    public Address buscarPorId(UUID id) {
+    public Address findById(UUID id) {
         return addressRepository.findById(id)
                 .orElseThrow(() -> new AddressNotFoundException("Endereço com ID " + id + " não encontrado"));
     }
 
     @Transactional(readOnly = true)
-    public List<Address> listarEnderecosDisponiveis(UUID alunoId) {
+    public List<Address> availableAddress(UUID alunoId) {
         UUID userId = currentUserService.getCurrentUserId();
         List<Guardian> responsaveis = guardianRepository.findByAlunosIdAndUsuarioIdUsuario(alunoId, userId);
 
@@ -42,54 +43,54 @@ public class AddressService {
     }
 
     @Transactional
-    public Address criar(AddressRequest request) {
+    public Address create(AddressRequest request) {
         Address address = new Address();
 
-        aplicarDados(address, request);
+        consumeData(address, request);
 
-        calcularCoordenadas(address);
+        calculateCoordinates(address);
         return addressRepository.save(address);
     }
 
-    public Address atualizar(UUID id, AddressRequest request) {
-        Address address = buscarPorId(id);
+    public Address update(UUID id, AddressRequest request) {
+        Address address = findById(id);
 
-        aplicarDados(address, request);
-        calcularCoordenadas(address);
+        consumeData(address, request);
+        calculateCoordinates(address);
 
         return addressRepository.save(address);
     }
 
-    public void desativar(UUID id) {
-        Address address = buscarPorId(id);
-        address.setAtivo(false);
+    public void deactivate(UUID id) {
+        Address address = findById(id);
+        address.setActive(false);
         addressRepository.save(address);
     }
 
-    private void aplicarDados(Address address, AddressRequest request) {
-        address.setLogradouro(request.logradouro());
-        address.setNumero(request.numero());
-        address.setComplemento(request.complemento());
-        address.setBairro(request.bairro());
-        address.setCidade(request.cidade());
-        address.setUf(request.uf());
-        address.setCep(request.cep());
-        address.setTipo(request.tipo());
+    private void consumeData(Address address, AddressRequest request) {
+        address.setStreet(request.street());
+        address.setNumber(request.number());
+        address.setAdditionalDetails(request.additionalDetails());
+        address.setNeighborhood(request.neighborhood());
+        address.setCity(request.city());
+        address.setFederalUnit(request.federalUnit());
+        address.setZipCode(request.zipCode());
+        address.setType(request.type());
     }
 
-    private void calcularCoordenadas(Address address) {
-        String enderecoCompleto = String.format("%s, %s, %s, %s, %s, %s",
-                address.getLogradouro(),
-                address.getNumero(),
-                address.getBairro(),
-                address.getCidade(),
-                address.getUf(),
-                address.getCep()
+    private void calculateCoordinates(Address address) {
+        String fullAddress = String.format("%s, %s, %s, %s, %s, %s",
+                address.getStreet(),
+                address.getNumber(),
+                address.getNeighborhood(),
+                address.getCity(),
+                address.getFederalUnit(),
+                address.getZipCode()
         );
 
-        LatLng coordenadas = geocodingService.obterCoordenadas(enderecoCompleto);
-        address.setLatitude(coordenadas.lat);
-        address.setLongitude(coordenadas.lng);
+        LatLng coordinates = geocodingService.obterCoordenadas(fullAddress);
+        address.setLatitude(BigDecimal.valueOf(coordinates.lat));
+        address.setLongitude(BigDecimal.valueOf(coordinates.lng));
     }
 
 }

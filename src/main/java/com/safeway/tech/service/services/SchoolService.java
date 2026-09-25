@@ -47,7 +47,7 @@ public class SchoolService {
         School school = new School();
         aplicarDados(school, request);
 
-        Address address = addressService.criar(request.endereco());
+        Address address = addressService.create(request.endereco());
         school.setAddress(address);
 
         UUID usuarioId = currentUserService.getCurrentUserId();
@@ -62,7 +62,7 @@ public class SchoolService {
         School school = buscarPorId(escolaId);
 
         aplicarDados(school, request);
-        Address address = addressService.atualizar(school.getAddress().getId(), request.endereco());
+        Address address = addressService.update(school.getAddress().getId(), request.endereco());
         school.setAddress(address);
 
         return schoolRepository.save(school);

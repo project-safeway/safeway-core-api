@@ -7,7 +7,7 @@ import com.safeway.tech.api.dto.route.google.MetricasRota;
 import com.safeway.tech.api.dto.route.google.ParadaOtimizada;
 import com.safeway.tech.api.dto.route.google.RotasRequest;
 import com.safeway.tech.api.dto.route.google.RotasResponse;
-import com.safeway.tech.service.services.RotasService;
+import com.safeway.tech.service.services.IOptimizerService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service("googleOptimization")
-public class GoogleOptimizationAdapter implements RotasService {
+public class GoogleOptimizationAdapter implements IOptimizerService {
 
     private final GoogleOptimizationClient cliente;
 

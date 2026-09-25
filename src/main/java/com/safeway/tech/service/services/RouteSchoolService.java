@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ItinerarioEscolaService {
+public class RouteSchoolService {
 
     private final ItinerarioEscolaRepository itinerarioEscolaRepository;
     private final ItinerarioRepository itinerarioRepository;
-    private final EscolaService escolaService;
-    private final EnderecoService enderecoService;
+    private final SchoolService schoolService;
+    private final AddressService addressService;
 
     public List<RouteSchool> buscarPorItinerarioId(UUID itinerarioId) {
         return itinerarioEscolaRepository.findByItinerarioId(itinerarioId);
@@ -42,11 +42,11 @@ public class ItinerarioEscolaService {
         Route route = itinerarioRepository.findById(itinerarioId)
                 .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
 
-        School school = escolaService.buscarPorId(request.escolaId());
+        School school = schoolService.buscarPorId(request.escolaId());
 
         Address address;
         if (request.enderecoId() != null) {
-            address = enderecoService.buscarPorId(request.enderecoId());
+            address = addressService.buscarPorId(request.enderecoId());
         } else {
             address = school.getAddress();
         }

@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ItinerarioService {
+public class RouteService {
 
     private final ItinerarioRepository itinerarioRepository;
-    private final TransporteService transporteService;
-    private final ItinerarioAlunoService itinerarioAlunoService;
-    private final ItinerarioEscolaService itinerarioEscolaService;
+    private final TransportService transportService;
+    private final RouteStudentService routeStudentService;
+    private final RouteSchoolService routeSchoolService;
     private final CurrentUserService currentUserService;
 
     public List<Route> listarTodos() {
@@ -56,7 +56,7 @@ public class ItinerarioService {
         route.setTipoViagem(request.tipoViagem());
 
         UUID transporteId = currentUserService.getCurrentTransporteId();
-        Transport transport = transporteService.buscarPorId(transporteId);
+        Transport transport = transportService.buscarPorId(transporteId);
         route.setTransport(transport);
 
         return itinerarioRepository.save(route);
@@ -73,12 +73,12 @@ public class ItinerarioService {
         route.setAtivo(request.ativo());
 
         if (request.alunos() != null && !request.alunos().isEmpty()) {
-            itinerarioAlunoService.sincronizarAlunos(route, request.alunos());
+            routeStudentService.sincronizarAlunos(route, request.alunos());
         }
 
         if (request.paradas() != null && !request.paradas().isEmpty()) {
-            List<RouteStudent> alunosAtuais = itinerarioAlunoService.buscarPorItinerarioId(route.getId());
-            List<RouteSchool> escolasAtuais = itinerarioEscolaService.buscarPorItinerarioId(route.getId());
+            List<RouteStudent> alunosAtuais = routeStudentService.buscarPorItinerarioId(route.getId());
+            List<RouteSchool> escolasAtuais = routeSchoolService.buscarPorItinerarioId(route.getId());
 
             Map<UUID, RouteStudent> alunosPorId = alunosAtuais.stream()
                     .collect(Collectors.toMap(a -> a.getStudent().getId(), a -> a));
@@ -105,8 +105,8 @@ public class ItinerarioService {
                 }
             }
 
-            itinerarioAlunoService.salvarTodos(alunosAtuais);
-            itinerarioEscolaService.salvarTodos(escolasAtuais);
+            routeStudentService.salvarTodos(alunosAtuais);
+            routeSchoolService.salvarTodos(escolasAtuais);
         }
 
         return itinerarioRepository.save(route);

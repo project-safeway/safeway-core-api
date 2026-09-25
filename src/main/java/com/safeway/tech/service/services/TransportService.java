@@ -14,10 +14,10 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class TransporteService {
+public class TransportService {
 
     private final TransporteRepository transporteRepository;
-    private final UsuarioService usuarioService;
+    private final UserService userService;
     private final CurrentUserService currentUserService;
 
     public Transport buscarPorId(UUID idTransporte) {
@@ -43,7 +43,7 @@ public class TransporteService {
         aplicarDados(transport, request);
 
         UUID userId = currentUserService.getCurrentUserId();
-        User user = usuarioService.buscarPorId(userId);
+        User user = userService.buscarPorId(userId);
 
         transport.setUser(user);
 

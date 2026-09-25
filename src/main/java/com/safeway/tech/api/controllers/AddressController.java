@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.address.AddressRequest;
 import com.safeway.tech.api.dto.address.AddressResponse;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.service.mappers.AddressMapper;
-import com.safeway.tech.service.services.EnderecoService;
+import com.safeway.tech.service.services.AddressService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,18 +25,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AddressController {
 
-    private final EnderecoService enderecoService;
+    private final AddressService addressService;
 
     @PostMapping
     public ResponseEntity<AddressResponse> criar(@Valid @RequestBody AddressRequest request) {
-        Address address = enderecoService.criar(request);
+        Address address = addressService.criar(request);
         AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AddressResponse> buscar(@PathVariable UUID id) {
-        Address address = enderecoService.buscarPorId(id);
+        Address address = addressService.buscarPorId(id);
         AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -46,14 +46,14 @@ public class AddressController {
             @PathVariable UUID id,
             @Valid @RequestBody AddressRequest request
     ) {
-        Address address = enderecoService.atualizar(id, request);
+        Address address = addressService.atualizar(id, request);
         AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativar(@PathVariable UUID id) {
-        enderecoService.desativar(id);
+        addressService.desativar(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

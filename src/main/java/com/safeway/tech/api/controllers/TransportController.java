@@ -7,7 +7,7 @@ import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.service.mappers.StudentMapper;
 import com.safeway.tech.service.mappers.TransportMapper;
-import com.safeway.tech.service.services.TransporteService;
+import com.safeway.tech.service.services.TransportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,46 +29,46 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TransportController {
 
-    private final TransporteService transporteService;
+    private final TransportService transportService;
 
     @GetMapping
     public ResponseEntity<List<TransportResponse>> listarTransportes() {
-        List<Transport> transports = transporteService.listarTransportes();
+        List<Transport> transports = transportService.listarTransportes();
         List<TransportResponse> response = transports.stream().map(TransportMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{idTransporte}")
     public ResponseEntity<TransportResponse> retornarUm(@PathVariable UUID idTransporte) {
-        Transport transport = transporteService.buscarPorId(idTransporte);
+        Transport transport = transportService.buscarPorId(idTransporte);
         TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{idTransporte}/alunos")
     public ResponseEntity<List<StudentTransportResponse>> listarAlunosDoTransporte(@PathVariable UUID idTransporte) {
-        List<Student> studentTransporte = transporteService.listarAlunos(idTransporte);
+        List<Student> studentTransporte = transportService.listarAlunos(idTransporte);
         List<StudentTransportResponse> response = studentTransporte.stream().map(StudentMapper::toTransportResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping
     public ResponseEntity<TransportResponse> salvarTransporte(@RequestBody @Valid TransportRequest request) {
-        Transport transport = transporteService.salvarTransporte(request);
+        Transport transport = transportService.salvarTransporte(request);
         TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{idTransporte}")
     public ResponseEntity<TransportResponse> alterarTransporte(@RequestBody @Valid TransportRequest request, @PathVariable UUID idTransporte) {
-        Transport transport = transporteService.atualizarTransporte(idTransporte, request);
+        Transport transport = transportService.atualizarTransporte(idTransporte, request);
         TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{idTransporte}")
     public ResponseEntity<Void> excluir(@PathVariable UUID idTransporte) {
-        transporteService.excluirTransporte(idTransporte);
+        transportService.excluirTransporte(idTransporte);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

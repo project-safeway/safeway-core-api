@@ -19,8 +19,8 @@ import java.util.UUID;
 public class ResponsavelService {
 
     private final ResponsavelRepository responsavelRepository;
-    private final UsuarioService usuarioService;
-    private final EnderecoService enderecoService;
+    private final UserService userService;
+    private final AddressService addressService;
     private final CurrentUserService currentUserService;
 
     public Guardian buscarPorId(UUID id) {
@@ -43,11 +43,11 @@ public class ResponsavelService {
         Guardian guardian = new Guardian();
         aplicaDados(guardian, request);
 
-        Address address = enderecoService.criar(request.endereco());
+        Address address = addressService.criar(request.endereco());
         guardian.setAddress(address);
 
         UUID userId = currentUserService.getCurrentUserId();
-        User user = usuarioService.buscarPorId(userId);
+        User user = userService.buscarPorId(userId);
         guardian.setUser(user);
 
         return responsavelRepository.save(guardian);
@@ -61,8 +61,8 @@ public class ResponsavelService {
         if (request.endereco() != null) {
             Address addressAtual = guardian.getAddress();
             Address address = addressAtual != null && addressAtual.getId() != null
-                    ? enderecoService.atualizar(addressAtual.getId(), request.endereco())
-                    : enderecoService.criar(request.endereco());
+                    ? addressService.atualizar(addressAtual.getId(), request.endereco())
+                    : addressService.criar(request.endereco());
             guardian.setAddress(address);
         }
 

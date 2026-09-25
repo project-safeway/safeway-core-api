@@ -16,10 +16,10 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ChamadaService {
+public class AttendanceService {
 
     private final ChamadaRepository chamadaRepository;
-    private final ItinerarioService itinerarioService;
+    private final RouteService routeService;
     private final CurrentUserService currentUserService;
 
     public Attendance buscarPorId(UUID id) {
@@ -38,7 +38,7 @@ public class ChamadaService {
             return attendanceExistente;
         }
 
-        Route route = itinerarioService.buscarPorId(idItinerario);
+        Route route = routeService.buscarPorId(idItinerario);
 
         Attendance attendance = new Attendance();
         attendance.setRoute(route);

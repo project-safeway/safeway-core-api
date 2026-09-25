@@ -2,7 +2,7 @@ package com.safeway.tech.api.controllers;
 
 import com.safeway.tech.api.dto.route.google.RotasRequest;
 import com.safeway.tech.api.dto.route.google.RotasResponse;
-import com.safeway.tech.service.services.RotasCompostasService;
+import com.safeway.tech.service.services.RouteOptimizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class GeocodingController {
 
-    private final RotasCompostasService rotasCompostasService;
+    private final RouteOptimizationService routeOptimizationService;
 
     @PostMapping("/otimizar")
     public RotasResponse otimizarRota(@RequestBody RotasRequest request) {
-        return rotasCompostasService.otimizarMelhorRota(request);
+        return routeOptimizationService.otimizarMelhorRota(request);
     }
 
 

@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ItinerarioAlunoService {
+public class RouteStudentService {
 
     private final ItinerarioAlunoRepository itinerarioAlunoRepository;
     private final ItinerarioRepository itinerarioRepository;
-    private final AlunoService alunoService;
-    private final EnderecoService enderecoService;
+    private final StudentService studentService;
+    private final AddressService addressService;
 
     public List<RouteStudent> buscarPorItinerarioId(UUID itinerarioId) {
         return itinerarioAlunoRepository.findByItinerarioId(itinerarioId);
@@ -47,12 +47,12 @@ public class ItinerarioAlunoService {
         Route route = itinerarioRepository.findById(itinerarioId)
                 .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
 
-        Student student = alunoService.buscarPorId(request.alunoId());
+        Student student = studentService.buscarPorId(request.alunoId());
 
         // Determinar endereço: usar request.enderecoId() se presente, caso contrário tentar fallback
         Address address;
         if (request.enderecoId() != null) {
-            address = enderecoService.buscarPorId(request.enderecoId());
+            address = addressService.buscarPorId(request.enderecoId());
 
             boolean enderecoPerenceAoResponsavel = student.getResponsaveis().stream()
                     .anyMatch(r -> r.getEndereco() != null && r.getEndereco().getId().equals(address.getId()));
@@ -115,12 +115,12 @@ public class ItinerarioAlunoService {
             RouteStudent ia = new RouteStudent();
             ia.setRoute(route);
 
-            Student student = alunoService.buscarPorId(dto.alunoId());
+            Student student = studentService.buscarPorId(dto.alunoId());
 
             // Determinar endereco: prefer dto.enderecoId(), senão fallback para primeiro endereco de responsavel
             Address address;
             if (dto.enderecoId() != null) {
-                address = enderecoService.buscarPorId(dto.enderecoId());
+                address = addressService.buscarPorId(dto.enderecoId());
             } else {
                 address = student.getResponsaveis().stream()
                         .map(Guardian::getAddress)

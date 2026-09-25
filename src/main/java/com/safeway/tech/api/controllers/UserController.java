@@ -3,7 +3,7 @@ package com.safeway.tech.api.controllers;
 import com.safeway.tech.api.dto.user.UserFeignResponse;
 import com.safeway.tech.api.dto.user.UserResponse;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.service.services.UsuarioService;
+import com.safeway.tech.service.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UsuarioService usuarioService;
+    private final UserService userService;
 
     private UserResponse toResponse(User u) {
         return UserResponse.fromEntity(u);
@@ -31,13 +31,13 @@ public class UserController {
 
     @PostMapping
     public UserResponse salvarUsuario(@RequestBody User user) {
-        User salvo = usuarioService.salvarUsuario(user);
+        User salvo = userService.salvarUsuario(user);
         return toResponse(salvo);
     }
 
     @GetMapping
     public List<UserResponse> listarUsuarios() {
-        return usuarioService.listarUsuarios()
+        return userService.listarUsuarios()
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -45,17 +45,17 @@ public class UserController {
 
     @GetMapping("/{idUsuario}")
     public UserResponse retornarUm(@PathVariable UUID idUsuario) {
-        return toResponse(usuarioService.buscarPorId(idUsuario));
+        return toResponse(userService.buscarPorId(idUsuario));
     }
 
     @DeleteMapping("/{idUsuario}")
     public void excluir(@PathVariable UUID idUsuario) {
-        usuarioService.excluir(idUsuario);
+        userService.excluir(idUsuario);
     }
 
     @PutMapping("/{idUsuario}")
     public UserResponse alterarUsuario(@RequestBody User novoUser, @PathVariable UUID idUsuario) {
-        User atualizado = usuarioService.alterarUsuario(novoUser, idUsuario);
+        User atualizado = userService.alterarUsuario(novoUser, idUsuario);
         return toResponse(atualizado);
     }
 
@@ -67,7 +67,7 @@ public class UserController {
 
     @GetMapping("/feign/{idUsuario}")
     public UserFeignResponse buscarUsuario(@PathVariable UUID idUsuario) {
-        User user = usuarioService.buscarPorId(idUsuario);
+        User user = userService.buscarPorId(idUsuario);
         return UserFeignResponse.fromEntity(user);
     }
 }

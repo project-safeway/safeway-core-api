@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class EnderecoService {
+public class AddressService {
 
     private final EnderecoRepository enderecoRepository;
     private final ResponsavelRepository responsavelRepository;

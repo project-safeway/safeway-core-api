@@ -16,15 +16,15 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ChamadaAlunoService {
+public class AttendanceStudentService {
 
     private final ChamadaAlunoRepository chamadaAlunoRepository;
-    private final AlunoService alunoService;
-    private final ChamadaService chamadaService;
+    private final StudentService studentService;
+    private final AttendanceService attendanceService;
 
     @Transactional
     public void registrarPresenca(Map<UUID, PresenceStatusEnum> presencas, UUID idChamada) {
-        Attendance attendance = chamadaService.buscarPorId(idChamada);
+        Attendance attendance = attendanceService.buscarPorId(idChamada);
 
         if (!AttendanceStatusEnum.IN_PROGRESS.equals(attendance.getStatus())) {
             throw new RuntimeException("Chamada não está em andamento");
@@ -34,7 +34,7 @@ public class ChamadaAlunoService {
             UUID idAluno = entry.getKey();
             PresenceStatusEnum status = entry.getValue();
 
-            Student student = alunoService.buscarPorId(idAluno);
+            Student student = studentService.buscarPorId(idAluno);
 
             AttendanceStudent attendanceStudent = chamadaAlunoRepository
                     .findByChamadaAndAluno(attendance, student)

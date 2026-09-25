@@ -27,19 +27,4 @@ public class GeocodingService {
             throw new RuntimeException("Erro ao buscar coordenadas: " + e.getMessage(), e);
         }
     }
-
-    public String obterEnderecoFormatado(String endereco) {
-        try {
-            GeocodingResult[] results = GeocodingApi.geocode(context, endereco).await();
-
-            if (results != null && results.length > 0) {
-                return results[0].formattedAddress;
-            }
-
-            throw new RuntimeException("Endereço não encontrado");
-
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao buscar endereço: " + e.getMessage(), e);
-        }
-    }
 }

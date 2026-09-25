@@ -21,13 +21,13 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AlunoService {
+public class StudentService {
 
     private final AlunoRepository alunoRepository;
-    private final EscolaService escolaService;
-    private final UsuarioService usuarioService;
+    private final SchoolService schoolService;
+    private final UserService userService;
     private final ResponsavelService responsavelService;
-    private final TransporteService transporteService;
+    private final TransportService transportService;
     private final EventPublisher eventPublisher;
     private final CurrentUserService currentUserService;
 
@@ -40,16 +40,16 @@ public class AlunoService {
     @Transactional
     public Student criarAluno(StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
-        User user = usuarioService.buscarPorId(userId);
+        User user = userService.buscarPorId(userId);
 
         if (!user.getAtivo()) {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
         UUID transporteId = currentUserService.getCurrentTransporteId();
-        Transport transport = transporteService.buscarPorId(transporteId);
+        Transport transport = transportService.buscarPorId(transporteId);
 
-        School school = escolaService.buscarPorId(request.escolaId());
+        School school = schoolService.buscarPorId(request.escolaId());
 
         Student student = new Student();
         aplicarDados(student, request);
@@ -74,13 +74,13 @@ public class AlunoService {
     @Transactional
     public Student atualizarAluno(UUID alunoId, StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
-        User user = usuarioService.buscarPorId(userId);
+        User user = userService.buscarPorId(userId);
 
         if (!user.getAtivo()) {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
-        School school = escolaService.buscarPorId(request.escolaId());
+        School school = schoolService.buscarPorId(request.escolaId());
 
         Student student = buscarPorId(alunoId);
         aplicarDados(student, request);

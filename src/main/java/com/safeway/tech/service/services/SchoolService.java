@@ -15,11 +15,11 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class EscolaService {
+public class SchoolService {
 
     private final EscolaRepository escolaRepository;
-    private final EnderecoService enderecoService;
-    private final UsuarioService usuarioService;
+    private final AddressService addressService;
+    private final UserService userService;
     private final CurrentUserService currentUserService;
 
     public List<School> listarEscolasComAlunos() {
@@ -47,11 +47,11 @@ public class EscolaService {
         School school = new School();
         aplicarDados(school, request);
 
-        Address address = enderecoService.criar(request.endereco());
+        Address address = addressService.criar(request.endereco());
         school.setAddress(address);
 
         UUID usuarioId = currentUserService.getCurrentUserId();
-        User user = usuarioService.buscarPorId(usuarioId);
+        User user = userService.buscarPorId(usuarioId);
         school.setUser(user);
 
         return escolaRepository.save(school);
@@ -62,7 +62,7 @@ public class EscolaService {
         School school = buscarPorId(escolaId);
 
         aplicarDados(school, request);
-        Address address = enderecoService.atualizar(school.getAddress().getId(), request.endereco());
+        Address address = addressService.atualizar(school.getAddress().getId(), request.endereco());
         school.setAddress(address);
 
         return escolaRepository.save(school);

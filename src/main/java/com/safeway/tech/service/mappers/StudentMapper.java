@@ -1,14 +1,14 @@
 package com.safeway.tech.service.mappers;
 
 import com.safeway.tech.api.dto.student.StudentFeignResponse;
-import com.safeway.tech.api.dto.student.SchoolResponse;
+import com.safeway.tech.api.dto.student.StudentResponse;
 import com.safeway.tech.api.dto.transport.StudentTransportResponse;
 import com.safeway.tech.domain.models.Student;
 
 public class StudentMapper {
 
-    public static SchoolResponse toResponse(Student student) {
-        return new SchoolResponse(
+    public static StudentResponse toResponse(Student student) {
+        return new StudentResponse(
                 student.getId(),
                 student.getName(),
                 student.getProfessor(),

@@ -2,11 +2,10 @@ package com.safeway.tech.api.controllers;
 
 import com.safeway.tech.api.dto.student.StudentFeignResponse;
 import com.safeway.tech.api.dto.student.StudentRequest;
-import com.safeway.tech.api.dto.student.SchoolResponse;
+import com.safeway.tech.api.dto.student.StudentResponse;
 import com.safeway.tech.api.dto.address.AddressResponse;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Address;
-import com.safeway.tech.facade.AlunoFacade;
 import com.safeway.tech.service.mappers.StudentMapper;
 import com.safeway.tech.service.mappers.AddressMapper;
 import com.safeway.tech.service.services.AlunoService;
@@ -33,14 +32,13 @@ import java.util.UUID;
 public class StudentController {
 
     private final AlunoService alunoService;
-    private final AlunoFacade alunoFacade;
     private final EnderecoService enderecoService;
 
     @PostMapping
-    public ResponseEntity<SchoolResponse> cadastrarAlunoCompleto(
+    public ResponseEntity<StudentResponse> cadastrarAlunoCompleto(
             @RequestBody @Valid StudentRequest request
     ) {
-        SchoolResponse response = alunoFacade.criarAluno(request);
+        StudentResponse response = StudentMapper.toResponse(alunoService.criarAluno(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -54,23 +52,23 @@ public class StudentController {
     }
 
     @GetMapping("/{alunoId}")
-    public ResponseEntity<SchoolResponse> listarDadosAluno(@PathVariable UUID alunoId) {
-        SchoolResponse response = alunoFacade.buscarPorId(alunoId);
+    public ResponseEntity<StudentResponse> listarDadosAluno(@PathVariable UUID alunoId) {
+        StudentResponse response = StudentMapper.toResponse(alunoService.buscarPorId(alunoId));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{alunoId}")
-    public ResponseEntity<SchoolResponse> atualizarAluno(
+    public ResponseEntity<StudentResponse> atualizarAluno(
             @PathVariable UUID alunoId,
             @RequestBody @Valid StudentRequest request
     ) {
-        SchoolResponse response = alunoFacade.atualizarAluno(alunoId, request);
+        StudentResponse response = StudentMapper.toResponse(alunoService.atualizarAluno(alunoId, request));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{alunoId}")
     public ResponseEntity<Void> deletarAluno(@PathVariable UUID alunoId) {
-        alunoFacade.deletarAluno(alunoId);
+        alunoService.deletarAluno(alunoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

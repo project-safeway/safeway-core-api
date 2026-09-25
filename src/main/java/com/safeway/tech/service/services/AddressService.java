@@ -4,7 +4,7 @@ import com.google.maps.model.LatLng;
 import com.safeway.tech.api.dto.address.AddressRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Guardian;
-import com.safeway.tech.infra.exception.EnderecoNotFoundException;
+import com.safeway.tech.infra.exception.AddressNotFoundException;
 import com.safeway.tech.repository.AddressRepository;
 import com.safeway.tech.repository.GuardianRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class AddressService {
 
     public Address buscarPorId(UUID id) {
         return addressRepository.findById(id)
-                .orElseThrow(() -> new EnderecoNotFoundException("Endereço com ID " + id + " não encontrado"));
+                .orElseThrow(() -> new AddressNotFoundException("Endereço com ID " + id + " não encontrado"));
     }
 
     @Transactional(readOnly = true)

@@ -7,10 +7,10 @@ import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.Guardian;
-import com.safeway.tech.infra.exception.AlunoNotFoundException;
+import com.safeway.tech.infra.exception.StudentNotFoundException;
 import com.safeway.tech.infra.exception.CoordinatesNotValidException;
-import com.safeway.tech.infra.exception.EnderecoNotFoundException;
-import com.safeway.tech.infra.exception.ItinerarioNotFoundException;
+import com.safeway.tech.infra.exception.AddressNotFoundException;
+import com.safeway.tech.infra.exception.RouteNotFoundException;
 import com.safeway.tech.infra.exception.OperationNotAllowedException;
 import com.safeway.tech.repository.RouteStudentRepository;
 import com.safeway.tech.repository.RouteRepository;
@@ -45,7 +45,7 @@ public class RouteStudentService {
     @Transactional
     public void adicionarAluno(UUID itinerarioId, ItinerarioAlunoRequest request) {
         Route route = routeRepository.findById(itinerarioId)
-                .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
+                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
 
         Student student = studentService.buscarPorId(request.alunoId());
 
@@ -65,7 +65,7 @@ public class RouteStudentService {
                     .map(Guardian::getAddress)
                     .filter(Objects::nonNull)
                     .findFirst()
-                    .orElseThrow(() -> new EnderecoNotFoundException("Nenhum endereço disponível para o responsável do student"));
+                    .orElseThrow(() -> new AddressNotFoundException("Nenhum endereço disponível para o responsável do student"));
         }
 
         // Validar que o endereço tem lat/lng válidos antes de prosseguir
@@ -100,7 +100,7 @@ public class RouteStudentService {
     public void removerAluno(UUID itinerarioId, UUID alunoId) {
         RouteStudent entity = routeStudentRepository
                 .findByItinerarioIdAndAlunoId(itinerarioId, alunoId)
-                .orElseThrow(() -> new AlunoNotFoundException("Student não encontrado no itinerário"));
+                .orElseThrow(() -> new StudentNotFoundException("Student não encontrado no itinerário"));
 
         routeStudentRepository.delete(entity);
     }
@@ -126,7 +126,7 @@ public class RouteStudentService {
                         .map(Guardian::getAddress)
                         .filter(Objects::nonNull)
                         .findFirst()
-                        .orElseThrow(() -> new EnderecoNotFoundException("Nenhum endereço disponível para o responsável do student"));
+                        .orElseThrow(() -> new AddressNotFoundException("Nenhum endereço disponível para o responsável do student"));
             }
 
             // validar lat/lng
@@ -175,7 +175,7 @@ public class RouteStudentService {
     @Transactional
     public List<AlunoComLocalizacao> buscarAlunosComLocalizacao(UUID itinerarioId) {
         Route route = routeRepository.findById(itinerarioId)
-                .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
+                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
 
         return routeStudentRepository.findByItinerarioOrderByOrdemEmbarqueAsc(route).stream()
                 .filter(ia -> ia.getAddress() != null && ia.getAddress().getLatitude() != null && ia.getAddress().getLongitude() != null)

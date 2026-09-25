@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.school.SchoolRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.EscolaNotFoundException;
+import com.safeway.tech.infra.exception.SchoolNotFoundException;
 import com.safeway.tech.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,14 +31,14 @@ public class SchoolService {
     public School buscarPorId(UUID escolaId) {
         UUID usuarioId = currentUserService.getCurrentUserId();
         return schoolRepository.findByIdEscolaAndIdUsuario(escolaId, usuarioId)
-                .orElseThrow(() -> new EscolaNotFoundException("School não encontrada"));
+                .orElseThrow(() -> new SchoolNotFoundException("School não encontrada"));
     }
 
     @Transactional(readOnly = true)
     public Address buscarEnderecoDaEscola(UUID escolaId) {
         UUID usuarioId = currentUserService.getCurrentUserId();
         School school = schoolRepository.findByIdEscolaAndIdUsuario(escolaId, usuarioId)
-                .orElseThrow(() -> new EscolaNotFoundException("School não encontrada"));
+                .orElseThrow(() -> new SchoolNotFoundException("School não encontrada"));
         return school.getAddress();
     }
 

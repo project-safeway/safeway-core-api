@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.guardian.GuardianRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.ResponsavelNotFoundException;
+import com.safeway.tech.infra.exception.GuardianNotFoundException;
 import com.safeway.tech.repository.GuardianRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class ResponsavelService {
     public Guardian buscarPorId(UUID id) {
         UUID userId = currentUserService.getCurrentUserId();
         return guardianRepository.findByIdResponsavelAndIdUsuario(id, userId)
-                .orElseThrow(() -> new ResponsavelNotFoundException("O responsável com ID " + id + "não foi encontrado"));
+                .orElseThrow(() -> new GuardianNotFoundException("O responsável com ID " + id + "não foi encontrado"));
     }
 
     public Optional<Guardian> buscarPorCpfAndUsuario(String cpf, UUID userId) {

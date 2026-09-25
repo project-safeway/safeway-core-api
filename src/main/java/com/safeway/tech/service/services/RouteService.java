@@ -7,7 +7,7 @@ import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.RouteSchool;
 import com.safeway.tech.domain.models.Transport;
-import com.safeway.tech.infra.exception.ItinerarioNotFoundException;
+import com.safeway.tech.infra.exception.RouteNotFoundException;
 import com.safeway.tech.repository.RouteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ public class RouteService {
 
     public Route buscarPorId(UUID id) {
         return routeRepository.findById(id)
-                .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
+                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
     }
 
     @Transactional

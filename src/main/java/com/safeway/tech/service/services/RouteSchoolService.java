@@ -5,9 +5,9 @@ import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteSchool;
-import com.safeway.tech.infra.exception.EnderecoNotFoundException;
-import com.safeway.tech.infra.exception.ItinerarioEscolaNotFound;
-import com.safeway.tech.infra.exception.ItinerarioNotFoundException;
+import com.safeway.tech.infra.exception.AddressNotFoundException;
+import com.safeway.tech.infra.exception.RouteSchoolNotFound;
+import com.safeway.tech.infra.exception.RouteNotFoundException;
 import com.safeway.tech.repository.RouteSchoolRepository;
 import com.safeway.tech.repository.RouteRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class RouteSchoolService {
     @Transactional
     public void adicionarEscola(UUID itinerarioId, ItinerarioEscolaRequest request) throws BadRequestException {
         Route route = routeRepository.findById(itinerarioId)
-                .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
+                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
 
         School school = schoolService.buscarPorId(request.escolaId());
 
@@ -52,7 +52,7 @@ public class RouteSchoolService {
         }
 
         if (address.getLatitude() == null || address.getLongitude() == null) {
-            throw new EnderecoNotFoundException("Endereço da school não possui latitude/longitude válidas");
+            throw new AddressNotFoundException("Endereço da school não possui latitude/longitude válidas");
         }
         double lat = address.getLatitude();
         double lng = address.getLongitude();
@@ -63,7 +63,7 @@ public class RouteSchoolService {
 
         routeSchoolRepository.findByItinerarioIdAndEscolaIdEscola(itinerarioId, school.getId())
                 .ifPresent(e -> {
-                    throw new ItinerarioEscolaNotFound("School já está vinculada a este itinerário");
+                    throw new RouteSchoolNotFound("School já está vinculada a este itinerário");
                 });
 
         RouteSchool entity = new RouteSchool();

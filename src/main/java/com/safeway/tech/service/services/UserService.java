@@ -1,7 +1,7 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.UsuarioNotFoundException;
+import com.safeway.tech.infra.exception.UserNotFoundException;
 import com.safeway.tech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class UserService {
 
     public void excluir(UUID idUsuario) {
         if (!userRepository.existsById(idUsuario)) {
-            throw new UsuarioNotFoundException("Usuário com ID " + idUsuario + " não encontrado.");
+            throw new UserNotFoundException("Usuário com ID " + idUsuario + " não encontrado.");
         }
 
         userRepository.deleteById(idUsuario);

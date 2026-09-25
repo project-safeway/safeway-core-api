@@ -7,7 +7,7 @@ import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.AlunoNotFoundException;
+import com.safeway.tech.infra.exception.StudentNotFoundException;
 import com.safeway.tech.infra.exception.OperationNotAllowedException;
 import com.safeway.tech.infra.messaging.publishers.EventPublisher;
 import com.safeway.tech.repository.StudentRepository;
@@ -34,7 +34,7 @@ public class StudentService {
     public Student buscarPorId(UUID alunoId) {
         UUID userId = currentUserService.getCurrentUserId();
         return studentRepository.findByIdAndUsuarioId(alunoId, userId)
-                .orElseThrow(() -> new AlunoNotFoundException("Student não encontrado"));
+                .orElseThrow(() -> new StudentNotFoundException("Student não encontrado"));
     }
 
     @Transactional

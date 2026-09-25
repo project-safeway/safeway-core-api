@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.transport.TransportRequest;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.TransporteNotFoundException;
+import com.safeway.tech.infra.exception.TransportNotFoundException;
 import com.safeway.tech.repository.TransportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class TransportService {
         UUID userId = currentUserService.getCurrentUserId();
 
         return transportRepository.findByIdAndUsuarioId(idTransporte, userId)
-                .orElseThrow(() -> new TransporteNotFoundException("Transport não encontrado"));
+                .orElseThrow(() -> new TransportNotFoundException("Transport não encontrado"));
     }
 
     public List<Student> listarAlunos(UUID idTransporte) {

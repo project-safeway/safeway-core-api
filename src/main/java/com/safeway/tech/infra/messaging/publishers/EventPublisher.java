@@ -2,7 +2,7 @@ package com.safeway.tech.infra.messaging.publishers;
 
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.infra.messaging.config.RabbitMQProperties;
-import com.safeway.tech.infra.messaging.event.AlunoEvent;
+import com.safeway.tech.infra.messaging.event.StudentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -23,7 +23,7 @@ public class EventPublisher {
         log.info("Publicando evento de student criado: {}", student.getId());
 
         try {
-            AlunoEvent event = new AlunoEvent(
+            StudentEvent event = new StudentEvent(
                     UUID.randomUUID(),
                     student.getId(),
                     student.getUsuario().getId(),
@@ -51,7 +51,7 @@ public class EventPublisher {
         log.info("Publicando evento de student atualizado: {}", student.getId());
 
         try {
-            AlunoEvent event = new AlunoEvent(
+            StudentEvent event = new StudentEvent(
                     UUID.randomUUID(),
                     student.getId(),
                     student.getUsuario().getId(),
@@ -79,7 +79,7 @@ public class EventPublisher {
         log.info("Publicando evento de student inativado: {}", student.getId());
 
         try {
-            AlunoEvent event = new AlunoEvent(
+            StudentEvent event = new StudentEvent(
                     UUID.randomUUID(),
                     student.getId(),
                     student.getUsuario().getId(),

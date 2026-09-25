@@ -24,7 +24,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/responsavel")
 @RequiredArgsConstructor
-public class ResponsavelController {
+public class GuardianController {
 
     private final ResponsavelService responsavelService;
 

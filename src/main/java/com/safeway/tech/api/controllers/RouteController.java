@@ -32,7 +32,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/itinerarios")
 @RequiredArgsConstructor
-public class ItinerarioController {
+public class RouteController {
 
     private final ItinerarioService itinerarioService;
     private final ItinerarioAlunoService itinerarioAlunoService;

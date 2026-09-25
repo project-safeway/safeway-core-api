@@ -30,7 +30,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/alunos")
 @RequiredArgsConstructor
-public class AlunoController {
+public class StudentController {
 
     private final AlunoService alunoService;
     private final AlunoFacade alunoFacade;

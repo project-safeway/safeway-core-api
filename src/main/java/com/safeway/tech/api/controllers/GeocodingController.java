@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rotas")
 @CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
-public class RotasController {
+public class GeocodingController {
 
     private final RotasCompostasService rotasCompostasService;
 

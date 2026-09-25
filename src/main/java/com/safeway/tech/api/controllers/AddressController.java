@@ -23,7 +23,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/enderecos")
 @RequiredArgsConstructor
-public class EnderecoController {
+public class AddressController {
 
     private final EnderecoService enderecoService;
 

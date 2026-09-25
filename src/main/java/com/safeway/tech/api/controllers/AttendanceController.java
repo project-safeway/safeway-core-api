@@ -31,7 +31,7 @@ import java.util.UUID;
 @RequestMapping("/chamada")
 @RestController
 @RequiredArgsConstructor
-public class ChamadaController {
+public class AttendanceController {
 
     private final ChamadaService chamadaService;
     private final ChamadaAlunoService chamadaAlunoService;

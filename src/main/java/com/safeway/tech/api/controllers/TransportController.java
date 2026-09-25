@@ -27,7 +27,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/transporte")
 @RequiredArgsConstructor
-public class TransporteController {
+public class TransportController {
 
     private final TransporteService transporteService;
 

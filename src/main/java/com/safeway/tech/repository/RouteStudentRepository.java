@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ItinerarioAlunoRepository extends JpaRepository<RouteStudent, UUID> {
+public interface RouteStudentRepository extends JpaRepository<RouteStudent, UUID> {
 
     @Query("SELECT ia FROM RouteStudent ia WHERE ia.itinerario.id = :itinerarioId")
     List<RouteStudent> findByItinerarioId(@Param("itinerarioId") UUID itinerarioId);

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ResponsavelRepository extends JpaRepository<Guardian, UUID> {
+public interface GuardianRepository extends JpaRepository<Guardian, UUID> {
 
     @Query("SELECT r FROM Guardian r WHERE r.usuario.id = :userId")
     List<Guardian> findAllByIdUsuario(@Param("userId") UUID userId);

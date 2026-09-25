@@ -5,8 +5,8 @@ import com.safeway.tech.api.dto.address.AddressRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.infra.exception.EnderecoNotFoundException;
-import com.safeway.tech.repository.EnderecoRepository;
-import com.safeway.tech.repository.ResponsavelRepository;
+import com.safeway.tech.repository.AddressRepository;
+import com.safeway.tech.repository.GuardianRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,20 +20,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AddressService {
 
-    private final EnderecoRepository enderecoRepository;
-    private final ResponsavelRepository responsavelRepository;
+    private final AddressRepository addressRepository;
+    private final GuardianRepository guardianRepository;
     private final GeocodingService geocodingService;
     private final CurrentUserService currentUserService;
 
     public Address buscarPorId(UUID id) {
-        return enderecoRepository.findById(id)
+        return addressRepository.findById(id)
                 .orElseThrow(() -> new EnderecoNotFoundException("Endereço com ID " + id + " não encontrado"));
     }
 
     @Transactional(readOnly = true)
     public List<Address> listarEnderecosDisponiveis(UUID alunoId) {
         UUID userId = currentUserService.getCurrentUserId();
-        List<Guardian> responsaveis = responsavelRepository.findByAlunosIdAndUsuarioIdUsuario(alunoId, userId);
+        List<Guardian> responsaveis = guardianRepository.findByAlunosIdAndUsuarioIdUsuario(alunoId, userId);
 
         return responsaveis.stream()
                 .map(Guardian::getAddress)
@@ -48,7 +48,7 @@ public class AddressService {
         aplicarDados(address, request);
 
         calcularCoordenadas(address);
-        return enderecoRepository.save(address);
+        return addressRepository.save(address);
     }
 
     public Address atualizar(UUID id, AddressRequest request) {
@@ -57,13 +57,13 @@ public class AddressService {
         aplicarDados(address, request);
         calcularCoordenadas(address);
 
-        return enderecoRepository.save(address);
+        return addressRepository.save(address);
     }
 
     public void desativar(UUID id) {
         Address address = buscarPorId(id);
         address.setAtivo(false);
-        enderecoRepository.save(address);
+        addressRepository.save(address);
     }
 
     private void aplicarDados(Address address, AddressRequest request) {

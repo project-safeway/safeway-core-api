@@ -5,7 +5,7 @@ import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.TransporteNotFoundException;
-import com.safeway.tech.repository.TransporteRepository;
+import com.safeway.tech.repository.TransportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +16,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TransportService {
 
-    private final TransporteRepository transporteRepository;
+    private final TransportRepository transportRepository;
     private final UserService userService;
     private final CurrentUserService currentUserService;
 
     public Transport buscarPorId(UUID idTransporte) {
         UUID userId = currentUserService.getCurrentUserId();
 
-        return transporteRepository.findByIdAndUsuarioId(idTransporte, userId)
+        return transportRepository.findByIdAndUsuarioId(idTransporte, userId)
                 .orElseThrow(() -> new TransporteNotFoundException("Transport não encontrado"));
     }
 
@@ -34,7 +34,7 @@ public class TransportService {
 
     public List<Transport> listarTransportes() {
         UUID userId = currentUserService.getCurrentUserId();
-        return transporteRepository.findAllByIdUsuario(userId);
+        return transportRepository.findAllByIdUsuario(userId);
     }
 
     public Transport salvarTransporte(TransportRequest request) {
@@ -47,7 +47,7 @@ public class TransportService {
 
         transport.setUser(user);
 
-        return transporteRepository.save(transport);
+        return transportRepository.save(transport);
     }
 
     public Transport atualizarTransporte(UUID idTransporte, TransportRequest request) {
@@ -55,12 +55,12 @@ public class TransportService {
 
         aplicarDados(transport, request);
 
-        return transporteRepository.save(transport);
+        return transportRepository.save(transport);
     }
 
     public void excluirTransporte(UUID idTransporte) {
         Transport transport = buscarPorId(idTransporte);
-        transporteRepository.delete(transport);
+        transportRepository.delete(transport);
     }
 
     private void aplicarDados(Transport transport, TransportRequest request) {

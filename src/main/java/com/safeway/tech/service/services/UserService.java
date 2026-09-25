@@ -2,7 +2,7 @@ package com.safeway.tech.service.services;
 
 import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.UsuarioNotFoundException;
-import com.safeway.tech.repository.UsuarioRepository;
+import com.safeway.tech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,34 +13,34 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository userRepository;
 
     public List<User> listarUsuarios() {
-        return usuarioRepository.findAll();
+        return userRepository.findAll();
     }
 
     public User buscarPorId(UUID idUsuario) {
-        return usuarioRepository.getReferenceById(idUsuario);
+        return userRepository.getReferenceById(idUsuario);
     }
 
     public User salvarUsuario(User user) {
-        return usuarioRepository.save(user);
+        return userRepository.save(user);
     }
 
     public User alterarUsuario(User novoUser, UUID idUsuario) {
-        User user = usuarioRepository.findById(idUsuario).orElseThrow(RuntimeException::new);
+        User user = userRepository.findById(idUsuario).orElseThrow(RuntimeException::new);
         user.setNome(novoUser.getNome());
         user.setEmail(novoUser.getEmail());
         user.setTel1(novoUser.getTel1());
         user.setTel2(novoUser.getTel2());
-        return usuarioRepository.save(user);
+        return userRepository.save(user);
     }
 
     public void excluir(UUID idUsuario) {
-        if (!usuarioRepository.existsById(idUsuario)) {
+        if (!userRepository.existsById(idUsuario)) {
             throw new UsuarioNotFoundException("Usuário com ID " + idUsuario + " não encontrado.");
         }
 
-        usuarioRepository.deleteById(idUsuario);
+        userRepository.deleteById(idUsuario);
     }
 }

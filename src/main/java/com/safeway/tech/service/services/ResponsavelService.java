@@ -5,7 +5,7 @@ import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.ResponsavelNotFoundException;
-import com.safeway.tech.repository.ResponsavelRepository;
+import com.safeway.tech.repository.GuardianRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,24 +18,24 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ResponsavelService {
 
-    private final ResponsavelRepository responsavelRepository;
+    private final GuardianRepository guardianRepository;
     private final UserService userService;
     private final AddressService addressService;
     private final CurrentUserService currentUserService;
 
     public Guardian buscarPorId(UUID id) {
         UUID userId = currentUserService.getCurrentUserId();
-        return responsavelRepository.findByIdResponsavelAndIdUsuario(id, userId)
+        return guardianRepository.findByIdResponsavelAndIdUsuario(id, userId)
                 .orElseThrow(() -> new ResponsavelNotFoundException("O responsável com ID " + id + "não foi encontrado"));
     }
 
     public Optional<Guardian> buscarPorCpfAndUsuario(String cpf, UUID userId) {
-        return responsavelRepository.findByCpfAndIdUsuario(cpf, userId);
+        return guardianRepository.findByCpfAndIdUsuario(cpf, userId);
     }
 
     public List<Guardian> listarResponsaveis() {
         UUID userId = currentUserService.getCurrentUserId();
-        return responsavelRepository.findAllByIdUsuario(userId);
+        return guardianRepository.findAllByIdUsuario(userId);
     }
 
     @Transactional
@@ -50,7 +50,7 @@ public class ResponsavelService {
         User user = userService.buscarPorId(userId);
         guardian.setUser(user);
 
-        return responsavelRepository.save(guardian);
+        return guardianRepository.save(guardian);
     }
 
     @Transactional
@@ -66,13 +66,13 @@ public class ResponsavelService {
             guardian.setAddress(address);
         }
 
-        return responsavelRepository.save(guardian);
+        return guardianRepository.save(guardian);
     }
 
     public void desativar(UUID id) {
         Guardian guardian = buscarPorId(id);
         guardian.setAtivo(false);
-        responsavelRepository.save(guardian);
+        guardianRepository.save(guardian);
     }
 
     private void aplicaDados(Guardian guardian, GuardianRequest request) {

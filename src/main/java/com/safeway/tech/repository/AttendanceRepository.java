@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-public interface ChamadaRepository extends JpaRepository<Attendance, UUID>, JpaSpecificationExecutor<Attendance> {
+public interface AttendanceRepository extends JpaRepository<Attendance, UUID>, JpaSpecificationExecutor<Attendance> {
 
     @Query("SELECT c FROM Attendance c WHERE c.itinerario.id = :idItinerario AND c.status = :status")
     Optional<Attendance> findByItinerarioIdAndStatus(

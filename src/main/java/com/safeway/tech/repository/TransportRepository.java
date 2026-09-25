@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface TransporteRepository extends JpaRepository<Transport, UUID> {
+public interface TransportRepository extends JpaRepository<Transport, UUID> {
 
     @Query("SELECT t FROM Transport t WHERE t.placa = :placa")
     Optional<Transport> findByPlaca(@Param("placa") String placa);

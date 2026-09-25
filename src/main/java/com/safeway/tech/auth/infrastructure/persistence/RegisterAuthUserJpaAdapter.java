@@ -6,8 +6,8 @@ import com.safeway.tech.auth.core.port.RegisterAuthUserPort;
 import com.safeway.tech.domain.enums.UserRole;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.repository.TransporteRepository;
-import com.safeway.tech.repository.UsuarioRepository;
+import com.safeway.tech.repository.TransportRepository;
+import com.safeway.tech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,17 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RegisterAuthUserJpaAdapter implements RegisterAuthUserPort {
 
-    private final UsuarioRepository usuarioRepository;
-    private final TransporteRepository transporteRepository;
+    private final UserRepository userRepository;
+    private final TransportRepository transportRepository;
 
     @Override
     public boolean existsByEmail(String email) {
-        return usuarioRepository.existsByEmail(email);
+        return userRepository.existsByEmail(email);
     }
 
     @Override
     public boolean existsByPlaca(String placa) {
-        return transporteRepository.findByPlaca(placa).isPresent();
+        return transportRepository.findByPlaca(placa).isPresent();
     }
 
     @Override
@@ -38,14 +38,14 @@ public class RegisterAuthUserJpaAdapter implements RegisterAuthUserPort {
         user.setPasswordHash(data.passwordHash());
         user.setRole(UserRole.COMMON);
         user.setTel1(data.telefone());
-        User savedUser = usuarioRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         Transport transport = new Transport();
         transport.setPlaca(data.transportePlaca());
         transport.setModelo(data.transporteModelo());
         transport.setCapacidade(data.transporteCapacidade());
         transport.setUser(savedUser);
-        Transport savedTransport = transporteRepository.save(transport);
+        Transport savedTransport = transportRepository.save(transport);
 
         return new RegisteredAuthUser(savedUser.getId(), savedTransport.getId());
     }

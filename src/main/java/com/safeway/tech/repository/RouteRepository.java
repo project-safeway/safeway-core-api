@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-public interface ItinerarioRepository extends JpaRepository<Route, UUID> {
+public interface RouteRepository extends JpaRepository<Route, UUID> {
 
     @Query("SELECT i FROM Route i WHERE i.transporte.id = :idTransporte AND i.ativo = true")
     List<Route> findAllByTransporte(@Param("idTransporte") UUID idTransporte);

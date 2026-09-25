@@ -8,7 +8,7 @@ import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.RouteSchool;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.infra.exception.ItinerarioNotFoundException;
-import com.safeway.tech.repository.ItinerarioRepository;
+import com.safeway.tech.repository.RouteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RouteService {
 
-    private final ItinerarioRepository itinerarioRepository;
+    private final RouteRepository routeRepository;
     private final TransportService transportService;
     private final RouteStudentService routeStudentService;
     private final RouteSchoolService routeSchoolService;
@@ -30,11 +30,11 @@ public class RouteService {
 
     public List<Route> listarTodos() {
         UUID transporteId = currentUserService.getCurrentTransporteId();
-        return itinerarioRepository.findAllByTransporte(transporteId);
+        return routeRepository.findAllByTransporte(transporteId);
     }
 
     public Route buscarPorId(UUID id) {
-        return itinerarioRepository.findById(id)
+        return routeRepository.findById(id)
                 .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
     }
 
@@ -42,7 +42,7 @@ public class RouteService {
     public void desativar(UUID id) {
         Route route = buscarPorId(id);
         route.setAtivo(false);
-        itinerarioRepository.save(route);
+        routeRepository.save(route);
     }
 
     @Transactional
@@ -59,7 +59,7 @@ public class RouteService {
         Transport transport = transportService.buscarPorId(transporteId);
         route.setTransport(transport);
 
-        return itinerarioRepository.save(route);
+        return routeRepository.save(route);
     }
 
     @Transactional
@@ -109,7 +109,7 @@ public class RouteService {
             routeSchoolService.salvarTodos(escolasAtuais);
         }
 
-        return itinerarioRepository.save(route);
+        return routeRepository.save(route);
     }
 
 }

@@ -3,7 +3,7 @@ package com.safeway.tech.auth.infrastructure.persistence;
 import com.safeway.tech.auth.core.model.AuthUser;
 import com.safeway.tech.auth.core.port.LoadAuthUserPort;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.repository.UsuarioRepository;
+import com.safeway.tech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +13,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LoadAuthUserJpaAdapter implements LoadAuthUserPort {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Optional<AuthUser> findByEmail(String email) {
-        return usuarioRepository.findByEmail(email)
+        return userRepository.findByEmail(email)
                 .map(this::toAuthUser);
     }
 

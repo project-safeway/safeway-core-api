@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ChamadaAlunoRepository extends JpaRepository<AttendanceStudent, UUID> {
+public interface AttendanceStudentRepository extends JpaRepository<AttendanceStudent, UUID> {
 
     @Query("SELECT ca FROM AttendanceStudent ca WHERE ca.chamada = :chamada AND ca.aluno = :aluno")
     Optional<AttendanceStudent> findByChamadaAndAluno(

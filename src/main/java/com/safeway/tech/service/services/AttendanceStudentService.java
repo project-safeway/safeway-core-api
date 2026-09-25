@@ -5,7 +5,7 @@ import com.safeway.tech.domain.enums.PresenceStatusEnum;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.domain.models.AttendanceStudent;
-import com.safeway.tech.repository.ChamadaAlunoRepository;
+import com.safeway.tech.repository.AttendanceStudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AttendanceStudentService {
 
-    private final ChamadaAlunoRepository chamadaAlunoRepository;
+    private final AttendanceStudentRepository attendanceStudentRepository;
     private final StudentService studentService;
     private final AttendanceService attendanceService;
 
@@ -36,7 +36,7 @@ public class AttendanceStudentService {
 
             Student student = studentService.buscarPorId(idAluno);
 
-            AttendanceStudent attendanceStudent = chamadaAlunoRepository
+            AttendanceStudent attendanceStudent = attendanceStudentRepository
                     .findByChamadaAndAluno(attendance, student)
                     .orElseGet(() -> {
                         AttendanceStudent ca = new AttendanceStudent();
@@ -48,7 +48,7 @@ public class AttendanceStudentService {
             attendanceStudent.setPresenca(status);
             attendanceStudent.setData(LocalDateTime.now());
 
-            chamadaAlunoRepository.save(attendanceStudent);
+            attendanceStudentRepository.save(attendanceStudent);
         }
     }
 

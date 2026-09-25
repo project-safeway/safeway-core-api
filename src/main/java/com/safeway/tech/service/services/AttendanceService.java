@@ -3,8 +3,8 @@ package com.safeway.tech.service.services;
 import com.safeway.tech.domain.enums.AttendanceStatusEnum;
 import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.domain.models.Route;
-import com.safeway.tech.repository.ChamadaRepository;
-import com.safeway.tech.repository.specification.ChamadaSpecs;
+import com.safeway.tech.repository.AttendanceRepository;
+import com.safeway.tech.repository.specification.AttendanceSpecs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,17 +18,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AttendanceService {
 
-    private final ChamadaRepository chamadaRepository;
+    private final AttendanceRepository attendanceRepository;
     private final RouteService routeService;
     private final CurrentUserService currentUserService;
 
     public Attendance buscarPorId(UUID id) {
-        return chamadaRepository.findById(id)
+        return attendanceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Chamada não encontrada"));
     }
 
     public Attendance buscarChamadaAtivaPorItinerario(UUID idItinerario) {
-        return chamadaRepository.findByItinerarioIdAndStatus(idItinerario, AttendanceStatusEnum.IN_PROGRESS)
+        return attendanceRepository.findByItinerarioIdAndStatus(idItinerario, AttendanceStatusEnum.IN_PROGRESS)
                 .orElse(null);
     }
 
@@ -44,7 +44,7 @@ public class AttendanceService {
         attendance.setRoute(route);
         attendance.setStatus(AttendanceStatusEnum.IN_PROGRESS);
 
-        attendance = chamadaRepository.save(attendance);
+        attendance = attendanceRepository.save(attendance);
 
         return attendance;
     }
@@ -57,7 +57,7 @@ public class AttendanceService {
 
         attendance.setStatus(statusChamada);
 
-        attendance = chamadaRepository.save(attendance);
+        attendance = attendanceRepository.save(attendance);
 
         return attendance;
     }
@@ -67,12 +67,12 @@ public class AttendanceService {
         UUID userId = currentUserService.getCurrentUserId();
 
         Specification<Attendance> specs = Specification.allOf(
-                ChamadaSpecs.comItinerarioId(idItinerario),
-                ChamadaSpecs.comStatus(status),
-                ChamadaSpecs.comTransporte(transporteId),
-                ChamadaSpecs.comUsuario(userId)
+                AttendanceSpecs.comItinerarioId(idItinerario),
+                AttendanceSpecs.comStatus(status),
+                AttendanceSpecs.comTransporte(transporteId),
+                AttendanceSpecs.comUsuario(userId)
         );
 
-        return chamadaRepository.findAll(specs, pageable);
+        return attendanceRepository.findAll(specs, pageable);
     }
 }

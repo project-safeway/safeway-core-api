@@ -12,8 +12,8 @@ import com.safeway.tech.infra.exception.CoordinatesNotValidException;
 import com.safeway.tech.infra.exception.EnderecoNotFoundException;
 import com.safeway.tech.infra.exception.ItinerarioNotFoundException;
 import com.safeway.tech.infra.exception.OperationNotAllowedException;
-import com.safeway.tech.repository.ItinerarioAlunoRepository;
-import com.safeway.tech.repository.ItinerarioRepository;
+import com.safeway.tech.repository.RouteStudentRepository;
+import com.safeway.tech.repository.RouteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,22 +29,22 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RouteStudentService {
 
-    private final ItinerarioAlunoRepository itinerarioAlunoRepository;
-    private final ItinerarioRepository itinerarioRepository;
+    private final RouteStudentRepository routeStudentRepository;
+    private final RouteRepository routeRepository;
     private final StudentService studentService;
     private final AddressService addressService;
 
     public List<RouteStudent> buscarPorItinerarioId(UUID itinerarioId) {
-        return itinerarioAlunoRepository.findByItinerarioId(itinerarioId);
+        return routeStudentRepository.findByItinerarioId(itinerarioId);
     }
 
     public void salvarTodos(List<RouteStudent> alunos) {
-        itinerarioAlunoRepository.saveAll(alunos);
+        routeStudentRepository.saveAll(alunos);
     }
 
     @Transactional
     public void adicionarAluno(UUID itinerarioId, ItinerarioAlunoRequest request) {
-        Route route = itinerarioRepository.findById(itinerarioId)
+        Route route = routeRepository.findById(itinerarioId)
                 .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
 
         Student student = studentService.buscarPorId(request.alunoId());
@@ -81,7 +81,7 @@ public class RouteStudentService {
         }
 
         // Evita duplicidade
-        Optional<RouteStudent> ia = itinerarioAlunoRepository.findByItinerarioIdAndAlunoId(itinerarioId, student.getId());
+        Optional<RouteStudent> ia = routeStudentRepository.findByItinerarioIdAndAlunoId(itinerarioId, student.getId());
 
         if (ia.isPresent()) {
             return;
@@ -93,22 +93,22 @@ public class RouteStudentService {
         entity.setAddress(address);
         entity.setOrdemEmbarque(request.ordemEmbarque());
 
-        itinerarioAlunoRepository.save(entity);
+        routeStudentRepository.save(entity);
     }
 
     @Transactional
     public void removerAluno(UUID itinerarioId, UUID alunoId) {
-        RouteStudent entity = itinerarioAlunoRepository
+        RouteStudent entity = routeStudentRepository
                 .findByItinerarioIdAndAlunoId(itinerarioId, alunoId)
                 .orElseThrow(() -> new AlunoNotFoundException("Student não encontrado no itinerário"));
 
-        itinerarioAlunoRepository.delete(entity);
+        routeStudentRepository.delete(entity);
     }
 
     @Transactional
     public void sincronizarAlunos(Route route, List<ItinerarioAlunoRequest> novos) {
         // Remove todos os vínculos anteriores
-        itinerarioAlunoRepository.deleteAllByItinerarioId(route.getId());
+        routeStudentRepository.deleteAllByItinerarioId(route.getId());
 
         // Cria novos vínculos — atribui endereco e valida se pertence ao responsável
         List<RouteStudent> entidades = novos.stream().map(dto -> {
@@ -153,13 +153,13 @@ public class RouteStudentService {
             return ia;
         }).toList();
 
-        itinerarioAlunoRepository.saveAll(entidades);
+        routeStudentRepository.saveAll(entidades);
     }
 
     @Transactional
     public void reordenar(UUID itinerarioId, List<UUID> novaOrdemAlunoIds) {
         // Mantido apenas para compatibilidade, mas ordemGlobal sera tratada em endpoint unificado
-        List<RouteStudent> atuais = itinerarioAlunoRepository.findByItinerarioId(itinerarioId);
+        List<RouteStudent> atuais = routeStudentRepository.findByItinerarioId(itinerarioId);
         Map<UUID, RouteStudent> map = atuais.stream()
                 .collect(Collectors.toMap(a -> a.getStudent().getId(), a -> a));
         int ordem = 1;
@@ -169,15 +169,15 @@ public class RouteStudentService {
                 ia.setOrdemEmbarque(ordem++);
             }
         }
-        itinerarioAlunoRepository.saveAll(atuais);
+        routeStudentRepository.saveAll(atuais);
     }
 
     @Transactional
     public List<AlunoComLocalizacao> buscarAlunosComLocalizacao(UUID itinerarioId) {
-        Route route = itinerarioRepository.findById(itinerarioId)
+        Route route = routeRepository.findById(itinerarioId)
                 .orElseThrow(() -> new ItinerarioNotFoundException("Itinerário não encontrado"));
 
-        return itinerarioAlunoRepository.findByItinerarioOrderByOrdemEmbarqueAsc(route).stream()
+        return routeStudentRepository.findByItinerarioOrderByOrdemEmbarqueAsc(route).stream()
                 .filter(ia -> ia.getAddress() != null && ia.getAddress().getLatitude() != null && ia.getAddress().getLongitude() != null)
                 .map(ia -> {
                     Address address = ia.getAddress();

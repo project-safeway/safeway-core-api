@@ -5,7 +5,7 @@ import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.EscolaNotFoundException;
-import com.safeway.tech.repository.EscolaRepository;
+import com.safeway.tech.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,27 +17,27 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SchoolService {
 
-    private final EscolaRepository escolaRepository;
+    private final SchoolRepository schoolRepository;
     private final AddressService addressService;
     private final UserService userService;
     private final CurrentUserService currentUserService;
 
     public List<School> listarEscolasComAlunos() {
         UUID usuarioId = currentUserService.getCurrentUserId();
-        return escolaRepository.findByUsuarioIdUsuario(usuarioId);
+        return schoolRepository.findByUsuarioIdUsuario(usuarioId);
     }
 
     @Transactional(readOnly = true)
     public School buscarPorId(UUID escolaId) {
         UUID usuarioId = currentUserService.getCurrentUserId();
-        return escolaRepository.findByIdEscolaAndIdUsuario(escolaId, usuarioId)
+        return schoolRepository.findByIdEscolaAndIdUsuario(escolaId, usuarioId)
                 .orElseThrow(() -> new EscolaNotFoundException("School não encontrada"));
     }
 
     @Transactional(readOnly = true)
     public Address buscarEnderecoDaEscola(UUID escolaId) {
         UUID usuarioId = currentUserService.getCurrentUserId();
-        School school = escolaRepository.findByIdEscolaAndIdUsuario(escolaId, usuarioId)
+        School school = schoolRepository.findByIdEscolaAndIdUsuario(escolaId, usuarioId)
                 .orElseThrow(() -> new EscolaNotFoundException("School não encontrada"));
         return school.getAddress();
     }
@@ -54,7 +54,7 @@ public class SchoolService {
         User user = userService.buscarPorId(usuarioId);
         school.setUser(user);
 
-        return escolaRepository.save(school);
+        return schoolRepository.save(school);
     }
 
     @Transactional
@@ -65,14 +65,14 @@ public class SchoolService {
         Address address = addressService.atualizar(school.getAddress().getId(), request.endereco());
         school.setAddress(address);
 
-        return escolaRepository.save(school);
+        return schoolRepository.save(school);
     }
 
     @Transactional
     public void desativar(UUID escolaId) {
         School school = buscarPorId(escolaId);
         school.setAtivo(false);
-        escolaRepository.save(school);
+        schoolRepository.save(school);
     }
 
     private void aplicarDados(School school, SchoolRequest request) {

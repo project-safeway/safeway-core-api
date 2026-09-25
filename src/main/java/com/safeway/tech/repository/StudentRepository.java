@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AlunoRepository extends JpaRepository<Student, UUID> {
+public interface StudentRepository extends JpaRepository<Student, UUID> {
 
     @Query("SELECT a FROM Student a WHERE a.id IN :ids AND a.usuario.id = :userId")
     List<Student> findByIdInAndIdUsuario(@Param("ids") List<UUID> ids, @Param("userId") UUID userId);

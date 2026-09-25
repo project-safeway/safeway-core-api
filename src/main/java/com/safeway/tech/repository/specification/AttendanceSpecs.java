@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.UUID;
 
-public class ChamadaSpecs {
+public class AttendanceSpecs {
 
     public static Specification<Attendance> comItinerarioId(UUID itinerarioId) {
         return (root, query, cb) ->

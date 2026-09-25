@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface EscolaRepository extends JpaRepository<School, UUID> {
+public interface SchoolRepository extends JpaRepository<School, UUID> {
     @Query("SELECT DISTINCT e FROM School e LEFT JOIN FETCH e.alunos WHERE e.usuario.id = :usuarioId AND e.ativo = true")
     List<School> findByUsuarioIdUsuario(@Param("usuarioId") UUID usuarioId);
 

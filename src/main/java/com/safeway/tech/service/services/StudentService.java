@@ -10,7 +10,7 @@ import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.AlunoNotFoundException;
 import com.safeway.tech.infra.exception.OperationNotAllowedException;
 import com.safeway.tech.infra.messaging.publishers.EventPublisher;
-import com.safeway.tech.repository.AlunoRepository;
+import com.safeway.tech.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StudentService {
 
-    private final AlunoRepository alunoRepository;
+    private final StudentRepository studentRepository;
     private final SchoolService schoolService;
     private final UserService userService;
     private final ResponsavelService responsavelService;
@@ -33,7 +33,7 @@ public class StudentService {
 
     public Student buscarPorId(UUID alunoId) {
         UUID userId = currentUserService.getCurrentUserId();
-        return alunoRepository.findByIdAndUsuarioId(alunoId, userId)
+        return studentRepository.findByIdAndUsuarioId(alunoId, userId)
                 .orElseThrow(() -> new AlunoNotFoundException("Student não encontrado"));
     }
 
@@ -65,7 +65,7 @@ public class StudentService {
             student.adicionarResponsavel(guardian);
         }
 
-        student = alunoRepository.save(student);
+        student = studentRepository.save(student);
 
         eventPublisher.publicarAlunoCriado(student);
         return student;
@@ -87,7 +87,7 @@ public class StudentService {
         student.setSchool(school);
 
         atualizarResponsaveis(student, request.responsaveis(), userId);
-        student = alunoRepository.save(student);
+        student = studentRepository.save(student);
 
         eventPublisher.publicarAlunoAtualizado(student);
         return student;
@@ -97,18 +97,18 @@ public class StudentService {
     public void deletarAluno(UUID alunoId) {
         Student student = buscarPorId(alunoId);
         student.setAtivo(false);
-        alunoRepository.save(student);
+        studentRepository.save(student);
         eventPublisher.publicarAlunoInativado(student);
     }
 
     public List<Student> buscarPorIdEmLote(List<UUID> ids) {
         UUID userId = currentUserService.getCurrentUserId();
-        return alunoRepository.findByIdInAndIdUsuario(ids, userId);
+        return studentRepository.findByIdInAndIdUsuario(ids, userId);
     }
 
     public List<Student> buscarTodosAtivos() {
         UUID userId = currentUserService.getCurrentUserId();
-        return alunoRepository.findByAtivoTrueAndIdUsuario(userId);
+        return studentRepository.findByAtivoTrueAndIdUsuario(userId);
     }
 
     private void aplicarDados(Student student, StudentRequest request) {

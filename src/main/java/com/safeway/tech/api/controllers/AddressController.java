@@ -28,21 +28,21 @@ public class AddressController {
     private final AddressService addressService;
 
     @PostMapping
-    public ResponseEntity<AddressResponse> criar(@Valid @RequestBody AddressRequest request) {
+    public ResponseEntity<AddressResponse> create(@Valid @RequestBody AddressRequest request) {
         Address address = addressService.create(request);
         AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AddressResponse> buscar(@PathVariable UUID id) {
+    public ResponseEntity<AddressResponse> findById(@PathVariable UUID id) {
         Address address = addressService.findById(id);
         AddressResponse response = AddressMapper.toResponse(address);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AddressResponse> atualizar(
+    public ResponseEntity<AddressResponse> update(
             @PathVariable UUID id,
             @Valid @RequestBody AddressRequest request
     ) {
@@ -52,7 +52,7 @@ public class AddressController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desativar(@PathVariable UUID id) {
+    public ResponseEntity<Void> deactivate(@PathVariable UUID id) {
         addressService.deactivate(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.safeway.tech.api.dto.route.google.Localizacao;
-import com.safeway.tech.api.dto.route.google.PontoParada;
+import com.safeway.tech.api.dto.route.google.Location;
+import com.safeway.tech.api.dto.route.google.StopPoint;
 import com.safeway.tech.api.dto.route.google.RotasRequest;
 import com.safeway.tech.api.dto.route.google.Veiculo;
 import org.springframework.beans.factory.annotation.Value;
@@ -99,12 +99,12 @@ public class GoogleOptimizationClient {
         ObjectNode model = mapper.createObjectNode();
 
         ArrayNode shipments = mapper.createArrayNode();
-        for (PontoParada p : request.pontosParada()) {
+        for (StopPoint p : request.stoppingPoint()) {
             ObjectNode shipment = mapper.createObjectNode();
             shipment.put("label", p.id());
             ArrayNode deliveries = mapper.createArrayNode();
             ObjectNode delivery = mapper.createObjectNode();
-            delivery.set("arrivalLocation", criarLocalizacao(p.localizacao()));
+            delivery.set("arrivalLocation", criarLocalizacao(p.location()));
             deliveries.add(delivery);
             shipment.set("deliveries", deliveries);
             shipments.add(shipment);
@@ -113,11 +113,11 @@ public class GoogleOptimizationClient {
 
         // Vehicles
         ArrayNode vehicles = mapper.createArrayNode();
-        Veiculo v = request.veiculo();
+        Veiculo v = request.vehicle();
         ObjectNode vehicle = mapper.createObjectNode();
         vehicle.put("label", v.id());
-        vehicle.set("startLocation", criarLocalizacao(v.localizacaoInicial()));
-        vehicle.set("endLocation", criarLocalizacao(v.localizacaoFinal()));
+        vehicle.set("startLocation", criarLocalizacao(v.locationInicial()));
+        vehicle.set("endLocation", criarLocalizacao(v.locationFinal()));
         vehicles.add(vehicle);
         model.set("vehicles", vehicles);
 
@@ -125,7 +125,7 @@ public class GoogleOptimizationClient {
         return root;
     }
 
-    private ObjectNode criarLocalizacao(Localizacao loc) {
+    private ObjectNode criarLocalizacao(Location loc) {
         if (loc == null) {
             throw new RuntimeException("Localização ausente");
         }

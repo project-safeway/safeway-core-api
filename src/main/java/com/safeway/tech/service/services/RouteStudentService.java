@@ -1,16 +1,16 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.route.StudentWithAddress;
 import com.safeway.tech.api.dto.route.RouteStudentRequest;
+import com.safeway.tech.api.dto.route.StudentWithAddress;
 import com.safeway.tech.domain.models.Address;
-import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteStudent;
-import com.safeway.tech.infra.exception.StudentNotFoundException;
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.infra.exception.CoordinatesNotValidException;
 import com.safeway.tech.infra.exception.RouteNotFoundException;
-import com.safeway.tech.repository.RouteStudentRepository;
+import com.safeway.tech.infra.exception.StudentNotFoundException;
 import com.safeway.tech.repository.RouteRepository;
+import com.safeway.tech.repository.RouteStudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

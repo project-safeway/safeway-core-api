@@ -1,7 +1,7 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.route.google.RotasRequest;
-import com.safeway.tech.api.dto.route.google.RotasResponse;
+import com.safeway.tech.api.dto.route.google.RouteResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,32 +13,32 @@ import java.util.Objects;
 @Slf4j
 public class RouteOptimizationService {
 
-    private List<IOptimizerService> provedores;
+    private final List<IOptimizerService> providers;
 
-    public RouteOptimizationService(List<IOptimizerService> provedores) {
-        this.provedores = provedores;
-        if (provedores != null && !provedores.isEmpty()) {
-            log.info("RotasCompostasService inicializado com {} provedor(es)", provedores.size());
-            provedores.forEach(p -> System.out.println("  - " + p.providerName()));
+    public RouteOptimizationService(List<IOptimizerService> providers) {
+        this.providers = providers;
+        if (providers != null && !providers.isEmpty()) {
+            log.info("RotasCompostasService inicializado com {} provider(es)", providers.size());
+            providers.forEach(p -> System.out.println("  - " + p.providerName()));
         } else {
-            log.warn("⚠️ AVISO: Nenhum provedor de rotas foi encontrado!");
+            log.warn("⚠️ AVISO: Nenhum provider de rotas foi encontrado!");
         }
     }
 
-    public RotasResponse optimizeBestRoute(RotasRequest request) {
-        if (provedores == null || provedores.isEmpty()) {
+    public RouteResponse optimizeBestRoute(RotasRequest request) {
+        if (providers == null || providers.isEmpty()) {
             throw new RuntimeException(
-                    "Nenhum provedor de rotas disponível. " +
+                    "Nenhum provider de rotas disponível. " +
                             "Verifique se AdaptadorOtimizacaoGoogle está configurado como @Service"
             );
         }
 
-        return provedores.stream()
+        return providers.stream()
                 .map(provedor -> {
                     try {
-                        log.info("Chamando provedor: {}", provedor.providerName());
+                        log.info("Chamando provider: {}", provedor.providerName());
                         long startTime = System.currentTimeMillis();
-                        RotasResponse response = provedor.optimizeRoute(request);
+                        RouteResponse response = provedor.optimizeRoute(request);
                         long endTime = System.currentTimeMillis();
                         log.info("Provedor {} respondeu em {}ms", provedor.providerName(), endTime - startTime);
                         return response;
@@ -48,7 +48,7 @@ public class RouteOptimizationService {
                     }
                 })
                 .filter(Objects::nonNull)
-                .min(Comparator.comparingDouble(RotasResponse::distanciaTotal))
-                .orElseThrow(() -> new RuntimeException("Nenhuma rota disponível de nenhum provedor"));
+                .min(Comparator.comparingDouble(RouteResponse::totalDistance))
+                .orElseThrow(() -> new RuntimeException("Nenhuma rota disponível de nenhum provider"));
     }
 }

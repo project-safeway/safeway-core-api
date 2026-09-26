@@ -2,9 +2,9 @@ package com.safeway.tech.service.services;
 
 import com.safeway.tech.domain.enums.AttendanceStatusEnum;
 import com.safeway.tech.domain.enums.PresenceStatusEnum;
-import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.domain.models.AttendanceStudent;
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.repository.AttendanceStudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

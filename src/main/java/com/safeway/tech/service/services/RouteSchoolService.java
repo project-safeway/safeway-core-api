@@ -2,14 +2,14 @@ package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.route.RouteSchoolRequest;
 import com.safeway.tech.domain.models.Address;
-import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteSchool;
+import com.safeway.tech.domain.models.School;
 import com.safeway.tech.infra.exception.AddressNotFoundException;
-import com.safeway.tech.infra.exception.RouteSchoolNotFound;
 import com.safeway.tech.infra.exception.RouteNotFoundException;
-import com.safeway.tech.repository.RouteSchoolRepository;
+import com.safeway.tech.infra.exception.RouteSchoolNotFound;
 import com.safeway.tech.repository.RouteRepository;
+import com.safeway.tech.repository.RouteSchoolRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;

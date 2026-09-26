@@ -4,8 +4,8 @@ import com.safeway.tech.api.dto.route.RouteRequest;
 import com.safeway.tech.api.dto.route.RouteUpdateRequest;
 import com.safeway.tech.api.dto.route.RouteUpdateRequest.RouteStopUpdate;
 import com.safeway.tech.domain.models.Route;
-import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.RouteSchool;
+import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.infra.exception.RouteNotFoundException;
 import com.safeway.tech.repository.RouteRepository;
@@ -55,8 +55,7 @@ public class RouteService {
         route.setEndTime(request.startTime());
         route.setRouteType(request.routeType());
 
-        UUID transportId = currentUserService.getCurrentTransporteId();
-        Transport transport = transportService.findById(transportId);
+        Transport transport = transportService.getTransport();
         route.setTransport(transport);
 
         return routeRepository.save(route);

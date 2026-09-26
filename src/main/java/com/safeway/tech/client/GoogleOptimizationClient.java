@@ -8,7 +8,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.safeway.tech.api.dto.route.google.Location;
 import com.safeway.tech.api.dto.route.google.StopPoint;
 import com.safeway.tech.api.dto.route.google.RotasRequest;
-import com.safeway.tech.api.dto.route.google.Veiculo;
+import com.safeway.tech.api.dto.route.google.Vehicle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -113,11 +113,11 @@ public class GoogleOptimizationClient {
 
         // Vehicles
         ArrayNode vehicles = mapper.createArrayNode();
-        Veiculo v = request.vehicle();
+        Vehicle v = request.vehicle();
         ObjectNode vehicle = mapper.createObjectNode();
         vehicle.put("label", v.id());
-        vehicle.set("startLocation", criarLocalizacao(v.locationInicial()));
-        vehicle.set("endLocation", criarLocalizacao(v.locationFinal()));
+        vehicle.set("startLocation", criarLocalizacao(v.intialLocation()));
+        vehicle.set("endLocation", criarLocalizacao(v.finalLocation()));
         vehicles.add(vehicle);
         model.set("vehicles", vehicles);
 

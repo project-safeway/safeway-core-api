@@ -6,7 +6,7 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record RotasRequest(
-        Veiculo vehicle,
+        Vehicle vehicle,
         List<StopPoint> stoppingPoint,
         Boolean mustOptimizeOrder
 ) {

@@ -20,7 +20,7 @@ public class RouteSchool extends BaseEntity {
     private Integer stopOrder;
 
     @Column(name = "general_order")
-    private Integer general_order;
+    private Integer generalOrder;
 
     @ManyToOne
     @JoinColumn(name = "route_id", nullable = false)

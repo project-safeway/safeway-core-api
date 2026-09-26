@@ -51,7 +51,7 @@ public class SchoolService {
         school.setAddress(address);
 
         UUID usuarioId = currentUserService.getCurrentUserId();
-        User user = userService.buscarPorId(usuarioId);
+        User user = userService.findById(usuarioId);
         school.setUser(user);
 
         return schoolRepository.save(school);

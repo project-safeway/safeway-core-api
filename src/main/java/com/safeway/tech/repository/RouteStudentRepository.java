@@ -20,7 +20,7 @@ public interface RouteStudentRepository extends JpaRepository<RouteStudent, UUID
     @Query("SELECT ia FROM RouteStudent ia WHERE ia.itinerario.id = :itinerarioId AND ia.aluno.id = :alunoId")
     Optional<RouteStudent> findByItinerarioIdAndAlunoId(
             @Param("itinerarioId") UUID itinerarioId,
-            @Param("alunoId") UUID alunoId);
+            @Param("studentId") UUID alunoId);
 
     @Modifying
     @Transactional

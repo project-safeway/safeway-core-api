@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -31,31 +29,23 @@ public class UserController {
 
     @PostMapping
     public UserResponse salvarUsuario(@RequestBody User user) {
-        User salvo = userService.salvarUsuario(user);
+        User salvo = userService.saveUser(user);
         return toResponse(salvo);
-    }
-
-    @GetMapping
-    public List<UserResponse> listarUsuarios() {
-        return userService.listarUsuarios()
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
     }
 
     @GetMapping("/{idUsuario}")
     public UserResponse retornarUm(@PathVariable UUID idUsuario) {
-        return toResponse(userService.buscarPorId(idUsuario));
+        return toResponse(userService.findById(idUsuario));
     }
 
     @DeleteMapping("/{idUsuario}")
     public void excluir(@PathVariable UUID idUsuario) {
-        userService.excluir(idUsuario);
+        userService.deleteUser(idUsuario);
     }
 
     @PutMapping("/{idUsuario}")
     public UserResponse alterarUsuario(@RequestBody User novoUser, @PathVariable UUID idUsuario) {
-        User atualizado = userService.alterarUsuario(novoUser, idUsuario);
+        User atualizado = userService.updateUser(novoUser, idUsuario);
         return toResponse(atualizado);
     }
 
@@ -67,7 +57,7 @@ public class UserController {
 
     @GetMapping("/feign/{idUsuario}")
     public UserFeignResponse buscarUsuario(@PathVariable UUID idUsuario) {
-        User user = userService.buscarPorId(idUsuario);
+        User user = userService.findById(idUsuario);
         return UserFeignResponse.fromEntity(user);
     }
 }

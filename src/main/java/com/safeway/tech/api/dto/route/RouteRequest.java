@@ -8,10 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import java.sql.Time;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ItinerarioRequest(
-        @NotBlank String nome,
-        Time horarioInicio,
-        Time horarioFim,
-        @NotNull RouteTypeEnum tipoViagem
+public record RouteRequest(
+        @NotBlank String name,
+        Time startTime,
+        Time endTime,
+        @NotNull RouteTypeEnum routeType
 ) {
 }

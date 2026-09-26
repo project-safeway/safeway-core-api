@@ -19,13 +19,13 @@ public class RouteOptimizationService {
         this.provedores = provedores;
         if (provedores != null && !provedores.isEmpty()) {
             log.info("RotasCompostasService inicializado com {} provedor(es)", provedores.size());
-            provedores.forEach(p -> System.out.println("  - " + p.nomeProvedor()));
+            provedores.forEach(p -> System.out.println("  - " + p.providerName()));
         } else {
             log.warn("⚠️ AVISO: Nenhum provedor de rotas foi encontrado!");
         }
     }
 
-    public RotasResponse otimizarMelhorRota(RotasRequest request) {
+    public RotasResponse optimizeBestRoute(RotasRequest request) {
         if (provedores == null || provedores.isEmpty()) {
             throw new RuntimeException(
                     "Nenhum provedor de rotas disponível. " +
@@ -36,14 +36,14 @@ public class RouteOptimizationService {
         return provedores.stream()
                 .map(provedor -> {
                     try {
-                        log.info("Chamando provedor: {}", provedor.nomeProvedor());
+                        log.info("Chamando provedor: {}", provedor.providerName());
                         long startTime = System.currentTimeMillis();
-                        RotasResponse response = provedor.otimizarRota(request);
+                        RotasResponse response = provedor.optimizeRoute(request);
                         long endTime = System.currentTimeMillis();
-                        log.info("Provedor {} respondeu em {}ms", provedor.nomeProvedor(), endTime - startTime);
+                        log.info("Provedor {} respondeu em {}ms", provedor.providerName(), endTime - startTime);
                         return response;
                     } catch (Exception e) {
-                        log.error("Provedor {} falhou: {}", provedor.nomeProvedor(), e.getMessage());
+                        log.error("Provedor {} falhou: {}", provedor.providerName(), e.getMessage());
                         return null;
                     }
                 })

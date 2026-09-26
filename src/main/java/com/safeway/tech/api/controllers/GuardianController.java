@@ -30,28 +30,28 @@ public class GuardianController {
 
     @PostMapping
     public ResponseEntity<GuardianResponse> salvarResponsavel(@RequestBody @Valid GuardianRequest request) {
-        Guardian guardian = responsavelService.criarResponsavel(request);
+        Guardian guardian = responsavelService.createGuardian(request);
         GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<GuardianResponse>> listarResponsaveis() {
-        List<Guardian> responsaveis = responsavelService.listarResponsaveis();
+        List<Guardian> responsaveis = responsavelService.listGuardians();
         List<GuardianResponse> response = responsaveis.stream().map(GuardianMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GuardianResponse> retornarUm(@PathVariable UUID id) {
-        Guardian guardian = responsavelService.buscarPorId(id);
+        Guardian guardian = responsavelService.findById(id);
         GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{idResponsavel}")
     public ResponseEntity<Void> excluir(@PathVariable UUID idResponsavel) {
-        responsavelService.desativar(idResponsavel);
+        responsavelService.deactivate(idResponsavel);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -59,7 +59,7 @@ public class GuardianController {
     public ResponseEntity<GuardianResponse> alterarResponsavel(
             @RequestBody @Valid GuardianRequest novoResponsavel,
             @PathVariable UUID idResponsavel) {
-        Guardian guardian = responsavelService.alterarResponsavel(novoResponsavel, idResponsavel);
+        Guardian guardian = responsavelService.updateGuardian(novoResponsavel, idResponsavel);
         GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

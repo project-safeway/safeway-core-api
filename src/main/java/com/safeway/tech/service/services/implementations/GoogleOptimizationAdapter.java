@@ -27,7 +27,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
 
     @Override
     @SuppressWarnings("MethodLength")
-    public RotasResponse otimizarRota(RotasRequest request) {
+    public RotasResponse optimizeRoute(RotasRequest request) {
         try {
             JsonNode response = cliente.otimizarRotas(request);
             RotasResponse bruto = parseResposta(response, request);
@@ -148,7 +148,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
     }
 
     @Override
-    public String nomeProvedor() {
+    public String providerName() {
         return "Google";
     }
 }

@@ -15,32 +15,28 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public List<User> listarUsuarios() {
-        return userRepository.findAll();
+    public User findById(UUID userId) {
+        return userRepository.getReferenceById(userId);
     }
 
-    public User buscarPorId(UUID idUsuario) {
-        return userRepository.getReferenceById(idUsuario);
-    }
-
-    public User salvarUsuario(User user) {
+    public User saveUser(User user) {
         return userRepository.save(user);
     }
 
-    public User alterarUsuario(User novoUser, UUID idUsuario) {
-        User user = userRepository.findById(idUsuario).orElseThrow(RuntimeException::new);
-        user.setNome(novoUser.getNome());
-        user.setEmail(novoUser.getEmail());
-        user.setTel1(novoUser.getTel1());
-        user.setTel2(novoUser.getTel2());
+    public User updateUser(User newUserData, UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(RuntimeException::new);
+        user.setName(newUserData.getName());
+        user.setEmail(newUserData.getEmail());
+        user.setPrimaryPhoneNumber(newUserData.getPrimaryPhoneNumber());
+        user.setSecondaryPhoneNumber(newUserData.getSecondaryPhoneNumber());
         return userRepository.save(user);
     }
 
-    public void excluir(UUID idUsuario) {
-        if (!userRepository.existsById(idUsuario)) {
-            throw new UserNotFoundException("Usuário com ID " + idUsuario + " não encontrado.");
+    public void deleteUser(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("Usuário com ID " + userId + " não encontrado.");
         }
 
-        userRepository.deleteById(idUsuario);
+        userRepository.deleteById(userId);
     }
 }

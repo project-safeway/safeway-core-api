@@ -1,8 +1,8 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.route.ItinerarioRequest;
-import com.safeway.tech.api.dto.route.ItinerarioUpdateRequest;
-import com.safeway.tech.api.dto.route.ItinerarioUpdateRequest.ItinerarioParadaUpdate;
+import com.safeway.tech.api.dto.route.RouteRequest;
+import com.safeway.tech.api.dto.route.RouteUpdateRequest;
+import com.safeway.tech.api.dto.route.RouteUpdateRequest.RouteStopUpdate;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.RouteSchool;
@@ -28,85 +28,85 @@ public class RouteService {
     private final RouteSchoolService routeSchoolService;
     private final CurrentUserService currentUserService;
 
-    public List<Route> listarTodos() {
-        UUID transporteId = currentUserService.getCurrentTransporteId();
-        return routeRepository.findAllByTransporte(transporteId);
+    public List<Route> findAll() {
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        return routeRepository.findAllByTransporte(transportId);
     }
 
-    public Route buscarPorId(UUID id) {
+    public Route findById(UUID id) {
         return routeRepository.findById(id)
                 .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
     }
 
     @Transactional
-    public void desativar(UUID id) {
-        Route route = buscarPorId(id);
-        route.setAtivo(false);
+    public void deactivate(UUID id) {
+        Route route = findById(id);
+        route.setActive(false);
         routeRepository.save(route);
     }
 
     @Transactional
-    public Route criar(ItinerarioRequest request) {
+    public Route createRoute(RouteRequest request) {
 
         Route route = new Route();
 
-        route.setNome(request.nome());
-        route.setHorarioInicio(request.horarioInicio());
-        route.setHorarioFim(request.horarioFim());
-        route.setTipoViagem(request.tipoViagem());
+        route.setName(request.name());
+        route.setStartTime(request.startTime());
+        route.setEndTime(request.startTime());
+        route.setRouteType(request.routeType());
 
-        UUID transporteId = currentUserService.getCurrentTransporteId();
-        Transport transport = transportService.buscarPorId(transporteId);
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        Transport transport = transportService.findById(transportId);
         route.setTransport(transport);
 
         return routeRepository.save(route);
     }
 
     @Transactional
-    public Route atualizar(UUID id, ItinerarioUpdateRequest request) {
-        Route route = buscarPorId(id);
+    public Route updateRoute(UUID id, RouteUpdateRequest request) {
+        Route route = findById(id);
 
-        route.setNome(request.nome());
-        route.setHorarioInicio(request.horarioInicio());
-        route.setHorarioFim(request.horarioFim());
-        route.setTipoViagem(request.tipoViagem());
-        route.setAtivo(request.ativo());
+        route.setName(request.name());
+        route.setStartTime(request.startTime());
+        route.setEndTime(request.endTime());
+        route.setRouteType(request.routeType());
+        route.setActive(request.active());
 
-        if (request.alunos() != null && !request.alunos().isEmpty()) {
-            routeStudentService.sincronizarAlunos(route, request.alunos());
+        if (request.students() != null && !request.students().isEmpty()) {
+            routeStudentService.syncStudents(route, request.students());
         }
 
-        if (request.paradas() != null && !request.paradas().isEmpty()) {
-            List<RouteStudent> alunosAtuais = routeStudentService.buscarPorItinerarioId(route.getId());
-            List<RouteSchool> escolasAtuais = routeSchoolService.buscarPorItinerarioId(route.getId());
+        if (request.stops() != null && !request.stops().isEmpty()) {
+            List<RouteStudent> actualStudents = routeStudentService.findByRouteId(route.getId());
+            List<RouteSchool> actualSchools = routeSchoolService.findByRouteId(route.getId());
 
-            Map<UUID, RouteStudent> alunosPorId = alunosAtuais.stream()
+            Map<UUID, RouteStudent> studentMap = actualStudents.stream()
                     .collect(Collectors.toMap(a -> a.getStudent().getId(), a -> a));
 
-            Map<UUID, RouteSchool> escolasPorId = escolasAtuais.stream()
+            Map<UUID, RouteSchool> schoolMap = actualSchools.stream()
                     .collect(Collectors.toMap(e -> e.getSchool().getId(), e -> e));
 
-            for (ItinerarioParadaUpdate parada : request.paradas()) {
-                if (parada == null || parada.id() == null) {
+            for (RouteStopUpdate stop : request.stops()) {
+                if (stop == null || stop.id() == null) {
                     continue;
                 }
-                if ("ALUNO".equalsIgnoreCase(parada.tipo())) {
-                    RouteStudent ia = alunosPorId.get(parada.id());
-                    if (ia != null) {
-                        ia.setOrdemGlobal(parada.ordemGlobal());
-                        ia.setOrdemEmbarque(parada.ordemEspecifica());
+                if ("ALUNO".equalsIgnoreCase(stop.type())) {
+                    RouteStudent routeStudent = studentMap.get(stop.id());
+                    if (routeStudent != null) {
+                        routeStudent.setGeneralOrder(stop.generalOrder());
+                        routeStudent.setBoardingOrder(stop.specificOrder());
                     }
-                } else if ("ESCOLA".equalsIgnoreCase(parada.tipo())) {
-                    RouteSchool ie = escolasPorId.get(parada.id());
-                    if (ie != null) {
-                        ie.setOrdemGlobal(parada.ordemGlobal());
-                        ie.setOrdemParada(parada.ordemEspecifica());
+                } else if ("ESCOLA".equalsIgnoreCase(stop.type())) {
+                    RouteSchool routeSchool = schoolMap.get(stop.id());
+                    if (routeSchool != null) {
+                        routeSchool.setGeneralOrder(stop.generalOrder());
+                        routeSchool.setStopOrder(stop.specificOrder());
                     }
                 }
             }
 
-            routeStudentService.salvarTodos(alunosAtuais);
-            routeSchoolService.salvarTodos(escolasAtuais);
+            routeStudentService.saveAll(actualStudents);
+            routeSchoolService.saveAll(actualSchools);
         }
 
         return routeRepository.save(route);

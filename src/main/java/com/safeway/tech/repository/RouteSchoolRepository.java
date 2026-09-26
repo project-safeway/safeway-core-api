@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface RouteSchoolRepository extends JpaRepository<RouteSchool, UUID> {
 
     @Query("SELECT ie FROM RouteSchool ie WHERE ie.itinerario.id = :itinerarioId AND ie.escola.id = :escolaId")
-    Optional<RouteSchool> findByItinerarioIdAndEscolaIdEscola(@Param("itinerarioId") UUID itinerarioId, @Param("escolaId") UUID escolaId);
+    Optional<RouteSchool> findByItinerarioIdAndEscolaIdEscola(@Param("itinerarioId") UUID itinerarioId, @Param("schoolId") UUID escolaId);
 
     @Query("SELECT ie FROM RouteSchool ie WHERE ie.itinerario.id = :itinerarioId")
     List<RouteSchool> findByItinerarioId(@Param("itinerarioId") UUID itinerarioId);

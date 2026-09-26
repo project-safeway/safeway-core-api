@@ -1,21 +1,18 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.student.StudentRequest;
-import com.safeway.tech.api.dto.guardian.GuardianRequest;
-import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.School;
-import com.safeway.tech.domain.models.Guardian;
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.StudentNotFoundException;
 import com.safeway.tech.infra.exception.OperationNotAllowedException;
+import com.safeway.tech.infra.exception.StudentNotFoundException;
 import com.safeway.tech.infra.messaging.publishers.EventPublisher;
 import com.safeway.tech.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,44 +23,35 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final SchoolService schoolService;
     private final UserService userService;
-    private final ResponsavelService responsavelService;
     private final TransportService transportService;
     private final EventPublisher eventPublisher;
     private final CurrentUserService currentUserService;
 
-    public Student buscarPorId(UUID alunoId) {
+    public Student findById(UUID studentId) {
         UUID userId = currentUserService.getCurrentUserId();
-        return studentRepository.findByIdAndUsuarioId(alunoId, userId)
+        return studentRepository.findByIdAndUsuarioId(studentId, userId)
                 .orElseThrow(() -> new StudentNotFoundException("Student não encontrado"));
     }
 
     @Transactional
-    public Student criarAluno(StudentRequest request) {
+    public Student createStudent(StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
-        User user = userService.buscarPorId(userId);
+        User user = userService.findById(userId);
 
-        if (!user.getAtivo()) {
+        if (!user.isActive()) {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
-        UUID transporteId = currentUserService.getCurrentTransporteId();
-        Transport transport = transportService.buscarPorId(transporteId);
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        Transport transport = transportService.findById(transportId);
 
-        School school = schoolService.buscarPorId(request.escolaId());
+        School school = schoolService.buscarPorId(request.schoolId());
 
         Student student = new Student();
-        aplicarDados(student, request);
+        applyData(student, request);
+
         student.setSchool(school);
-        student.setUsuario(user);
         student.setTransport(transport);
-
-        for (GuardianRequest guardianRequest : request.responsaveis()) {
-            Guardian guardian = responsavelService
-                    .buscarPorCpfAndUsuario(guardianRequest.cpf(), userId)
-                    .orElseGet(() -> responsavelService.criarResponsavel(guardianRequest));
-
-            student.adicionarResponsavel(guardian);
-        }
 
         student = studentRepository.save(student);
 
@@ -72,21 +60,20 @@ public class StudentService {
     }
 
     @Transactional
-    public Student atualizarAluno(UUID alunoId, StudentRequest request) {
+    public Student updateStudent(UUID studentId, StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
-        User user = userService.buscarPorId(userId);
+        User user = userService.findById(userId);
 
-        if (!user.getAtivo()) {
+        if (!user.isActive()) {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
-        School school = schoolService.buscarPorId(request.escolaId());
+        School school = schoolService.buscarPorId(request.schoolId());
 
-        Student student = buscarPorId(alunoId);
-        aplicarDados(student, request);
+        Student student = findById(studentId);
+        applyData(student, request);
         student.setSchool(school);
 
-        atualizarResponsaveis(student, request.responsaveis(), userId);
         student = studentRepository.save(student);
 
         eventPublisher.publicarAlunoAtualizado(student);
@@ -94,50 +81,30 @@ public class StudentService {
     }
 
     @Transactional
-    public void deletarAluno(UUID alunoId) {
-        Student student = buscarPorId(alunoId);
-        student.setAtivo(false);
+    public void deleteStudent(UUID alunoId) {
+        Student student = findById(alunoId);
+        student.setActive(false);
         studentRepository.save(student);
         eventPublisher.publicarAlunoInativado(student);
     }
 
-    public List<Student> buscarPorIdEmLote(List<UUID> ids) {
+    public List<Student> batchFindById(List<UUID> ids) {
         UUID userId = currentUserService.getCurrentUserId();
         return studentRepository.findByIdInAndIdUsuario(ids, userId);
     }
 
-    public List<Student> buscarTodosAtivos() {
+    public List<Student> findAllActive() {
         UUID userId = currentUserService.getCurrentUserId();
         return studentRepository.findByAtivoTrueAndIdUsuario(userId);
     }
 
-    private void aplicarDados(Student student, StudentRequest request) {
-        student.setNome(request.nome());
+    private void applyData(Student student, StudentRequest request) {
+        student.setName(request.name());
         student.setProfessor(request.professor());
-        student.setDtNascimento(request.dtNascimento());
-        student.setSerie(request.serie());
-        student.setSala(request.sala());
-        student.setValorMensalidade(request.valorMensalidade());
-        student.setDiaVencimento(request.diaVencimento());
-    }
-
-    private void atualizarResponsaveis(Student student, List<GuardianRequest> requests, UUID userId) {
-        List<Guardian> novosResponsaveis = new ArrayList<>();
-
-        for (GuardianRequest request : requests) {
-            Guardian guardian = responsavelService.buscarPorCpfAndUsuario(request.cpf(), userId)
-                    .orElseGet(() -> responsavelService.criarResponsavel(request));
-            novosResponsaveis.add(guardian);
-        }
-
-        for (Guardian guardianAtual : new ArrayList<>(student.getResponsaveis())) {
-            if (!novosResponsaveis.contains(guardianAtual)) {
-                student.removerResponsavel(guardianAtual);
-            }
-        }
-
-        for (Guardian guardian : novosResponsaveis) {
-            student.adicionarResponsavel(guardian);
-        }
+        student.setBirthdate(request.birthdate());
+        student.setGrade(request.grade());
+        student.setClassroom(request.classroom());
+        student.setMonthlyFee(request.monthlyFee());
+        student.setDueDate(request.dueDate());
     }
 }

@@ -23,30 +23,30 @@ public class AttendanceStudentService {
     private final AttendanceService attendanceService;
 
     @Transactional
-    public void registrarPresenca(Map<UUID, PresenceStatusEnum> presencas, UUID idChamada) {
-        Attendance attendance = attendanceService.buscarPorId(idChamada);
+    public void registerAttendance(Map<UUID, PresenceStatusEnum> presencas, UUID idChamada) {
+        Attendance attendance = attendanceService.findById(idChamada);
 
         if (!AttendanceStatusEnum.IN_PROGRESS.equals(attendance.getStatus())) {
             throw new RuntimeException("Chamada não está em andamento");
         }
 
         for (Map.Entry<UUID, PresenceStatusEnum> entry : presencas.entrySet()) {
-            UUID idAluno = entry.getKey();
+            UUID studentId = entry.getKey();
             PresenceStatusEnum status = entry.getValue();
 
-            Student student = studentService.buscarPorId(idAluno);
+            Student student = studentService.findById(studentId);
 
             AttendanceStudent attendanceStudent = attendanceStudentRepository
                     .findByChamadaAndAluno(attendance, student)
                     .orElseGet(() -> {
-                        AttendanceStudent ca = new AttendanceStudent();
-                        ca.setAttendance(attendance);
-                        ca.setStudent(student);
-                        return ca;
+                        AttendanceStudent newAttendanceStudent = new AttendanceStudent();
+                        newAttendanceStudent.setAttendance(attendance);
+                        newAttendanceStudent.setStudent(student);
+                        return newAttendanceStudent;
                     });
 
-            attendanceStudent.setPresenca(status);
-            attendanceStudent.setData(LocalDateTime.now());
+            attendanceStudent.setPresence(status);
+            attendanceStudent.setDate(LocalDateTime.now());
 
             attendanceStudentRepository.save(attendanceStudent);
         }

@@ -38,7 +38,7 @@ public class StudentController {
     public ResponseEntity<StudentResponse> cadastrarAlunoCompleto(
             @RequestBody @Valid StudentRequest request
     ) {
-        StudentResponse response = StudentMapper.toResponse(studentService.criarAluno(request));
+        StudentResponse response = StudentMapper.toResponse(studentService.createStudent(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -53,7 +53,7 @@ public class StudentController {
 
     @GetMapping("/{alunoId}")
     public ResponseEntity<StudentResponse> listarDadosAluno(@PathVariable UUID alunoId) {
-        StudentResponse response = StudentMapper.toResponse(studentService.buscarPorId(alunoId));
+        StudentResponse response = StudentMapper.toResponse(studentService.findById(alunoId));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -62,13 +62,13 @@ public class StudentController {
             @PathVariable UUID alunoId,
             @RequestBody @Valid StudentRequest request
     ) {
-        StudentResponse response = StudentMapper.toResponse(studentService.atualizarAluno(alunoId, request));
+        StudentResponse response = StudentMapper.toResponse(studentService.updateStudent(alunoId, request));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{alunoId}")
     public ResponseEntity<Void> deletarAluno(@PathVariable UUID alunoId) {
-        studentService.deletarAluno(alunoId);
+        studentService.deleteStudent(alunoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -80,21 +80,21 @@ public class StudentController {
 
     @GetMapping("/feign/{alunoId}")
     public ResponseEntity<StudentFeignResponse> buscarAlunoPorId(@PathVariable UUID alunoId) {
-        Student student = studentService.buscarPorId(alunoId);
+        Student student = studentService.findById(alunoId);
         StudentFeignResponse response = StudentMapper.toFeignResponse(student);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/ativos")
     public ResponseEntity<List<StudentFeignResponse>> buscarTodosAtivos() {
-        List<Student> students = studentService.buscarTodosAtivos();
+        List<Student> students = studentService.findAllActive();
         List<StudentFeignResponse> response = students.stream().map(StudentMapper::toFeignResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/lote")
     public ResponseEntity<List<StudentFeignResponse>> buscarPorIdEmLote(@RequestBody List<UUID> ids) {
-        List<Student> students = studentService.buscarPorIdEmLote(ids);
+        List<Student> students = studentService.batchFindById(ids);
         List<StudentFeignResponse> response = students.stream().map(StudentMapper::toFeignResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

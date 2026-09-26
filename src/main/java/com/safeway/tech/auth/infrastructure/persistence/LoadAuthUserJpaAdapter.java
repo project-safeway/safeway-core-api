@@ -24,11 +24,11 @@ public class LoadAuthUserJpaAdapter implements LoadAuthUserPort {
     private AuthUser toAuthUser(User user) {
         return new AuthUser(
                 user.getId(),
-                user.getNome(),
+                user.getName(),
                 user.getEmail(),
                 user.getPasswordHash(),
                 user.getRole().name(),
-                user.getTransporte().getId()
+                user.getTransport().getId()
         );
     }
 }

@@ -20,5 +20,5 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
     List<Student> findByAtivoTrueAndIdUsuario(@Param("userId") UUID userId);
 
     @Query("SELECT a FROM Student a WHERE a.id = :alunoId AND a.usuario.id = :userId AND a.ativo = true")
-    Optional<Student> findByIdAndUsuarioId(@Param("alunoId") UUID alunoId, @Param("userId") UUID userId);
+    Optional<Student> findByIdAndUsuarioId(@Param("studentId") UUID alunoId, @Param("userId") UUID userId);
 }

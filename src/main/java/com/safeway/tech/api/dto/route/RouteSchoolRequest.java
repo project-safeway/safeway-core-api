@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ItinerarioEscolaRequest(
-        @NotNull UUID escolaId,
-        UUID enderecoId,
-        Integer ordemParada
+public record RouteSchoolRequest(
+        @NotNull UUID schoolId,
+        UUID addressId,
+        Integer stopOrder
 ) {
 }
 

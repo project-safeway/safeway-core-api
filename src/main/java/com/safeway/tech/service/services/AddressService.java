@@ -32,11 +32,11 @@ public class AddressService {
     }
 
     @Transactional(readOnly = true)
-    public List<Address> availableAddress(UUID alunoId) {
+    public List<Address> availableAddress(UUID studentId) {
         UUID userId = currentUserService.getCurrentUserId();
-        List<Guardian> responsaveis = guardianRepository.findByAlunosIdAndUsuarioIdUsuario(alunoId, userId);
+        List<Guardian> guardians = guardianRepository.findByAlunosIdAndUsuarioIdUsuario(studentId, userId);
 
-        return responsaveis.stream()
+        return guardians.stream()
                 .map(Guardian::getAddress)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -88,7 +88,7 @@ public class AddressService {
                 address.getZipCode()
         );
 
-        LatLng coordinates = geocodingService.obterCoordenadas(fullAddress);
+        LatLng coordinates = geocodingService.getCoordinates(fullAddress);
         address.setLatitude(BigDecimal.valueOf(coordinates.lat));
         address.setLongitude(BigDecimal.valueOf(coordinates.lng));
     }

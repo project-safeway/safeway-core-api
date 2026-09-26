@@ -20,7 +20,7 @@ public class GeocodingController {
 
     @PostMapping("/otimizar")
     public RotasResponse otimizarRota(@RequestBody RotasRequest request) {
-        return routeOptimizationService.otimizarMelhorRota(request);
+        return routeOptimizationService.optimizeBestRoute(request);
     }
 
 

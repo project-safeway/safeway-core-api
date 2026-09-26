@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,63 +22,58 @@ public class ResponsavelService {
     private final AddressService addressService;
     private final CurrentUserService currentUserService;
 
-    public Guardian buscarPorId(UUID id) {
+    public Guardian findById(UUID id) {
         UUID userId = currentUserService.getCurrentUserId();
         return guardianRepository.findByIdResponsavelAndIdUsuario(id, userId)
                 .orElseThrow(() -> new GuardianNotFoundException("O responsável com ID " + id + "não foi encontrado"));
     }
 
-    public Optional<Guardian> buscarPorCpfAndUsuario(String cpf, UUID userId) {
-        return guardianRepository.findByCpfAndIdUsuario(cpf, userId);
-    }
-
-    public List<Guardian> listarResponsaveis() {
+    public List<Guardian> listGuardians() {
         UUID userId = currentUserService.getCurrentUserId();
         return guardianRepository.findAllByIdUsuario(userId);
     }
 
     @Transactional
-    public Guardian criarResponsavel(GuardianRequest request) {
+    public Guardian createGuardian(GuardianRequest request) {
         Guardian guardian = new Guardian();
-        aplicaDados(guardian, request);
+        applyData(guardian, request);
 
-        Address address = addressService.create(request.endereco());
+        Address address = addressService.create(request.address());
         guardian.setAddress(address);
 
         UUID userId = currentUserService.getCurrentUserId();
-        User user = userService.buscarPorId(userId);
+        User user = userService.findById(userId);
         guardian.setUser(user);
 
         return guardianRepository.save(guardian);
     }
 
     @Transactional
-    public Guardian alterarResponsavel(GuardianRequest request, UUID idResponsavel) {
-        Guardian guardian = buscarPorId(idResponsavel);
-        aplicaDados(guardian, request);
+    public Guardian updateGuardian(GuardianRequest request, UUID guardianId) {
+        Guardian guardian = findById(guardianId);
+        applyData(guardian, request);
 
-        if (request.endereco() != null) {
-            Address addressAtual = guardian.getAddress();
-            Address address = addressAtual != null && addressAtual.getId() != null
-                    ? addressService.update(addressAtual.getId(), request.endereco())
-                    : addressService.create(request.endereco());
+        if (request.address() != null) {
+            Address currentAddress = guardian.getAddress();
+            Address address = currentAddress != null && currentAddress.getId() != null
+                    ? addressService.update(currentAddress.getId(), request.address())
+                    : addressService.create(request.address());
             guardian.setAddress(address);
         }
 
         return guardianRepository.save(guardian);
     }
 
-    public void desativar(UUID id) {
-        Guardian guardian = buscarPorId(id);
-        guardian.setAtivo(false);
+    public void deactivate(UUID id) {
+        Guardian guardian = findById(id);
+        guardian.setActive(false);
         guardianRepository.save(guardian);
     }
 
-    private void aplicaDados(Guardian guardian, GuardianRequest request) {
-        guardian.setNome(request.nome());
-        guardian.setCpf(request.cpf());
-        guardian.setTel1(request.tel1());
-        guardian.setTel2(request.tel2());
+    private void applyData(Guardian guardian, GuardianRequest request) {
+        guardian.setName(request.name());
+        guardian.setPrimaryPhoneNumber(request.primaryPhoneNumber());
+        guardian.setSecondaryPhoneNumber(request.secondaryPhoneNumber());
         guardian.setEmail(request.email());
     }
 }

@@ -22,23 +22,24 @@ public class AttendanceService {
     private final RouteService routeService;
     private final CurrentUserService currentUserService;
 
-    public Attendance buscarPorId(UUID id) {
+    public Attendance findById(UUID id) {
         return attendanceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Chamada não encontrada"));
     }
 
-    public Attendance buscarChamadaAtivaPorItinerario(UUID idItinerario) {
-        return attendanceRepository.findByItinerarioIdAndStatus(idItinerario, AttendanceStatusEnum.IN_PROGRESS)
+    public Attendance findActiveByRoute(UUID routeId) {
+        return attendanceRepository.findByItinerarioIdAndStatus(routeId, AttendanceStatusEnum.IN_PROGRESS)
                 .orElse(null);
     }
 
-    public Attendance iniciarChamada(UUID idItinerario) {
-        Attendance attendanceExistente = buscarChamadaAtivaPorItinerario(idItinerario);
+    public Attendance startAttendance(UUID routeId) {
+        Attendance attendanceExistente = findActiveByRoute(routeId);
+
         if (attendanceExistente != null) {
             return attendanceExistente;
         }
 
-        Route route = routeService.buscarPorId(idItinerario);
+        Route route = routeService.findById(routeId);
 
         Attendance attendance = new Attendance();
         attendance.setRoute(route);
@@ -49,8 +50,8 @@ public class AttendanceService {
         return attendance;
     }
 
-    public Attendance atualizarChamada(UUID idItinerario, AttendanceStatusEnum statusChamada) {
-        Attendance attendance = buscarChamadaAtivaPorItinerario(idItinerario);
+    public Attendance updateAttendance(UUID routeId, AttendanceStatusEnum statusChamada) {
+        Attendance attendance = findActiveByRoute(routeId);
         if (attendance == null) {
             throw new RuntimeException("Nenhuma chamada em andamento encontrada para este itinerário");
         }
@@ -62,12 +63,12 @@ public class AttendanceService {
         return attendance;
     }
 
-    public Page<Attendance> buscarHistoricoChamadas(UUID idItinerario, List<AttendanceStatusEnum> status, Pageable pageable) {
+    public Page<Attendance> findAttendanceHistory(UUID routeId, List<AttendanceStatusEnum> status, Pageable pageable) {
         UUID transporteId = currentUserService.getCurrentTransporteId();
         UUID userId = currentUserService.getCurrentUserId();
 
         Specification<Attendance> specs = Specification.allOf(
-                AttendanceSpecs.comItinerarioId(idItinerario),
+                AttendanceSpecs.comItinerarioId(routeId),
                 AttendanceSpecs.comStatus(status),
                 AttendanceSpecs.comTransporte(transporteId),
                 AttendanceSpecs.comUsuario(userId)

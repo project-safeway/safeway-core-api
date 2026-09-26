@@ -1,6 +1,6 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.route.ItinerarioEscolaRequest;
+import com.safeway.tech.api.dto.route.RouteSchoolRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.Route;
@@ -15,6 +15,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,24 +30,24 @@ public class RouteSchoolService {
     private final SchoolService schoolService;
     private final AddressService addressService;
 
-    public List<RouteSchool> buscarPorItinerarioId(UUID itinerarioId) {
-        return routeSchoolRepository.findByItinerarioId(itinerarioId);
+    public List<RouteSchool> findByRouteId(UUID routeId) {
+        return routeSchoolRepository.findByItinerarioId(routeId);
     }
 
-    public void salvarTodos(List<RouteSchool> escolas) {
-        routeSchoolRepository.saveAll(escolas);
+    public void saveAll(List<RouteSchool> schools) {
+        routeSchoolRepository.saveAll(schools);
     }
 
     @Transactional
-    public void adicionarEscola(UUID itinerarioId, ItinerarioEscolaRequest request) throws BadRequestException {
-        Route route = routeRepository.findById(itinerarioId)
+    public void addSchool(UUID routeId, RouteSchoolRequest request) throws BadRequestException {
+        Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
 
-        School school = schoolService.buscarPorId(request.escolaId());
+        School school = schoolService.buscarPorId(request.schoolId());
 
         Address address;
-        if (request.enderecoId() != null) {
-            address = addressService.findById(request.enderecoId());
+        if (request.addressId() != null) {
+            address = addressService.findById(request.addressId());
         } else {
             address = school.getAddress();
         }
@@ -54,14 +55,16 @@ public class RouteSchoolService {
         if (address.getLatitude() == null || address.getLongitude() == null) {
             throw new AddressNotFoundException("Endereço da school não possui latitude/longitude válidas");
         }
-        double lat = address.getLatitude();
-        double lng = address.getLongitude();
-        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-            // TODO: Alteração para exception personalizada
+
+        BigDecimal lat = address.getLatitude();
+        BigDecimal lng = address.getLongitude();
+
+        if (lat.compareTo(BigDecimal.valueOf(-90)) < 0 || lat.compareTo(BigDecimal.valueOf(90)) > 0
+                || lng.compareTo(BigDecimal.valueOf(-180)) < 0 || lng.compareTo(BigDecimal.valueOf(180)) > 0) {
             throw new BadRequestException("Coordenadas do endereço da school inválidas: " + lat + ", " + lng);
         }
 
-        routeSchoolRepository.findByItinerarioIdAndEscolaIdEscola(itinerarioId, school.getId())
+        routeSchoolRepository.findByItinerarioIdAndEscolaIdEscola(routeId, school.getId())
                 .ifPresent(e -> {
                     throw new RouteSchoolNotFound("School já está vinculada a este itinerário");
                 });
@@ -70,35 +73,35 @@ public class RouteSchoolService {
         entity.setRoute(route);
         entity.setSchool(school);
         entity.setAddress(address);
-        entity.setOrdemParada(request.ordemParada());
+        entity.setStopOrder(request.stopOrder());
 
         routeSchoolRepository.save(entity);
     }
 
     @Transactional
-    public void removerEscola(UUID itinerarioId, UUID escolaId) {
+    public void removeSchool(UUID routeId, UUID schoolId) {
         RouteSchool entity = routeSchoolRepository
-                .findByItinerarioIdAndEscolaIdEscola(itinerarioId, escolaId)
+                .findByItinerarioIdAndEscolaIdEscola(routeId, schoolId)
                 .orElseThrow(() -> new RuntimeException("School não encontrada no itinerário"));
 
         routeSchoolRepository.delete(entity);
     }
 
     @Transactional
-    public void reordenar(UUID itinerarioId, List<UUID> novaOrdemEscolaIds) {
-        List<RouteSchool> atuais = routeSchoolRepository.findByItinerarioId(itinerarioId);
+    public void reorder(UUID routeId, List<UUID> newSchoolIdsOrder) {
+        List<RouteSchool> actual = routeSchoolRepository.findByItinerarioId(routeId);
 
-        Map<UUID, RouteSchool> map = atuais.stream()
+        Map<UUID, RouteSchool> map = actual.stream()
                 .collect(Collectors.toMap(e -> e.getSchool().getId(), e -> e));
 
-        int ordem = 1;
-        for (UUID id : novaOrdemEscolaIds) {
+        int order = 1;
+        for (UUID id : newSchoolIdsOrder) {
             RouteSchool ie = map.get(id);
             if (ie != null) {
-                ie.setOrdemParada(ordem++);
+                ie.setStopOrder(order++);
             }
         }
 
-        routeSchoolRepository.saveAll(atuais);
+        routeSchoolRepository.saveAll(actual);
     }
 }

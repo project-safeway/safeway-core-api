@@ -4,6 +4,6 @@ import com.safeway.tech.api.dto.route.google.RotasRequest;
 import com.safeway.tech.api.dto.route.google.RotasResponse;
 
 public interface IOptimizerService {
-    RotasResponse otimizarRota(RotasRequest request);
-    String nomeProvedor();
+    RotasResponse optimizeRoute(RotasRequest request);
+    String providerName();
 }

@@ -19,18 +19,18 @@ public class EventPublisher {
     private final RabbitTemplate rabbitTemplate;
     private final RabbitMQProperties rabbitMQProperties;
 
-    public void publicarAlunoCriado(Student student) {
+    public void publicarAlunoCriado(Student student, UUID userId) {
         log.info("Publicando evento de student criado: {}", student.getId());
 
         try {
             StudentEvent event = new StudentEvent(
                     UUID.randomUUID(),
                     student.getId(),
-                    student.getUsuario().getId(),
-                    student.getNome(),
-                    student.getValorMensalidade(),
-                    student.getDiaVencimento(),
-                    student.getAtivo(),
+                    userId,
+                    student.getName(),
+                    student.getMonthlyFee(),
+                    student.getDueDate(),
+                    student.isActive(),
                     "ALUNO_CRIADO",
                     LocalDateTime.now()
             );
@@ -47,18 +47,18 @@ public class EventPublisher {
         }
     }
 
-    public void publicarAlunoAtualizado(Student student) {
+    public void publicarAlunoAtualizado(Student student, UUID userId) {
         log.info("Publicando evento de student atualizado: {}", student.getId());
 
         try {
             StudentEvent event = new StudentEvent(
                     UUID.randomUUID(),
                     student.getId(),
-                    student.getUsuario().getId(),
-                    student.getNome(),
-                    student.getValorMensalidade(),
-                    student.getDiaVencimento(),
-                    student.getAtivo(),
+                    userId,
+                    student.getName(),
+                    student.getMonthlyFee(),
+                    student.getDueDate(),
+                    student.isActive(),
                     "ALUNO_ATUALIZADO",
                     LocalDateTime.now()
             );
@@ -75,18 +75,18 @@ public class EventPublisher {
         }
     }
 
-    public void publicarAlunoInativado(Student student) {
+    public void publicarAlunoInativado(Student student, UUID userId) {
         log.info("Publicando evento de student inativado: {}", student.getId());
 
         try {
             StudentEvent event = new StudentEvent(
                     UUID.randomUUID(),
                     student.getId(),
-                    student.getUsuario().getId(),
-                    student.getNome(),
-                    student.getValorMensalidade(),
-                    student.getDiaVencimento(),
-                    student.getAtivo(),
+                    userId,
+                    student.getName(),
+                    student.getMonthlyFee(),
+                    student.getDueDate(),
+                    student.isActive(),
                     "ALUNO_INATIVADO",
                     LocalDateTime.now()
             );

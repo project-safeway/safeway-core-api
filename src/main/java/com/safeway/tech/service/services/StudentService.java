@@ -54,7 +54,7 @@ public class StudentService {
 
         student = studentRepository.save(student);
 
-        eventPublisher.publicarAlunoCriado(student);
+        eventPublisher.publicarAlunoCriado(student, userId);
         return student;
     }
 
@@ -75,16 +75,16 @@ public class StudentService {
 
         student = studentRepository.save(student);
 
-        eventPublisher.publicarAlunoAtualizado(student);
+        eventPublisher.publicarAlunoAtualizado(student, userId);
         return student;
     }
 
     @Transactional
-    public void deleteStudent(UUID alunoId) {
-        Student student = findById(alunoId);
+    public void deleteStudent(UUID studentId) {
+        Student student = findById(studentId);
         student.setActive(false);
         studentRepository.save(student);
-        eventPublisher.publicarAlunoInativado(student);
+        eventPublisher.publicarAlunoInativado(student, currentUserService.getCurrentUserId());
     }
 
     public List<Student> batchFindById(List<UUID> ids) {

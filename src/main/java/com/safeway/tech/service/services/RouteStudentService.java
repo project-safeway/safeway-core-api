@@ -114,7 +114,8 @@ public class RouteStudentService {
 
             if (lat.compareTo(BigDecimal.valueOf(-90)) < 0 || lat.compareTo(BigDecimal.valueOf(90)) > 0
                     || lng.compareTo(BigDecimal.valueOf(-180)) < 0 || lng.compareTo(BigDecimal.valueOf(180)) > 0) {
-                throw new CoordinatesNotValidException("Coordenadas do endereço inválidas para student id=" + student.getId() + ": " + lat + ", " + lng);
+                throw new CoordinatesNotValidException("Coordenadas do endereço inválidas para student id="
+                        + student.getId() + ": " + lat + ", " + lng);
             }
 
             ia.setStudent(student);

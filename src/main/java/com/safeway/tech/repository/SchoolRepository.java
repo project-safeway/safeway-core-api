@@ -10,23 +10,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface SchoolRepository extends JpaRepository<School, UUID> {
-    @Query("""
-        SELECT s
-        FROM School s
-        WHERE s.transport.id = :transportId
-          AND s.active = true
-    """)
+    @Query("SELECT s FROM School s WHERE s.transport.id = :transportId AND s.active = true")
     List<School> findAllByTransportId(@Param("transportId") UUID transportId);
 
-    @Query("""
-        SELECT s
-        FROM School s
-        WHERE s.id = :schoolId
-          AND s.transport.id = :transportId
-          AND s.active = true
-    """)
-    Optional<School> findByIdAndTransportId(
-            @Param("schoolId") UUID schoolId,
-            @Param("transportId") UUID transportId
-    );
+    @Query("SELECT s FROM School s WHERE s.id = :schoolId AND s.transport.id = :transportId AND s.active = true")
+    Optional<School> findByIdAndTransportId(@Param("schoolId") UUID schoolId, @Param("transportId") UUID transportId);
 }

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@RequestMapping("/chamada")
+@RequestMapping("/attendance")
 @RestController
 @RequiredArgsConstructor
 public class AttendanceController {
@@ -36,30 +36,30 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
     private final AttendanceStudentService attendanceStudentService;
 
-    @PostMapping("/iniciar/{id}")
-    public ResponseEntity<AttendanceResponse> iniciarChamada(@PathVariable UUID id) {
+    @PostMapping("/start/{id}")
+    public ResponseEntity<AttendanceResponse> startAttendance(@PathVariable UUID id) {
         Attendance attendance = attendanceService.startAttendance(id);
         AttendanceResponse response = AttendanceMapper.toResponse(attendance);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/alterar/{id}")
-    public ResponseEntity<AttendanceResponse> alterarChamada(@PathVariable UUID id, @PathParam("status") AttendanceStatusEnum status) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<AttendanceResponse> updateAttendance(@PathVariable UUID id, @PathParam("status") AttendanceStatusEnum status) {
         Attendance attendance = attendanceService.updateAttendance(id, status);
         AttendanceResponse response = AttendanceMapper.toResponse(attendance);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/{id}/registrar-presenca")
-    public ResponseEntity<Void> registrarPresenca(
+    @PutMapping("/{id}/register-presence")
+    public ResponseEntity<Void> registerPresence(
             @PathVariable UUID id,
-            @RequestBody Map<UUID, PresenceStatusEnum> presencas) {
-        attendanceStudentService.registerAttendance(presencas, id);
+            @RequestBody Map<UUID, PresenceStatusEnum> presences) {
+        attendanceStudentService.registerAttendance(presences, id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/historico/{id}")
-    public ResponseEntity<Page<AttendanceResponse>> historicoChamada(
+    @GetMapping("/history/{id}")
+    public ResponseEntity<Page<AttendanceResponse>> attendanceHistory(
             @PathVariable UUID id,
             @RequestParam(required = false) List<AttendanceStatusEnum> status,
             @RequestParam(defaultValue = "0") int page,
@@ -78,8 +78,8 @@ public class AttendanceController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
 
-        Page<Attendance> chamadas = attendanceService.findAttendanceHistory(id, status, pageable);
-        Page<AttendanceResponse> response = chamadas.map(AttendanceMapper::toResponse);
+        Page<Attendance> attendances = attendanceService.findAttendanceHistory(id, status, pageable);
+        Page<AttendanceResponse> response = attendances.map(AttendanceMapper::toResponse);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

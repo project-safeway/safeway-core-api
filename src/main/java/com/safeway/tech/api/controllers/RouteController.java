@@ -1,16 +1,16 @@
 package com.safeway.tech.api.controllers;
 
-import com.safeway.tech.api.dto.route.StudentWithAddress;
-import com.safeway.tech.api.dto.route.RouteStudentRequest;
-import com.safeway.tech.api.dto.route.RouteSchoolRequest;
 import com.safeway.tech.api.dto.route.RouteRequest;
 import com.safeway.tech.api.dto.route.RouteResponse;
+import com.safeway.tech.api.dto.route.RouteSchoolRequest;
+import com.safeway.tech.api.dto.route.RouteStudentRequest;
 import com.safeway.tech.api.dto.route.RouteUpdateRequest;
+import com.safeway.tech.api.dto.route.StudentWithAddress;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.service.mappers.RouteMapper;
-import com.safeway.tech.service.services.RouteStudentService;
 import com.safeway.tech.service.services.RouteSchoolService;
 import com.safeway.tech.service.services.RouteService;
+import com.safeway.tech.service.services.RouteStudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;

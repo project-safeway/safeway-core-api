@@ -22,14 +22,14 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/escolas")
+@RequestMapping("/schools")
 @RequiredArgsConstructor
 public class SchoolController {
 
     private final SchoolService schoolService;
 
     @PostMapping
-    public ResponseEntity<SchoolResponse> cadastrarEscola(
+    public ResponseEntity<SchoolResponse> createSchool(
             @Valid @RequestBody SchoolRequest request) {
 
         School school = schoolService.createSchool(request);
@@ -38,21 +38,21 @@ public class SchoolController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SchoolResponse>> listarEscolasComAlunos() {
+    public ResponseEntity<List<SchoolResponse>> findAllSchools() {
         List<School> schools = schoolService.findAllSchools();
         List<SchoolResponse> response = schools.stream().map(SchoolMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SchoolResponse> buscarEscolaPorId(@PathVariable UUID id) {
+    public ResponseEntity<SchoolResponse> findById(@PathVariable UUID id) {
         School school = schoolService.findById(id);
         SchoolResponse response = SchoolMapper.toResponse(school);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SchoolResponse> atualizarEscola(
+    public ResponseEntity<SchoolResponse> updateSchool(
             @PathVariable UUID id,
             @Valid @RequestBody SchoolRequest request) {
         School school = schoolService.updateSchool(id, request);
@@ -61,7 +61,7 @@ public class SchoolController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarEscola(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteSchool(@PathVariable UUID id) {
         schoolService.deactivate(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

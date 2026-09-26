@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/itinerarios")
+@RequestMapping("/routes")
 @RequiredArgsConstructor
 public class RouteController {
 
@@ -39,7 +39,7 @@ public class RouteController {
     private final RouteSchoolService routeSchoolService;
 
     @PostMapping
-    public ResponseEntity<RouteResponse> criar(
+    public ResponseEntity<RouteResponse> create(
             @Valid @RequestBody RouteRequest request
     ) {
         Route route = routeService.createRoute(request);
@@ -48,27 +48,27 @@ public class RouteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RouteResponse>> listarTodos() {
+    public ResponseEntity<List<RouteResponse>> getRoutes() {
         List<Route> routes = routeService.findAll();
         List<RouteResponse> response = routes.stream().map(RouteMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RouteResponse> buscarPorId(@PathVariable UUID id) {
+    public ResponseEntity<RouteResponse> findById(@PathVariable UUID id) {
         Route route = routeService.findById(id);
         RouteResponse response = RouteMapper.toResponse(route);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/{id}/alunos")
-    public ResponseEntity<List<StudentWithAddress>> buscarAlunosDoItinerario(@PathVariable UUID id) {
-        List<StudentWithAddress> alunos = routeStudentService.findStudentWithAddress(id);
-        return ResponseEntity.status(HttpStatus.OK).body(alunos);
+    @GetMapping("/{id}/students")
+    public ResponseEntity<List<StudentWithAddress>> findAllStudentsWithAddress(@PathVariable UUID id) {
+        List<StudentWithAddress> students = routeStudentService.findStudentWithAddress(id);
+        return ResponseEntity.status(HttpStatus.OK).body(students);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RouteResponse> atualizar(
+    public ResponseEntity<RouteResponse> update(
             @PathVariable UUID id,
             @Valid @RequestBody RouteUpdateRequest request
     ) {
@@ -78,13 +78,13 @@ public class RouteController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desativar(@PathVariable UUID id) {
+    public ResponseEntity<Void> deactivate(@PathVariable UUID id) {
         routeService.deactivate(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/{id}/alunos")
-    public ResponseEntity<Void> adicionarAluno(
+    @PostMapping("/{id}/students")
+    public ResponseEntity<Void> addStudent(
             @PathVariable UUID id,
             @Valid @RequestBody RouteStudentRequest request
     ) {
@@ -92,36 +92,26 @@ public class RouteController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @DeleteMapping("/{id}/alunos/{alunoId}")
-    public ResponseEntity<Void> removerAluno(
+    @DeleteMapping("/{id}/students/{studentId}")
+    public ResponseEntity<Void> removeStudent(
             @PathVariable UUID id,
-            @PathVariable String alunoId
+            @PathVariable UUID studentId
     ) {
-        if (alunoId == null || alunoId.isBlank() || "undefined".equalsIgnoreCase(alunoId)) {
-            return ResponseEntity.badRequest().build();
-        }
-        UUID alunoIdLong;
-        try {
-            alunoIdLong = UUID.fromString(alunoId);
-        } catch (NumberFormatException ex) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        routeStudentService.removeStudent(id, alunoIdLong);
+        routeStudentService.removeStudent(id, studentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PatchMapping("/{id}/alunos/ordem")
-    public ResponseEntity<Void> reordenar(
+    @PatchMapping("/{id}/students/order")
+    public ResponseEntity<Void> reorder(
             @PathVariable UUID id,
-            @RequestBody List<UUID> novaOrdemIds
+            @RequestBody List<UUID> newIdsOrder
     ) {
-        routeStudentService.reorder(id, novaOrdemIds);
+        routeStudentService.reorder(id, newIdsOrder);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/{id}/escolas")
-    public ResponseEntity<Void> adicionarEscola(
+    @PostMapping("/{id}/schools")
+    public ResponseEntity<Void> addSchool(
             @PathVariable UUID id,
             @Valid @RequestBody RouteSchoolRequest request
     ) throws BadRequestException {
@@ -129,21 +119,21 @@ public class RouteController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @DeleteMapping("/{id}/escolas/{escolaId}")
-    public ResponseEntity<Void> removerEscola(
+    @DeleteMapping("/{id}/schools/{schoolId}")
+    public ResponseEntity<Void> removeSchool(
             @PathVariable UUID id,
-            @PathVariable UUID escolaId
+            @PathVariable UUID schoolId
     ) {
-        routeSchoolService.removeSchool(id, escolaId);
+        routeSchoolService.removeSchool(id, schoolId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PatchMapping("/{id}/escolas/ordem")
-    public ResponseEntity<Void> reordenarEscolas(
+    @PatchMapping("/{id}/schools/order")
+    public ResponseEntity<Void> reorderSchools(
             @PathVariable UUID id,
-            @RequestBody List<UUID> novaOrdemEscolaIds
+            @RequestBody List<UUID> newSchoolIdsOrder
     ) {
-        routeSchoolService.reorder(id, novaOrdemEscolaIds);
+        routeSchoolService.reorder(id, newSchoolIdsOrder);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

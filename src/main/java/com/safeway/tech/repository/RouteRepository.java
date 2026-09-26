@@ -10,6 +10,6 @@ import java.util.UUID;
 
 public interface RouteRepository extends JpaRepository<Route, UUID> {
 
-    @Query("SELECT i FROM Route i WHERE i.transport.id = :idTransporte AND i.active = true")
-    List<Route> findAllByTransporte(@Param("transportId") UUID idTransporte);
+    @Query("SELECT i FROM Route i WHERE i.transport.id = :transportId AND i.active = true")
+    List<Route> findAllByTransportId(@Param("transportId") UUID transportId);
 }

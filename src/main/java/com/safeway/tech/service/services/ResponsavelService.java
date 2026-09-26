@@ -24,13 +24,13 @@ public class ResponsavelService {
 
     public Guardian findById(UUID id) {
         UUID userId = currentUserService.getCurrentUserId();
-        return guardianRepository.findByIdResponsavelAndIdUsuario(id, userId)
+        return guardianRepository.findByGuardianIdAndUserId(id, userId)
                 .orElseThrow(() -> new GuardianNotFoundException("O responsável com ID " + id + "não foi encontrado"));
     }
 
     public List<Guardian> listGuardians() {
         UUID userId = currentUserService.getCurrentUserId();
-        return guardianRepository.findAllByIdUsuario(userId);
+        return guardianRepository.findByUserId(userId);
     }
 
     @Transactional

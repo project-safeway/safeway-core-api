@@ -31,7 +31,7 @@ public class RouteSchoolService {
     private final AddressService addressService;
 
     public List<RouteSchool> findByRouteId(UUID routeId) {
-        return routeSchoolRepository.findByItinerarioId(routeId);
+        return routeSchoolRepository.findByRouteId(routeId);
     }
 
     public void saveAll(List<RouteSchool> schools) {
@@ -64,7 +64,7 @@ public class RouteSchoolService {
             throw new BadRequestException("Coordenadas do endereço da school inválidas: " + lat + ", " + lng);
         }
 
-        routeSchoolRepository.findByItinerarioIdAndEscolaIdEscola(routeId, school.getId())
+        routeSchoolRepository.findByRouteIdAndSchoolId(routeId, school.getId())
                 .ifPresent(e -> {
                     throw new RouteSchoolNotFound("School já está vinculada a este itinerário");
                 });
@@ -81,7 +81,7 @@ public class RouteSchoolService {
     @Transactional
     public void removeSchool(UUID routeId, UUID schoolId) {
         RouteSchool entity = routeSchoolRepository
-                .findByItinerarioIdAndEscolaIdEscola(routeId, schoolId)
+                .findByRouteIdAndSchoolId(routeId, schoolId)
                 .orElseThrow(() -> new RuntimeException("School não encontrada no itinerário"));
 
         routeSchoolRepository.delete(entity);
@@ -89,7 +89,7 @@ public class RouteSchoolService {
 
     @Transactional
     public void reorder(UUID routeId, List<UUID> newSchoolIdsOrder) {
-        List<RouteSchool> actual = routeSchoolRepository.findByItinerarioId(routeId);
+        List<RouteSchool> actual = routeSchoolRepository.findByRouteId(routeId);
 
         Map<UUID, RouteSchool> map = actual.stream()
                 .collect(Collectors.toMap(e -> e.getSchool().getId(), e -> e));

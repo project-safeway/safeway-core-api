@@ -13,9 +13,9 @@ import java.util.UUID;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, UUID>, JpaSpecificationExecutor<Attendance> {
 
-    @Query("SELECT c FROM Attendance c WHERE c.itinerario.id = :idItinerario AND c.status = :status")
-    Optional<Attendance> findByItinerarioIdAndStatus(
-            @Param("idItinerario") UUID idItinerario,
+    @Query("SELECT c FROM Attendance c WHERE c.route.id = :routeId AND c.status = :status")
+    Optional<Attendance> findByRouteIdAndStatus(
+            @Param("routeId") UUID routeId,
             @Param("status") AttendanceStatusEnum status
     );
 }

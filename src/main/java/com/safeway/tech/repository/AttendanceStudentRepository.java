@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public interface AttendanceStudentRepository extends JpaRepository<AttendanceStudent, UUID> {
 
-    @Query("SELECT ca FROM AttendanceStudent ca WHERE ca.chamada = :chamada AND ca.aluno = :aluno")
-    Optional<AttendanceStudent> findByChamadaAndAluno(
-            @Param("chamada") Attendance attendance,
+    @Query("SELECT ca FROM AttendanceStudent ca WHERE ca.attendance = :attendance AND ca.student = :student")
+    Optional<AttendanceStudent> findByAttendanceAndStudent(
+            @Param("attendance") Attendance attendance,
             @Param("student") Student student);
 }

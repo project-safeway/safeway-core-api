@@ -26,7 +26,7 @@ public class RegisterAuthUserJpaAdapter implements RegisterAuthUserPort {
 
     @Override
     public boolean existsByLicensePlate(String licensePlate) {
-        return transportRepository.findByPlaca(licensePlate).isPresent();
+        return transportRepository.findByLicensePlate(licensePlate).isPresent();
     }
 
     @Override

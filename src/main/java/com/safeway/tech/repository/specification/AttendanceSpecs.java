@@ -9,23 +9,13 @@ import java.util.UUID;
 
 public class AttendanceSpecs {
 
-    public static Specification<Attendance> comItinerarioId(UUID itinerarioId) {
+    public static Specification<Attendance> withRouteId(UUID routeId) {
         return (root, query, cb) ->
-                itinerarioId == null ? null : cb.equal(root.get("itinerario").get("id"), itinerarioId);
+                routeId == null ? null : cb.equal(root.get("route").get("id"), routeId);
     }
 
-    public static Specification<Attendance> comStatus(List<AttendanceStatusEnum> statusList) {
+    public static Specification<Attendance> withStatus(List<AttendanceStatusEnum> statusList) {
         return (root, query, cb) ->
                 statusList == null || statusList.isEmpty() ? null : root.get("status").in(statusList);
-    }
-
-    public static Specification<Attendance> comTransporte(UUID transporteId) {
-        return (root, query, cb) ->
-                transporteId == null ? null : cb.equal(root.get("itinerario").get("transport").get("id"), transporteId);
-    }
-
-    public static Specification<Attendance> comUsuario(UUID usuarioId) {
-        return (root, query, cb) ->
-                usuarioId == null ? null : cb.equal(root.get("itinerario").get("transport").get("usuario").get("id"), usuarioId);
     }
 }

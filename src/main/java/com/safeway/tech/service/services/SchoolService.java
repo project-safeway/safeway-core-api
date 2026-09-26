@@ -21,14 +21,14 @@ public class SchoolService {
     private final CurrentUserService currentUserService;
 
     public List<School> findAllSchools() {
-        UUID userId = currentUserService.getCurrentUserId();
-        return schoolRepository.findByUsuarioIdUsuario(userId);
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        return schoolRepository.findAllByTransportId(transportId);
     }
 
     @Transactional(readOnly = true)
     public School findById(UUID schoolId) {
-        UUID userId = currentUserService.getCurrentUserId();
-        return schoolRepository.findByIdEscolaAndIdUsuario(schoolId, userId)
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        return schoolRepository.findByIdAndTransportId(schoolId, transportId)
                 .orElseThrow(() -> new SchoolNotFoundException("School não encontrada"));
     }
 

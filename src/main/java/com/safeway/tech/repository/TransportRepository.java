@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public interface TransportRepository extends JpaRepository<Transport, UUID> {
 
-    @Query("SELECT t FROM Transport t WHERE t.licensePlate = :placa")
-    Optional<Transport> findByPlaca(@Param("licensePlate") String placa);
+    @Query("SELECT t FROM Transport t WHERE t.licensePlate = :licensePlate")
+    Optional<Transport> findByLicensePlate(@Param("licensePlate") String licensePlate);
 
-    @Query("SELECT t FROM Transport t WHERE t.usuario.id = :userId")
+    @Query("SELECT t FROM Transport t JOIN User u ON u.transport.id = t.id WHERE u.id = :userId")
     Transport findByUserId(@Param("userId") UUID userId);
 }

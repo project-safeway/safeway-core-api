@@ -29,7 +29,7 @@ public class StudentService {
 
     public Student findById(UUID studentId) {
         UUID userId = currentUserService.getCurrentUserId();
-        return studentRepository.findByIdAndUsuarioId(studentId, userId)
+        return studentRepository.findByIdAndUserId(studentId, userId)
                 .orElseThrow(() -> new StudentNotFoundException("Student não encontrado"));
     }
 
@@ -89,12 +89,12 @@ public class StudentService {
 
     public List<Student> batchFindById(List<UUID> ids) {
         UUID userId = currentUserService.getCurrentUserId();
-        return studentRepository.findByIdInAndIdUsuario(ids, userId);
+        return studentRepository.findByIdInAndUserId(ids, userId);
     }
 
     public List<Student> findAllActive() {
         UUID userId = currentUserService.getCurrentUserId();
-        return studentRepository.findByAtivoTrueAndIdUsuario(userId);
+        return studentRepository.findAllByActiveTrueAndUserId(userId);
     }
 
     private void applyData(Student student, StudentRequest request) {

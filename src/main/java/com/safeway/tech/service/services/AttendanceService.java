@@ -20,7 +20,6 @@ public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
     private final RouteService routeService;
-    private final CurrentUserService currentUserService;
 
     public Attendance findById(UUID id) {
         return attendanceRepository.findById(id)
@@ -28,7 +27,7 @@ public class AttendanceService {
     }
 
     public Attendance findActiveByRoute(UUID routeId) {
-        return attendanceRepository.findByItinerarioIdAndStatus(routeId, AttendanceStatusEnum.IN_PROGRESS)
+        return attendanceRepository.findByRouteIdAndStatus(routeId, AttendanceStatusEnum.IN_PROGRESS)
                 .orElse(null);
     }
 
@@ -64,14 +63,9 @@ public class AttendanceService {
     }
 
     public Page<Attendance> findAttendanceHistory(UUID routeId, List<AttendanceStatusEnum> status, Pageable pageable) {
-        UUID transporteId = currentUserService.getCurrentTransporteId();
-        UUID userId = currentUserService.getCurrentUserId();
-
         Specification<Attendance> specs = Specification.allOf(
-                AttendanceSpecs.comItinerarioId(routeId),
-                AttendanceSpecs.comStatus(status),
-                AttendanceSpecs.comTransporte(transporteId),
-                AttendanceSpecs.comUsuario(userId)
+                AttendanceSpecs.withRouteId(routeId),
+                AttendanceSpecs.withStatus(status)
         );
 
         return attendanceRepository.findAll(specs, pageable);

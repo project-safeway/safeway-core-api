@@ -10,9 +10,23 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface SchoolRepository extends JpaRepository<School, UUID> {
-    @Query("SELECT DISTINCT e FROM School e LEFT JOIN FETCH e.alunos WHERE e.usuario.id = :usuarioId AND e.ativo = true")
-    List<School> findByUsuarioIdUsuario(@Param("usuarioId") UUID usuarioId);
+    @Query("""
+        SELECT s
+        FROM School s
+        WHERE s.transport.id = :transportId
+          AND s.active = true
+    """)
+    List<School> findAllByTransportId(@Param("transportId") UUID transportId);
 
-    @Query("SELECT e FROM School e LEFT JOIN FETCH e.alunos WHERE e.id = :idEscola AND e.usuario.id = :userId AND e.ativo = true")
-    Optional<School> findByIdEscolaAndIdUsuario(@Param("idEscola") UUID idEscola, @Param("userId") UUID userId);
+    @Query("""
+        SELECT s
+        FROM School s
+        WHERE s.id = :schoolId
+          AND s.transport.id = :transportId
+          AND s.active = true
+    """)
+    Optional<School> findByIdAndTransportId(
+            @Param("schoolId") UUID schoolId,
+            @Param("transportId") UUID transportId
+    );
 }

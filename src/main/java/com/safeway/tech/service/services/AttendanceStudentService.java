@@ -37,7 +37,7 @@ public class AttendanceStudentService {
             Student student = studentService.findById(studentId);
 
             AttendanceStudent attendanceStudent = attendanceStudentRepository
-                    .findByChamadaAndAluno(attendance, student)
+                    .findByAttendanceAndStudent(attendance, student)
                     .orElseGet(() -> {
                         AttendanceStudent newAttendanceStudent = new AttendanceStudent();
                         newAttendanceStudent.setAttendance(attendance);

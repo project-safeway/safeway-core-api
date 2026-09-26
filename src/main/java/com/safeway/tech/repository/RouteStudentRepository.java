@@ -14,20 +14,19 @@ import java.util.UUID;
 
 public interface RouteStudentRepository extends JpaRepository<RouteStudent, UUID> {
 
-    @Query("SELECT ia FROM RouteStudent ia WHERE ia.itinerario.id = :itinerarioId")
-    List<RouteStudent> findByItinerarioId(@Param("itinerarioId") UUID itinerarioId);
+    @Query("SELECT rs FROM RouteStudent rs WHERE rs.route.id = :routeId")
+    List<RouteStudent> findByRouteId(@Param("routeId") UUID routeId);
 
-    @Query("SELECT ia FROM RouteStudent ia WHERE ia.itinerario.id = :itinerarioId AND ia.aluno.id = :alunoId")
-    Optional<RouteStudent> findByItinerarioIdAndAlunoId(
-            @Param("itinerarioId") UUID itinerarioId,
-            @Param("studentId") UUID alunoId);
+    @Query("SELECT rs FROM RouteStudent rs WHERE rs.route.id = :routeId AND rs.student.id = :studentId")
+    Optional<RouteStudent> findByRouteIdAndStudentId(
+            @Param("routeId") UUID routeId,
+            @Param("studentId") UUID studentId);
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM RouteStudent ia WHERE ia.itinerario.id = :itinerarioId")
-    void deleteAllByItinerarioId(
-            @Param("itinerarioId") UUID itinerarioId);
+    @Query("DELETE FROM RouteStudent rs WHERE rs.route.id = :routeId")
+    void deleteAllByRouteId(@Param("routeId") UUID routeId);
 
-    @Query("SELECT ia FROM RouteStudent ia WHERE ia.itinerario = :itinerario ORDER BY ia.ordemEmbarque ASC")
-    List<RouteStudent> findByItinerarioOrderByOrdemEmbarqueAsc(@Param("itinerario") Route route);
+    @Query("SELECT rs FROM RouteStudent rs WHERE rs.route = :route ORDER BY rs.boardingOrder ASC")
+    List<RouteStudent> findByRouteOrderByBoardingOrderAsc(@Param("route") Route route);
 }

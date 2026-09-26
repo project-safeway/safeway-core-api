@@ -34,7 +34,7 @@ public class AddressService {
     @Transactional(readOnly = true)
     public List<Address> availableAddress(UUID studentId) {
         UUID userId = currentUserService.getCurrentUserId();
-        List<Guardian> guardians = guardianRepository.findByAlunosIdAndUsuarioIdUsuario(studentId, userId);
+        List<Guardian> guardians = guardianRepository.findByStudentIdAndUserId(studentId, userId);
 
         return guardians.stream()
                 .map(Guardian::getAddress)

@@ -11,15 +11,12 @@ import java.util.UUID;
 
 public interface GuardianRepository extends JpaRepository<Guardian, UUID> {
 
-    @Query("SELECT r FROM Guardian r WHERE r.usuario.id = :userId")
-    List<Guardian> findAllByIdUsuario(@Param("userId") UUID userId);
+    @Query("SELECT g FROM Guardian g WHERE g.user.id = :userId")
+    List<Guardian> findByUserId(@Param("userId") UUID userId);
 
-    @Query("SELECT r FROM Guardian r JOIN r.alunos a WHERE a.id = :alunoId AND r.usuario.id = :usuarioId")
-    List<Guardian> findByAlunosIdAndUsuarioIdUsuario(@Param("studentId") UUID alunoId, @Param("usuarioId") UUID usuarioId);
+    @Query("SELECT g FROM Guardian g JOIN GuardianStudent gs WHERE gs.student = :studentId AND g.user.id = :userId")
+    List<Guardian> findByStudentIdAndUserId(@Param("studentId") UUID studentId, @Param("userId") UUID userId);
 
-    @Query("SELECT r FROM Guardian r WHERE r.id = :idResponsavel AND r.usuario.id = :usuarioId")
-    Optional<Guardian> findByIdResponsavelAndIdUsuario(@Param("idResponsavel") UUID idResponsavel, @Param("usuarioId") UUID usuarioId);
-
-    @Query("SELECT r FROM Guardian r WHERE r.cpf = :cpf AND r.usuario.id = :usuarioId")
-    Optional<Guardian> findByCpfAndIdUsuario(@Param("cpf") String cpf, @Param("usuarioId") UUID usuarioId);
+    @Query("SELECT g FROM Guardian g WHERE g.id = :guardianId AND g.user.id = :userId")
+    Optional<Guardian> findByGuardianIdAndUserId(@Param("guardianId") UUID guardianId, @Param("userId") UUID userId);
 }

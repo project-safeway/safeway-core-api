@@ -30,7 +30,7 @@ public class RouteService {
 
     public List<Route> findAll() {
         UUID transportId = currentUserService.getCurrentTransporteId();
-        return routeRepository.findAllByTransporte(transportId);
+        return routeRepository.findAllByTransportId(transportId);
     }
 
     public Route findById(UUID id) {

@@ -32,7 +32,7 @@ public class RouteStudentService {
     private final AddressService addressService;
 
     public List<RouteStudent> findByRouteId(UUID routeId) {
-        return routeStudentRepository.findByItinerarioId(routeId);
+        return routeStudentRepository.findByRouteId(routeId);
     }
 
     public void saveAll(List<RouteStudent> students) {
@@ -64,7 +64,7 @@ public class RouteStudentService {
         }
 
         // Evita duplicidade
-        Optional<RouteStudent> routeStudent = routeStudentRepository.findByItinerarioIdAndAlunoId(routeId, student.getId());
+        Optional<RouteStudent> routeStudent = routeStudentRepository.findByRouteIdAndStudentId(routeId, student.getId());
 
         if (routeStudent.isPresent()) {
             return;
@@ -82,7 +82,7 @@ public class RouteStudentService {
     @Transactional
     public void removeStudent(UUID routeId, UUID studentId) {
         RouteStudent entity = routeStudentRepository
-                .findByItinerarioIdAndAlunoId(routeId, studentId)
+                .findByRouteIdAndStudentId(routeId, studentId)
                 .orElseThrow(() -> new StudentNotFoundException("Student não encontrado no itinerário"));
 
         routeStudentRepository.delete(entity);
@@ -91,7 +91,7 @@ public class RouteStudentService {
     @Transactional
     public void syncStudents(Route route, List<RouteStudentRequest> newStudents) {
         // Remove todos os vínculos anteriores
-        routeStudentRepository.deleteAllByItinerarioId(route.getId());
+        routeStudentRepository.deleteAllByRouteId(route.getId());
 
         // Cria novos vínculos — atribui endereco e valida se pertence ao responsável
         List<RouteStudent> entities = newStudents.stream().map(dto -> {
@@ -128,7 +128,7 @@ public class RouteStudentService {
 
     @Transactional
     public void reorder(UUID routeId, List<UUID> newStudentIdsOrder) {
-        List<RouteStudent> actualOrder = routeStudentRepository.findByItinerarioId(routeId);
+        List<RouteStudent> actualOrder = routeStudentRepository.findByRouteId(routeId);
 
         Map<UUID, RouteStudent> studentMap = actualOrder.stream()
                 .collect(Collectors.toMap(a -> a.getStudent().getId(), a -> a));
@@ -150,7 +150,7 @@ public class RouteStudentService {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
 
-        return routeStudentRepository.findByItinerarioOrderByOrdemEmbarqueAsc(route).stream()
+        return routeStudentRepository.findByRouteOrderByBoardingOrderAsc(route).stream()
                 .filter(routeStudent ->
                         routeStudent.getAddress() != null
                             && routeStudent.getAddress().getLatitude() != null

@@ -7,10 +7,10 @@ import jakarta.validation.constraints.Size;
 public record TransporteRequestV2(
         @NotBlank(message = "Placa é obrigatória")
         @Size(max = 10)
-        String placa,
+        String licensePlate,
         @Size(max = 50)
-        String modelo,
+        String model,
         @PositiveOrZero
-        Integer capacidade
+        Integer capacity
 ) {
 }

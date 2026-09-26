@@ -21,11 +21,11 @@ public class AttendanceSpecs {
 
     public static Specification<Attendance> comTransporte(UUID transporteId) {
         return (root, query, cb) ->
-                transporteId == null ? null : cb.equal(root.get("itinerario").get("transporte").get("id"), transporteId);
+                transporteId == null ? null : cb.equal(root.get("itinerario").get("transport").get("id"), transporteId);
     }
 
     public static Specification<Attendance> comUsuario(UUID usuarioId) {
         return (root, query, cb) ->
-                usuarioId == null ? null : cb.equal(root.get("itinerario").get("transporte").get("usuario").get("id"), usuarioId);
+                usuarioId == null ? null : cb.equal(root.get("itinerario").get("transport").get("usuario").get("id"), usuarioId);
     }
 }

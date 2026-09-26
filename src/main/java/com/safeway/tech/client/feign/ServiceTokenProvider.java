@@ -58,11 +58,6 @@ public class ServiceTokenProvider {
         return cachedToken;
     }
 
-    public synchronized void invalidateToken() {
-        cachedToken = null;
-        tokenExpiration = null;
-    }
-
     private record ServiceTokenRequest(String clientId, String clientSecret) {
     }
 

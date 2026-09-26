@@ -27,7 +27,7 @@ public class LoginUseCase {
         AuthUser authUser = loadAuthUserPort.findByEmail(command.email())
                 .orElseThrow(InvalidCredentialsException::new);
 
-        if (!passwordVerifierPort.matches(command.senha(), authUser.passwordHash())) {
+        if (!passwordVerifierPort.matches(command.password(), authUser.passwordHash())) {
             throw new InvalidCredentialsException();
         }
 
@@ -36,9 +36,9 @@ public class LoginUseCase {
         return new LoginResult(
                 token.value(),
                 token.expiresIn(),
-                authUser.nome(),
+                authUser.name(),
                 authUser.id(),
-                authUser.idTransporte()
+                authUser.transportId()
         );
     }
 }

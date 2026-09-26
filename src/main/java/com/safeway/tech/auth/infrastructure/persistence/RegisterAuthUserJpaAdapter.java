@@ -25,27 +25,28 @@ public class RegisterAuthUserJpaAdapter implements RegisterAuthUserPort {
     }
 
     @Override
-    public boolean existsByPlaca(String placa) {
-        return transportRepository.findByPlaca(placa).isPresent();
+    public boolean existsByLicensePlate(String licensePlate) {
+        return transportRepository.findByPlaca(licensePlate).isPresent();
     }
 
     @Override
     @Transactional
     public RegisteredAuthUser create(RegisterAuthUserData data) {
-        User user = new User();
-        user.setNome(data.nome());
-        user.setEmail(data.email());
-        user.setPasswordHash(data.passwordHash());
-        user.setRole(UserRole.COMMON);
-        user.setTel1(data.telefone());
-        User savedUser = userRepository.save(user);
 
         Transport transport = new Transport();
-        transport.setPlaca(data.transportePlaca());
-        transport.setModelo(data.transporteModelo());
-        transport.setCapacidade(data.transporteCapacidade());
-        transport.setUser(savedUser);
+        transport.setLicensePlate(data.transportLicensePlate());
+        transport.setModel(data.transportModel());
+        transport.setCapacity(data.transportCapacity());
         Transport savedTransport = transportRepository.save(transport);
+
+        User user = new User();
+        user.setName(data.name());
+        user.setEmail(data.email());
+        user.setPasswordHash(data.passwordHash());
+        user.setRole(UserRole.DRIVER);
+        user.setPrimaryPhoneNumber(data.phoneNumber());
+        user.setTransport(savedTransport);
+        User savedUser = userRepository.save(user);
 
         return new RegisteredAuthUser(savedUser.getId(), savedTransport.getId());
     }

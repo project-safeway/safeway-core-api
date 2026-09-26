@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public record RegisteredAuthUser(
         UUID userId,
-        UUID idTransporte
+        UUID transportId
 ) {
 }

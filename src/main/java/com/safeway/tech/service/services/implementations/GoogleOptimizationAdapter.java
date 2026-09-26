@@ -30,7 +30,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
     @SuppressWarnings("MethodLength")
     public RouteResponse optimizeRoute(RouteRequest request) {
         try {
-            JsonNode response = client.otimizarRotas(request);
+            JsonNode response = client.optimizeRoute(request);
             RouteResponse rawResponse = parseResponse(response, request);
 
             // Se nao for para otimizar a order, reordena de volta para a order original enviada pelo front

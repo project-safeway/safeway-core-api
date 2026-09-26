@@ -1,10 +1,10 @@
 package com.safeway.tech.auth.core.application;
 
 public record RegisterUserCommand(
-        String nome,
+        String name,
         String email,
-        String senha,
-        String telefone,
-        RegisterTransporteCommand transporte
+        String password,
+        String phoneNumber,
+        RegisterTransportCommand transport
 ) {
 }

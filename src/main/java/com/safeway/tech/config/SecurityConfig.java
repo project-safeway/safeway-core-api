@@ -91,8 +91,6 @@ public class SecurityConfig {
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
 
-
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

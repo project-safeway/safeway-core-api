@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/rotas")
+@RequestMapping("/geocoding")
 @CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class GeocodingController {
 
     private final RouteOptimizationService routeOptimizationService;
 
-    @PostMapping("/otimizar")
-    public RouteResponse otimizarRota(@RequestBody RouteRequest request) {
+    @PostMapping("/optimize")
+    public RouteResponse optimizeRoute(@RequestBody RouteRequest request) {
         return routeOptimizationService.optimizeBestRoute(request);
     }
 

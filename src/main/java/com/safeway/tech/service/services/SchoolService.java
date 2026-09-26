@@ -3,7 +3,6 @@ package com.safeway.tech.service.services;
 import com.safeway.tech.api.dto.school.SchoolRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
-import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.SchoolNotFoundException;
 import com.safeway.tech.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,64 +18,53 @@ public class SchoolService {
 
     private final SchoolRepository schoolRepository;
     private final AddressService addressService;
-    private final UserService userService;
     private final CurrentUserService currentUserService;
 
-    public List<School> listarEscolasComAlunos() {
-        UUID usuarioId = currentUserService.getCurrentUserId();
-        return schoolRepository.findByUsuarioIdUsuario(usuarioId);
+    public List<School> findAllSchools() {
+        UUID userId = currentUserService.getCurrentUserId();
+        return schoolRepository.findByUsuarioIdUsuario(userId);
     }
 
     @Transactional(readOnly = true)
-    public School buscarPorId(UUID escolaId) {
-        UUID usuarioId = currentUserService.getCurrentUserId();
-        return schoolRepository.findByIdEscolaAndIdUsuario(escolaId, usuarioId)
+    public School findById(UUID schoolId) {
+        UUID userId = currentUserService.getCurrentUserId();
+        return schoolRepository.findByIdEscolaAndIdUsuario(schoolId, userId)
                 .orElseThrow(() -> new SchoolNotFoundException("School não encontrada"));
-    }
-
-    @Transactional(readOnly = true)
-    public Address buscarEnderecoDaEscola(UUID escolaId) {
-        UUID usuarioId = currentUserService.getCurrentUserId();
-        School school = schoolRepository.findByIdEscolaAndIdUsuario(escolaId, usuarioId)
-                .orElseThrow(() -> new SchoolNotFoundException("School não encontrada"));
-        return school.getAddress();
     }
 
     @Transactional
-    public School cadastrarEscola(SchoolRequest request) {
+    public School createSchool(SchoolRequest request) {
         School school = new School();
-        aplicarDados(school, request);
 
-        Address address = addressService.create(request.endereco());
-        school.setAddress(address);
+        applyData(school, request);
 
-        UUID usuarioId = currentUserService.getCurrentUserId();
-        User user = userService.findById(usuarioId);
-        school.setUser(user);
-
-        return schoolRepository.save(school);
-    }
-
-    @Transactional
-    public School atualizarEscola(UUID escolaId, SchoolRequest request) {
-        School school = buscarPorId(escolaId);
-
-        aplicarDados(school, request);
-        Address address = addressService.update(school.getAddress().getId(), request.endereco());
+        Address address = addressService.create(request.address());
         school.setAddress(address);
 
         return schoolRepository.save(school);
     }
 
     @Transactional
-    public void desativar(UUID escolaId) {
-        School school = buscarPorId(escolaId);
-        school.setAtivo(false);
+    public School updateSchool(UUID schoolId, SchoolRequest request) {
+        School school = findById(schoolId);
+
+        applyData(school, request);
+
+        Address address = addressService.update(school.getAddress().getId(), request.address());
+        school.setAddress(address);
+
+        return schoolRepository.save(school);
+    }
+
+    @Transactional
+    public void deactivate(UUID schoolId) {
+        School school = findById(schoolId);
+        school.setActive(false);
         schoolRepository.save(school);
     }
 
-    private void aplicarDados(School school, SchoolRequest request) {
-        school.setNome(request.nome());
-        school.setNivelEnsino(request.nivelEnsino());
+    private void applyData(School school, SchoolRequest request) {
+        school.setName(request.name());
+        school.setEducationLevel(request.educationLevel());
     }
 }

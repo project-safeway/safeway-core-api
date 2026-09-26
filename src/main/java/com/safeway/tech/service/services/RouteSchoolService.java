@@ -43,7 +43,7 @@ public class RouteSchoolService {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
 
-        School school = schoolService.buscarPorId(request.schoolId());
+        School school = schoolService.findById(request.schoolId());
 
         Address address;
         if (request.addressId() != null) {

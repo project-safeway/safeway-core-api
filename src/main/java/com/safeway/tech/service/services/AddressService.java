@@ -47,8 +47,8 @@ public class AddressService {
         Address address = new Address();
 
         consumeData(address, request);
-
         calculateCoordinates(address);
+
         return addressRepository.save(address);
     }
 

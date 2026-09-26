@@ -42,10 +42,9 @@ public class StudentService {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
-        UUID transportId = currentUserService.getCurrentTransporteId();
-        Transport transport = transportService.findById(transportId);
+        Transport transport = transportService.getTransport();
 
-        School school = schoolService.buscarPorId(request.schoolId());
+        School school = schoolService.findById(request.schoolId());
 
         Student student = new Student();
         applyData(student, request);
@@ -68,7 +67,7 @@ public class StudentService {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
-        School school = schoolService.buscarPorId(request.schoolId());
+        School school = schoolService.findById(request.schoolId());
 
         Student student = findById(studentId);
         applyData(student, request);

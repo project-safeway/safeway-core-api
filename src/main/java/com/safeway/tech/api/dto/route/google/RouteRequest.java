@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record RotasRequest(
+public record RouteRequest(
         Vehicle vehicle,
         List<StopPoint> stoppingPoint,
         Boolean mustOptimizeOrder

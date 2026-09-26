@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.safeway.tech.api.dto.route.google.Location;
 import com.safeway.tech.api.dto.route.google.StopPoint;
-import com.safeway.tech.api.dto.route.google.RotasRequest;
+import com.safeway.tech.api.dto.route.google.RouteRequest;
 import com.safeway.tech.api.dto.route.google.Vehicle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -71,7 +71,7 @@ public class GoogleOptimizationClient {
         return GoogleCredentials.getApplicationDefault().createScoped("https://www.googleapis.com/auth/cloud-platform");
     }
 
-    public JsonNode otimizarRotas(RotasRequest request) {
+    public JsonNode otimizarRotas(RouteRequest request) {
         if (projectId == null || projectId.isBlank() || "dev-local".equals(projectId)) {
             throw new RuntimeException("projectId inválido. Configure 'google.projectId' ou defina GOOGLE_APPLICATION_CREDENTIALS com project_id.");
         }
@@ -94,7 +94,7 @@ public class GoogleOptimizationClient {
         }
     }
 
-    private ObjectNode montarRequest(RotasRequest request) {
+    private ObjectNode montarRequest(RouteRequest request) {
         ObjectNode root = mapper.createObjectNode();
         ObjectNode model = mapper.createObjectNode();
 

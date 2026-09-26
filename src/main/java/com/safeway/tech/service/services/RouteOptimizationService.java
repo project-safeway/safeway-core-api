@@ -1,6 +1,6 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.route.google.RotasRequest;
+import com.safeway.tech.api.dto.route.google.RouteRequest;
 import com.safeway.tech.api.dto.route.google.RouteResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class RouteOptimizationService {
         }
     }
 
-    public RouteResponse optimizeBestRoute(RotasRequest request) {
+    public RouteResponse optimizeBestRoute(RouteRequest request) {
         if (providers == null || providers.isEmpty()) {
             throw new RuntimeException(
                     "Nenhum provider de rotas disponível. " +

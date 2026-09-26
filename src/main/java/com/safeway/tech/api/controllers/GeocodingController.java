@@ -1,6 +1,6 @@
 package com.safeway.tech.api.controllers;
 
-import com.safeway.tech.api.dto.route.google.RotasRequest;
+import com.safeway.tech.api.dto.route.google.RouteRequest;
 import com.safeway.tech.api.dto.route.google.RouteResponse;
 import com.safeway.tech.service.services.RouteOptimizationService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class GeocodingController {
     private final RouteOptimizationService routeOptimizationService;
 
     @PostMapping("/otimizar")
-    public RouteResponse otimizarRota(@RequestBody RotasRequest request) {
+    public RouteResponse otimizarRota(@RequestBody RouteRequest request) {
         return routeOptimizationService.optimizeBestRoute(request);
     }
 

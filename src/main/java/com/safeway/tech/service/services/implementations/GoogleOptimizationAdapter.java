@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.safeway.tech.api.dto.route.google.Location;
 import com.safeway.tech.api.dto.route.google.RouteMetrics;
 import com.safeway.tech.api.dto.route.google.OptimizedStop;
-import com.safeway.tech.api.dto.route.google.RotasRequest;
+import com.safeway.tech.api.dto.route.google.RouteRequest;
 import com.safeway.tech.api.dto.route.google.RouteResponse;
 import com.safeway.tech.api.dto.route.google.StopPoint;
 import com.safeway.tech.client.GoogleOptimizationClient;
@@ -28,7 +28,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
 
     @Override
     @SuppressWarnings("MethodLength")
-    public RouteResponse optimizeRoute(RotasRequest request) {
+    public RouteResponse optimizeRoute(RouteRequest request) {
         try {
             JsonNode response = client.otimizarRotas(request);
             RouteResponse rawResponse = parseResponse(response, request);
@@ -65,7 +65,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
     }
 
     @SuppressWarnings("MethodLength")
-    private RouteResponse parseResponse(JsonNode response, RotasRequest request) {
+    private RouteResponse parseResponse(JsonNode response, RouteRequest request) {
         List<OptimizedStop> stops = new ArrayList<>();
         List<RouteMetrics> metrics = new ArrayList<>();
         double totalDistance = 0D;

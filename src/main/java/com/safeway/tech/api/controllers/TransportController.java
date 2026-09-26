@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/transporte")
+@RequestMapping("/transports")
 @RequiredArgsConstructor
 public class TransportController {
 
@@ -32,21 +32,21 @@ public class TransportController {
     }
 
     @PostMapping
-    public ResponseEntity<TransportResponse> salvarTransporte(@RequestBody @Valid TransportRequest request) {
+    public ResponseEntity<TransportResponse> createTransport(@RequestBody @Valid TransportRequest request) {
         Transport transport = transportService.saveTransport(request);
         TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping
-    public ResponseEntity<TransportResponse> alterarTransporte(@RequestBody @Valid TransportRequest request) {
+    public ResponseEntity<TransportResponse> updateTransport(@RequestBody @Valid TransportRequest request) {
         Transport transport = transportService.updateTransport(request);
         TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> excluir() {
+    public ResponseEntity<Void> delete() {
         transportService.deleteTransport();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

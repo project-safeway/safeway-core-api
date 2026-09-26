@@ -22,44 +22,44 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/responsavel")
+@RequestMapping("/guardians")
 @RequiredArgsConstructor
 public class GuardianController {
 
     private final ResponsavelService responsavelService;
 
     @PostMapping
-    public ResponseEntity<GuardianResponse> salvarResponsavel(@RequestBody @Valid GuardianRequest request) {
+    public ResponseEntity<GuardianResponse> createGuardian(@RequestBody @Valid GuardianRequest request) {
         Guardian guardian = responsavelService.createGuardian(request);
         GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<GuardianResponse>> listarResponsaveis() {
-        List<Guardian> responsaveis = responsavelService.listGuardians();
-        List<GuardianResponse> response = responsaveis.stream().map(GuardianMapper::toResponse).toList();
+    public ResponseEntity<List<GuardianResponse>> getGuardians() {
+        List<Guardian> guardians = responsavelService.listGuardians();
+        List<GuardianResponse> response = guardians.stream().map(GuardianMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GuardianResponse> retornarUm(@PathVariable UUID id) {
+    public ResponseEntity<GuardianResponse> findById(@PathVariable UUID id) {
         Guardian guardian = responsavelService.findById(id);
         GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/{idResponsavel}")
-    public ResponseEntity<Void> excluir(@PathVariable UUID idResponsavel) {
-        responsavelService.deactivate(idResponsavel);
+    @DeleteMapping("/{guardianId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID guardianId) {
+        responsavelService.deactivate(guardianId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping("/{idResponsavel}")
-    public ResponseEntity<GuardianResponse> alterarResponsavel(
-            @RequestBody @Valid GuardianRequest novoResponsavel,
-            @PathVariable UUID idResponsavel) {
-        Guardian guardian = responsavelService.updateGuardian(novoResponsavel, idResponsavel);
+    @PutMapping("/{guardianId}")
+    public ResponseEntity<GuardianResponse> updateGuardian(
+            @RequestBody @Valid GuardianRequest newGuardian,
+            @PathVariable UUID guardianId) {
+        Guardian guardian = responsavelService.updateGuardian(newGuardian, guardianId);
         GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

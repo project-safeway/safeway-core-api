@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@RequestMapping("/attendance")
+@RequestMapping("/attendances")
 @RestController
 @RequiredArgsConstructor
 public class AttendanceController {

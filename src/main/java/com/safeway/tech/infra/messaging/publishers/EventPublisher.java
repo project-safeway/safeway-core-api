@@ -41,7 +41,7 @@ public class EventPublisher {
                     event
             );
 
-            log.info("Evento de student criado publicado com sucesso: {}", event.alunoId());
+            log.info("Evento de student criado publicado com sucesso: {}", event.studentId());
         } catch (Exception e) {
             log.error("Erro ao publicar evento de student criado", e);
         }
@@ -69,7 +69,7 @@ public class EventPublisher {
                     event
             );
 
-            log.info("Evento de student atualizado publicado com sucesso: {}", event.alunoId());
+            log.info("Evento de student atualizado publicado com sucesso: {}", event.studentId());
         } catch (Exception e) {
             log.error("Erro ao publicar evento de student atualizado", e);
         }
@@ -97,7 +97,7 @@ public class EventPublisher {
                     event
             );
 
-            log.info("Evento de student inativado publicado com sucesso: {}", event.alunoId());
+            log.info("Evento de student inativado publicado com sucesso: {}", event.studentId());
         } catch (Exception e) {
             log.error("Erro ao publicar evento de student inativado", e);
         }

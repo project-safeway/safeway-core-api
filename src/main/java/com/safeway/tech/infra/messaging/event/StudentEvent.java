@@ -7,13 +7,13 @@ import java.util.UUID;
 
 public record StudentEvent(
         UUID id,
-        UUID alunoId,
-        UUID usuarioId,
-        String nome,
-        Double valorMensalidade,
-        Integer diaVencimento,
-        Boolean ativo,
-        String tipo,
+        UUID studentId,
+        UUID userId,
+        String name,
+        Double monthlyFee,
+        Integer dueDate,
+        Boolean active,
+        String type,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime timestamp
 ) {

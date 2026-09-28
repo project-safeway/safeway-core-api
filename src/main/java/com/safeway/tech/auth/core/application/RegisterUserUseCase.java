@@ -1,7 +1,7 @@
 package com.safeway.tech.auth.core.application;
 
 import com.safeway.tech.auth.core.exception.EmailAlreadyInUseException;
-import com.safeway.tech.auth.core.exception.TransporteAlreadyInUseException;
+import com.safeway.tech.auth.core.exception.TransportAlreadyInUseException;
 import com.safeway.tech.auth.core.model.RegisterAuthUserData;
 import com.safeway.tech.auth.core.model.RegisteredAuthUser;
 import com.safeway.tech.auth.core.port.PasswordHasherPort;
@@ -25,23 +25,23 @@ public class RegisterUserUseCase {
             throw new EmailAlreadyInUseException();
         }
 
-        String placaNormalizada = command.transporte().placa().trim().toUpperCase();
-        if (registerAuthUserPort.existsByPlaca(placaNormalizada)) {
-            throw new TransporteAlreadyInUseException();
+        String normalizedLicensePlate = command.transport().licensePlate().trim().toUpperCase();
+        if (registerAuthUserPort.existsByLicensePlate(normalizedLicensePlate)) {
+            throw new TransportAlreadyInUseException();
         }
 
         RegisterAuthUserData data = new RegisterAuthUserData(
-                command.nome(),
+                command.name(),
                 command.email(),
-                passwordHasherPort.hash(command.senha()),
-                command.telefone(),
-                placaNormalizada,
-                command.transporte().modelo(),
-                command.transporte().capacidade()
+                passwordHasherPort.hash(command.password()),
+                command.phoneNumber(),
+                normalizedLicensePlate,
+                command.transport().model(),
+                command.transport().capacity()
         );
 
         RegisteredAuthUser registeredAuthUser = registerAuthUserPort.create(data);
 
-        return new RegisterUserResult(registeredAuthUser.userId(), registeredAuthUser.idTransporte());
+        return new RegisterUserResult(registeredAuthUser.userId(), registeredAuthUser.transportId());
     }
 }

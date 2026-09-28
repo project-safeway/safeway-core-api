@@ -5,8 +5,8 @@ import java.util.UUID;
 public record AuthResponseV2(
         String accessToken,
         Long expiresIn,
-        String nomeUsuario,
+        String username,
         UUID userId,
-        UUID idTransporte
+        UUID transportId
 ) {
 }

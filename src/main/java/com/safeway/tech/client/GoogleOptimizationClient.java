@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.safeway.tech.api.dto.rotas.Localizacao;
-import com.safeway.tech.api.dto.rotas.PontoParada;
-import com.safeway.tech.api.dto.rotas.RotasRequest;
-import com.safeway.tech.api.dto.rotas.Veiculo;
+import com.safeway.tech.api.dto.route.google.Location;
+import com.safeway.tech.api.dto.route.google.RouteRequest;
+import com.safeway.tech.api.dto.route.google.StopPoint;
+import com.safeway.tech.api.dto.route.google.Vehicle;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 
 @Component
+@Slf4j
 public class GoogleOptimizationClient {
 
     private final WebClient webClient;
@@ -35,7 +37,7 @@ public class GoogleOptimizationClient {
         try {
             this.credentials = initCredentials();
         } catch (IOException e) {
-            System.err.println("Aviso: não foi possível inicializar credenciais Google. Detalhe: " + e.getMessage());
+            log.warn("Aviso: não foi possível inicializar credenciais Google. Detalhe: {}", e.getMessage());
             this.credentials = null;
         }
     }
@@ -48,15 +50,15 @@ public class GoogleOptimizationClient {
                 JsonNode node = mapper.readTree(content);
                 String pid = node.path("project_id").asText();
                 if (pid != null && !pid.isBlank()) {
-                    System.out.println("projectId extraído da service account: " + pid);
+                    log.info("projectId extraído da service account: {}", pid);
                     return pid;
                 }
-                System.out.println("Service account sem project_id, usando configurado: " + fallback);
+                log.info("Service account sem project_id, usando configurado: {}", fallback);
             } catch (Exception ex) {
-                System.err.println("Falha ao ler project_id do arquivo: " + ex.getMessage());
+                log.error("Falha ao ler project_id do arquivo: {}", ex.getMessage());
             }
         } else {
-            System.out.println("Sem GOOGLE_APPLICATION_CREDENTIALS, usando projectId configurado: " + fallback);
+            log.info("Sem GOOGLE_APPLICATION_CREDENTIALS, usando projectId configurado: {}", fallback);
         }
         return fallback;
     }
@@ -71,12 +73,12 @@ public class GoogleOptimizationClient {
         return GoogleCredentials.getApplicationDefault().createScoped("https://www.googleapis.com/auth/cloud-platform");
     }
 
-    public JsonNode otimizarRotas(RotasRequest request) {
+    public JsonNode optimizeRoute(RouteRequest request) {
         if (projectId == null || projectId.isBlank() || "dev-local".equals(projectId)) {
             throw new RuntimeException("projectId inválido. Configure 'google.projectId' ou defina GOOGLE_APPLICATION_CREDENTIALS com project_id.");
         }
-        ObjectNode body = montarRequest(request);
-        System.out.println("Google optimizeTours body: " + body);
+        ObjectNode body = buildRequest(request);
+        log.info("Google optimizeTours body: {}", body);
         String uri = String.format("/v1/projects/%s:optimizeTours", projectId);
         try {
             return webClient.post()
@@ -94,17 +96,17 @@ public class GoogleOptimizationClient {
         }
     }
 
-    private ObjectNode montarRequest(RotasRequest request) {
+    private ObjectNode buildRequest(RouteRequest request) {
         ObjectNode root = mapper.createObjectNode();
         ObjectNode model = mapper.createObjectNode();
 
         ArrayNode shipments = mapper.createArrayNode();
-        for (PontoParada p : request.pontosParada()) {
+        for (StopPoint p : request.stoppingPoint()) {
             ObjectNode shipment = mapper.createObjectNode();
             shipment.put("label", p.id());
             ArrayNode deliveries = mapper.createArrayNode();
             ObjectNode delivery = mapper.createObjectNode();
-            delivery.set("arrivalLocation", criarLocalizacao(p.localizacao()));
+            delivery.set("arrivalLocation", createLocation(p.location()));
             deliveries.add(delivery);
             shipment.set("deliveries", deliveries);
             shipments.add(shipment);
@@ -113,11 +115,11 @@ public class GoogleOptimizationClient {
 
         // Vehicles
         ArrayNode vehicles = mapper.createArrayNode();
-        Veiculo v = request.veiculo();
+        Vehicle v = request.vehicle();
         ObjectNode vehicle = mapper.createObjectNode();
         vehicle.put("label", v.id());
-        vehicle.set("startLocation", criarLocalizacao(v.localizacaoInicial()));
-        vehicle.set("endLocation", criarLocalizacao(v.localizacaoFinal()));
+        vehicle.set("startLocation", createLocation(v.intialLocation()));
+        vehicle.set("endLocation", createLocation(v.finalLocation()));
         vehicles.add(vehicle);
         model.set("vehicles", vehicles);
 
@@ -125,7 +127,7 @@ public class GoogleOptimizationClient {
         return root;
     }
 
-    private ObjectNode criarLocalizacao(Localizacao loc) {
+    private ObjectNode createLocation(Location loc) {
         if (loc == null) {
             throw new RuntimeException("Localização ausente");
         }

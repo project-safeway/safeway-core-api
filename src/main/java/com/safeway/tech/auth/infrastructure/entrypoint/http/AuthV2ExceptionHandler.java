@@ -2,7 +2,7 @@ package com.safeway.tech.auth.infrastructure.entrypoint.http;
 
 import com.safeway.tech.auth.core.exception.EmailAlreadyInUseException;
 import com.safeway.tech.auth.core.exception.InvalidCredentialsException;
-import com.safeway.tech.auth.core.exception.TransporteAlreadyInUseException;
+import com.safeway.tech.auth.core.exception.TransportAlreadyInUseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,8 +21,8 @@ public class AuthV2ExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
-    @ExceptionHandler(TransporteAlreadyInUseException.class)
-    public ResponseEntity<String> handleTransporteAlreadyInUse(TransporteAlreadyInUseException ex) {
+    @ExceptionHandler(TransportAlreadyInUseException.class)
+    public ResponseEntity<String> handleTransportAlreadyInUse(TransportAlreadyInUseException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }

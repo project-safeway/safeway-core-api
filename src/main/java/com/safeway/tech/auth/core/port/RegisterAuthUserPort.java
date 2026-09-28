@@ -5,6 +5,6 @@ import com.safeway.tech.auth.core.model.RegisteredAuthUser;
 
 public interface RegisterAuthUserPort {
     boolean existsByEmail(String email);
-    boolean existsByPlaca(String placa);
+    boolean existsByLicensePlate(String licensePlate);
     RegisteredAuthUser create(RegisterAuthUserData data);
 }

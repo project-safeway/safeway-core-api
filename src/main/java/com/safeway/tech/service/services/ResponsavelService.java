@@ -1,85 +1,79 @@
 package com.safeway.tech.service.services;
 
-import com.safeway.tech.api.dto.responsavel.ResponsavelRequest;
-import com.safeway.tech.domain.models.Endereco;
-import com.safeway.tech.domain.models.Responsavel;
-import com.safeway.tech.domain.models.Usuario;
-import com.safeway.tech.infra.exception.ResponsavelNotFoundException;
-import com.safeway.tech.repository.ResponsavelRepository;
+import com.safeway.tech.api.dto.guardian.GuardianRequest;
+import com.safeway.tech.domain.models.Address;
+import com.safeway.tech.domain.models.Guardian;
+import com.safeway.tech.domain.models.User;
+import com.safeway.tech.infra.exception.GuardianNotFoundException;
+import com.safeway.tech.repository.GuardianRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ResponsavelService {
 
-    private final ResponsavelRepository responsavelRepository;
-    private final UsuarioService usuarioService;
-    private final EnderecoService enderecoService;
+    private final GuardianRepository guardianRepository;
+    private final UserService userService;
+    private final AddressService addressService;
     private final CurrentUserService currentUserService;
 
-    public Responsavel buscarPorId(UUID id) {
+    public Guardian findById(UUID id) {
         UUID userId = currentUserService.getCurrentUserId();
-        return responsavelRepository.findByIdResponsavelAndIdUsuario(id, userId)
-                .orElseThrow(() -> new ResponsavelNotFoundException("O responsável com ID " + id + "não foi encontrado"));
+        return guardianRepository.findByGuardianIdAndUserId(id, userId)
+                .orElseThrow(() -> new GuardianNotFoundException("O responsável com ID " + id + "não foi encontrado"));
     }
 
-    public Optional<Responsavel> buscarPorCpfAndUsuario(String cpf, UUID userId) {
-        return responsavelRepository.findByCpfAndIdUsuario(cpf, userId);
-    }
-
-    public List<Responsavel> listarResponsaveis() {
+    public List<Guardian> listGuardians() {
         UUID userId = currentUserService.getCurrentUserId();
-        return responsavelRepository.findAllByIdUsuario(userId);
+        return guardianRepository.findByUserId(userId);
     }
 
     @Transactional
-    public Responsavel criarResponsavel(ResponsavelRequest request) {
-        Responsavel responsavel = new Responsavel();
-        aplicaDados(responsavel, request);
+    public Guardian createGuardian(GuardianRequest request) {
+        Guardian guardian = new Guardian();
+        applyData(guardian, request);
 
-        Endereco endereco = enderecoService.criar(request.endereco());
-        responsavel.setEndereco(endereco);
+        Address address = addressService.create(request.address());
+        guardian.setAddress(address);
 
         UUID userId = currentUserService.getCurrentUserId();
-        Usuario usuario = usuarioService.buscarPorId(userId);
-        responsavel.setUsuario(usuario);
+        User user = userService.findById(userId);
+        guardian.setUser(user);
 
-        return responsavelRepository.save(responsavel);
+        return guardianRepository.save(guardian);
     }
 
     @Transactional
-    public Responsavel alterarResponsavel(ResponsavelRequest request, UUID idResponsavel) {
-        Responsavel responsavel = buscarPorId(idResponsavel);
-        aplicaDados(responsavel, request);
+    public Guardian updateGuardian(GuardianRequest request, UUID guardianId) {
+        Guardian guardian = findById(guardianId);
+        applyData(guardian, request);
 
-        if (request.endereco() != null) {
-            Endereco enderecoAtual = responsavel.getEndereco();
-            Endereco endereco = enderecoAtual != null && enderecoAtual.getId() != null
-                    ? enderecoService.atualizar(enderecoAtual.getId(), request.endereco())
-                    : enderecoService.criar(request.endereco());
-            responsavel.setEndereco(endereco);
+        if (request.address() != null) {
+            Address currentAddress = guardian.getAddress();
+            Address address = currentAddress != null && currentAddress.getId() != null
+                    ? addressService.update(currentAddress.getId(), request.address())
+                    : addressService.create(request.address());
+            guardian.setAddress(address);
         }
 
-        return responsavelRepository.save(responsavel);
+        return guardianRepository.save(guardian);
     }
 
-    public void desativar(UUID id) {
-        Responsavel responsavel = buscarPorId(id);
-        responsavel.setAtivo(false);
-        responsavelRepository.save(responsavel);
+    public void deactivate(UUID id) {
+        Guardian guardian = findById(id);
+        guardian.setActive(false);
+        guardianRepository.save(guardian);
     }
 
-    private void aplicaDados(Responsavel responsavel, ResponsavelRequest request) {
-        responsavel.setNome(request.nome());
-        responsavel.setCpf(request.cpf());
-        responsavel.setTel1(request.tel1());
-        responsavel.setTel2(request.tel2());
-        responsavel.setEmail(request.email());
+    private void applyData(Guardian guardian, GuardianRequest request) {
+        guardian.setName(request.name());
+        guardian.setPrimaryPhoneNumber(request.primaryPhoneNumber());
+        guardian.setSecondaryPhoneNumber(request.secondaryPhoneNumber());
+        guardian.setEmail(request.email());
     }
 }

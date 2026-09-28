@@ -34,10 +34,10 @@ public class CurrentUserService {
         Object principal = auth.getPrincipal();
 
         if (principal instanceof Jwt jwt) {
-            Object transporteClaim = jwt.getClaim("transporte");
+            Object transporteClaim = jwt.getClaim("transport");
 
             if (transporteClaim == null) {
-                throw new IllegalStateException("Claim 'transporte' não encontrada no token");
+                throw new IllegalStateException("Claim 'transport' não encontrada no token");
             }
 
             return UUID.fromString(transporteClaim.toString());

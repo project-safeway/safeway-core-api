@@ -4,10 +4,10 @@ import java.util.UUID;
 
 public record AuthUser(
         UUID id,
-        String nome,
+        String name,
         String email,
         String passwordHash,
         String role,
-        UUID idTransporte
+        UUID transportId
 ) {
 }

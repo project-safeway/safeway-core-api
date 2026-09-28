@@ -19,7 +19,6 @@ otimização de rotas com Google Maps, e muito mais.
 | **Itinerários**  | Criação de itinerários com alunos e escolas associados          |
 | **Rotas**        | Otimização de rotas via Google Maps / Route Optimization API    |
 | **Transportes**  | Cadastro de veículos (modelo, placa, capacidade)                |
-| **Eventos**      | Agenda de eventos com prioridade e tipo                         |
 | **Endereços**    | Gerenciamento de endereços com geocodificação                   |
 | **Financeiro**   | Mensalidades, pagamentos de funcionários e controle de despesas |
 | **Usuários**     | Gestão de contas e perfis de acesso                             |
@@ -112,7 +111,7 @@ POST /auth/register
 ```json
 {
   "nome": "Usuario Teste",
-  "email": "usuario@teste.com",
+  "email": "user@teste.com",
   "senha": "senha123",
   "tel1": "11999999999"
 }
@@ -124,7 +123,7 @@ POST /auth/login
 
 ```json
 {
-  "email": "usuario@teste.com",
+  "email": "user@teste.com",
   "senha": "senha123"
 }
 ```
@@ -135,8 +134,8 @@ POST /auth/login
 
 ### Principais tabelas
 
-`usuarios` · `alunos` · `escolas` · `enderecos` · `transportes` · `responsaveis` · `chamadas` · `eventos` ·
-`itinerarios` · `mensalidades_aluno` · `pagamentos`
+`users` · `students` · `schools` · `addresses` · `transports` · `guardians` · `chamadas` ·
+`routes` · `mensalidades_aluno` · `pagamentos`
 
 ---
 
@@ -202,8 +201,6 @@ back-end/
 │   │       ├── application.properties
 │   │       └── keys/               # Chaves RSA (pub.key, pri.key)
 │   └── test/                       # Testes
-├── schema.sql                      # Schema completo do banco
-├── teste-endpoints.md              # Exemplos de teste dos endpoints
 ├── pom.xml                         # Dependências Maven
 ├── mvnw / mvnw.cmd                 # Maven Wrapper
 └── README.md

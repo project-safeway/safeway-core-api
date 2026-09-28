@@ -1,7 +1,7 @@
 # Copilot Instructions - Safeway Back-end
 
 Objetivo
-- API principal do Safeway para gestao de transporte escolar, cadastro de alunos, chamada, itinerarios, eventos e integracoes.
+- API principal do Safeway para gestao de transporte escolar, cadastro de alunos, chamada, itinerarios e integracoes.
 
 Arquitetura e stack
 - Java 21, Spring Boot 3.
@@ -15,7 +15,7 @@ Padroes de codigo
 - Entidades herdam BaseEntity (UUID, timestamps, soft delete por ativo).
 - Servicos: interface + implementacao, com @Transactional em escrita.
 - Mappers para converter entidade <-> DTO.
-- Filtragem por usuario atual (CurrentUserService) para escopo multi-tenant.
+- Filtragem por user atual (CurrentUserService) para escopo multi-tenant.
 - Validacao de entrada com @Valid e DTOs de request/response.
 - Checkstyle baseado em Google Java Style.
 
@@ -33,7 +33,7 @@ Comandos usuais
 
 Boas praticas de mudanca
 - Preservar padrao de DTOs e mappers.
-- Garantir que queries respeitam o usuario autenticado.
+- Garantir que queries respeitam o user autenticado.
 - Manter endpoints consistentes com controllers existentes.
 
 Sugestoes de prompts

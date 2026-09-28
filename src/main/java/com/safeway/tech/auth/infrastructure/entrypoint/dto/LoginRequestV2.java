@@ -8,6 +8,6 @@ public record LoginRequestV2(
         @Email(message = "Email inválido")
         String email,
         @NotBlank(message = "Senha é obrigatória")
-        String senha
+        String password
 ) {
 }

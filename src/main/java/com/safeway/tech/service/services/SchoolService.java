@@ -20,7 +20,7 @@ public class SchoolService {
     private final AddressService addressService;
     private final CurrentUserService currentUserService;
 
-    public List<School> findAllSchools() {
+    public List<School> findAll() {
         UUID transportId = currentUserService.getCurrentTransporteId();
         return schoolRepository.findAllByTransportId(transportId);
     }
@@ -33,7 +33,7 @@ public class SchoolService {
     }
 
     @Transactional
-    public School createSchool(SchoolRequest request) {
+    public School create(SchoolRequest request) {
         School school = new School();
 
         applyData(school, request);
@@ -45,7 +45,7 @@ public class SchoolService {
     }
 
     @Transactional
-    public School updateSchool(UUID schoolId, SchoolRequest request) {
+    public School update(UUID schoolId, SchoolRequest request) {
         School school = findById(schoolId);
 
         applyData(school, request);
@@ -57,7 +57,7 @@ public class SchoolService {
     }
 
     @Transactional
-    public void deactivate(UUID schoolId) {
+    public void delete(UUID schoolId) {
         School school = findById(schoolId);
         school.setActive(false);
         schoolRepository.save(school);

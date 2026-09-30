@@ -34,7 +34,7 @@ public class StudentService {
     }
 
     @Transactional
-    public Student createStudent(StudentRequest request) {
+    public Student create(StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
         User user = userService.findById(userId);
 
@@ -42,14 +42,15 @@ public class StudentService {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
-        Transport transport = transportService.getTransport();
-
-        School school = schoolService.findById(request.schoolId());
-
         Student student = new Student();
         applyData(student, request);
 
+        School school = schoolService.findById(request.schoolId());
+
         student.setSchool(school);
+
+        Transport transport = transportService.getTransport();
+
         student.setTransport(transport);
 
         student = studentRepository.save(student);
@@ -59,7 +60,7 @@ public class StudentService {
     }
 
     @Transactional
-    public Student updateStudent(UUID studentId, StudentRequest request) {
+    public Student update(UUID studentId, StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
         User user = userService.findById(userId);
 
@@ -67,10 +68,11 @@ public class StudentService {
             throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
         }
 
-        School school = schoolService.findById(request.schoolId());
-
         Student student = findById(studentId);
         applyData(student, request);
+
+        School school = schoolService.findById(request.schoolId());
+
         student.setSchool(school);
 
         student = studentRepository.save(student);
@@ -80,12 +82,14 @@ public class StudentService {
     }
 
     @Transactional
-    public void deleteStudent(UUID studentId) {
+    public void delete(UUID studentId) {
         Student student = findById(studentId);
         student.setActive(false);
         studentRepository.save(student);
         eventPublisher.publicarAlunoInativado(student, currentUserService.getCurrentUserId());
     }
+
+
 
     public List<Student> batchFindById(List<UUID> ids) {
         UUID userId = currentUserService.getCurrentUserId();

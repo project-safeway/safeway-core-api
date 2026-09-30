@@ -13,7 +13,6 @@ public record AddressRequest(
         @NotBlank @Size(max = 100) String city,
         @NotBlank @Size(min = 2, max = 2) String federalUnit,
         @NotBlank @Size(max = 9) String zipCode,
-
         @NotBlank @Size(max = 50) String type,
         Boolean principal
 ) {

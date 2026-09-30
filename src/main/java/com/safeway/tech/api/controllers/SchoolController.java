@@ -32,14 +32,14 @@ public class SchoolController {
     public ResponseEntity<SchoolResponse> createSchool(
             @Valid @RequestBody SchoolRequest request) {
 
-        School school = schoolService.createSchool(request);
+        School school = schoolService.create(request);
         SchoolResponse response = SchoolMapper.toResponse(school);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<SchoolResponse>> findAllSchools() {
-        List<School> schools = schoolService.findAllSchools();
+        List<School> schools = schoolService.findAll();
         List<SchoolResponse> response = schools.stream().map(SchoolMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -55,14 +55,14 @@ public class SchoolController {
     public ResponseEntity<SchoolResponse> updateSchool(
             @PathVariable UUID id,
             @Valid @RequestBody SchoolRequest request) {
-        School school = schoolService.updateSchool(id, request);
+        School school = schoolService.update(id, request);
         SchoolResponse response = SchoolMapper.toResponse(school);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSchool(@PathVariable UUID id) {
-        schoolService.deactivate(id);
+        schoolService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -30,7 +30,6 @@ public class RouteSchoolService {
     private final RouteSchoolRepository routeSchoolRepository;
     private final RouteRepository routeRepository;
     private final SchoolService schoolService;
-    private final AddressService addressService;
 
     public List<RouteSchool> findByRouteId(UUID routeId) {
         return routeSchoolRepository.findByRouteId(routeId);
@@ -87,7 +86,10 @@ public class RouteSchoolService {
 
         Address address;
         if (request.addressId() != null) {
-            address = addressService.findById(request.addressId());
+            address = school.getAddress();
+            if (!request.addressId().equals(address.getId())) {
+                throw new AddressNotFoundException("Address must match the selected school's address");
+            }
         } else {
             address = school.getAddress();
         }

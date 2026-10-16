@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ResponsavelService {
+public class GuardianService {
 
     private final GuardianRepository guardianRepository;
     private final UserService userService;

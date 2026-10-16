@@ -36,6 +36,13 @@ public class RouteService {
     }
 
     @Transactional
+    public Route findByIdForUpdate(UUID id) {
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        return routeRepository.findByIdAndTransportIdForUpdate(id, transportId)
+                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
+    }
+
+    @Transactional
     public void deactivate(UUID id) {
         Route route = findById(id);
         route.setActive(false);

@@ -401,6 +401,7 @@ CREATE TABLE attendance_students (
 
 CREATE TABLE guardian_invitations (
     id CHAR(36) NOT NULL,
+    active BOOLEAN NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     deleted_at DATETIME,

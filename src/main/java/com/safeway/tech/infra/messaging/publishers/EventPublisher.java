@@ -20,87 +20,36 @@ public class EventPublisher {
     private final RabbitMQProperties rabbitMQProperties;
 
     public void publicarAlunoCriado(Student student, UUID userId) {
-        log.info("Publicando evento de student criado: {}", student.getId());
-
-        try {
-            StudentEvent event = new StudentEvent(
-                    UUID.randomUUID(),
-                    student.getId(),
-                    userId,
-                    student.getName(),
-                    student.getMonthlyFee(),
-                    student.getDueDate(),
-                    student.isActive(),
-                    "ALUNO_CRIADO",
-                    LocalDateTime.now()
-            );
-
-            rabbitTemplate.convertAndSend(
-                    rabbitMQProperties.getExchanges().getAluno(),
-                    rabbitMQProperties.getRoutingKeys().getAlunoCriado(),
-                    event
-            );
-
-            log.info("Evento de student criado publicado com sucesso: {}", event.studentId());
-        } catch (Exception e) {
-            log.error("Erro ao publicar evento de student criado", e);
-        }
+        publish(student, userId, "ALUNO_CRIADO", rabbitMQProperties.getRoutingKeys().getAlunoCriado());
     }
 
     public void publicarAlunoAtualizado(Student student, UUID userId) {
-        log.info("Publicando evento de student atualizado: {}", student.getId());
-
-        try {
-            StudentEvent event = new StudentEvent(
-                    UUID.randomUUID(),
-                    student.getId(),
-                    userId,
-                    student.getName(),
-                    student.getMonthlyFee(),
-                    student.getDueDate(),
-                    student.isActive(),
-                    "ALUNO_ATUALIZADO",
-                    LocalDateTime.now()
-            );
-
-            rabbitTemplate.convertAndSend(
-                    rabbitMQProperties.getExchanges().getAluno(),
-                    rabbitMQProperties.getRoutingKeys().getAlunoAtualizado(),
-                    event
-            );
-
-            log.info("Evento de student atualizado publicado com sucesso: {}", event.studentId());
-        } catch (Exception e) {
-            log.error("Erro ao publicar evento de student atualizado", e);
-        }
+        publish(student, userId, "ALUNO_ATUALIZADO", rabbitMQProperties.getRoutingKeys().getAlunoAtualizado());
     }
 
     public void publicarAlunoInativado(Student student, UUID userId) {
-        log.info("Publicando evento de student inativado: {}", student.getId());
+        publish(student, userId, "ALUNO_INATIVADO", rabbitMQProperties.getRoutingKeys().getAlunoInativado());
+    }
 
-        try {
-            StudentEvent event = new StudentEvent(
-                    UUID.randomUUID(),
-                    student.getId(),
-                    userId,
-                    student.getName(),
-                    student.getMonthlyFee(),
-                    student.getDueDate(),
-                    student.isActive(),
-                    "ALUNO_INATIVADO",
-                    LocalDateTime.now()
-            );
-
-            rabbitTemplate.convertAndSend(
-                    rabbitMQProperties.getExchanges().getAluno(),
-                    rabbitMQProperties.getRoutingKeys().getAlunoInativado(),
-                    event
-            );
-
-            log.info("Evento de student inativado publicado com sucesso: {}", event.studentId());
-        } catch (Exception e) {
-            log.error("Erro ao publicar evento de student inativado", e);
+    private void publish(Student student, UUID userId, String eventType, String routingKey) {
+        String exchange = rabbitMQProperties.getExchanges().getAluno();
+        if (exchange == null || exchange.isBlank() || routingKey == null || routingKey.isBlank()) {
+            throw new IllegalStateException("Student event exchange and routing key must be configured");
         }
+
+        StudentEvent event = new StudentEvent(
+                UUID.randomUUID(),
+                student.getId(),
+                userId,
+                student.getName(),
+                student.getMonthlyFee(),
+                student.getDueDate(),
+                student.isActive(),
+                eventType,
+                LocalDateTime.now()
+        );
+        log.info("Publishing student event {} for student {}", eventType, student.getId());
+        rabbitTemplate.convertAndSend(exchange, routingKey, event);
     }
 
 }

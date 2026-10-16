@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.guardian.GuardianRequest;
 import com.safeway.tech.api.dto.guardian.GuardianResponse;
 import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.service.mappers.GuardianMapper;
-import com.safeway.tech.service.services.ResponsavelService;
+import com.safeway.tech.service.services.GuardianService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,32 +26,32 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GuardianController {
 
-    private final ResponsavelService responsavelService;
+    private final GuardianService guardianService;
 
     @PostMapping
     public ResponseEntity<GuardianResponse> createGuardian(@RequestBody @Valid GuardianRequest request) {
-        Guardian guardian = responsavelService.createGuardian(request);
+        Guardian guardian = guardianService.createGuardian(request);
         GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<GuardianResponse>> getGuardians() {
-        List<Guardian> guardians = responsavelService.listGuardians();
+        List<Guardian> guardians = guardianService.listGuardians();
         List<GuardianResponse> response = guardians.stream().map(GuardianMapper::toResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GuardianResponse> findById(@PathVariable UUID id) {
-        Guardian guardian = responsavelService.findById(id);
+        Guardian guardian = guardianService.findById(id);
         GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{guardianId}")
     public ResponseEntity<Void> delete(@PathVariable UUID guardianId) {
-        responsavelService.deactivate(guardianId);
+        guardianService.deactivate(guardianId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -59,7 +59,7 @@ public class GuardianController {
     public ResponseEntity<GuardianResponse> updateGuardian(
             @RequestBody @Valid GuardianRequest newGuardian,
             @PathVariable UUID guardianId) {
-        Guardian guardian = responsavelService.updateGuardian(newGuardian, guardianId);
+        Guardian guardian = guardianService.updateGuardian(newGuardian, guardianId);
         GuardianResponse response = GuardianMapper.toResponse(guardian);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -44,7 +44,7 @@ public class RouteController {
     ) {
         Route route = routeService.createRoute(request);
         RouteResponse response = RouteMapper.toResponse(route);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
@@ -63,6 +63,7 @@ public class RouteController {
 
     @GetMapping("/{id}/students")
     public ResponseEntity<List<StudentWithAddress>> findAllStudentsWithAddress(@PathVariable UUID id) {
+        routeService.findById(id);
         List<StudentWithAddress> students = routeStudentService.findStudentWithAddress(id);
         return ResponseEntity.status(HttpStatus.OK).body(students);
     }
@@ -88,6 +89,7 @@ public class RouteController {
             @PathVariable UUID id,
             @Valid @RequestBody RouteStudentRequest request
     ) {
+        routeService.findById(id);
         routeStudentService.addStudent(id, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -97,6 +99,7 @@ public class RouteController {
             @PathVariable UUID id,
             @PathVariable UUID studentId
     ) {
+        routeService.findById(id);
         routeStudentService.removeStudent(id, studentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -106,6 +109,7 @@ public class RouteController {
             @PathVariable UUID id,
             @RequestBody List<UUID> newIdsOrder
     ) {
+        routeService.findById(id);
         routeStudentService.reorder(id, newIdsOrder);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -115,6 +119,7 @@ public class RouteController {
             @PathVariable UUID id,
             @Valid @RequestBody RouteSchoolRequest request
     ) throws BadRequestException {
+        routeService.findById(id);
         routeSchoolService.addSchool(id, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -124,6 +129,7 @@ public class RouteController {
             @PathVariable UUID id,
             @PathVariable UUID schoolId
     ) {
+        routeService.findById(id);
         routeSchoolService.removeSchool(id, schoolId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -133,6 +139,7 @@ public class RouteController {
             @PathVariable UUID id,
             @RequestBody List<UUID> newSchoolIdsOrder
     ) {
+        routeService.findById(id);
         routeSchoolService.reorder(id, newSchoolIdsOrder);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

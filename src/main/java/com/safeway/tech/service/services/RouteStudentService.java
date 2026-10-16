@@ -1,16 +1,21 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.route.RouteStudentRequest;
+import com.safeway.tech.api.dto.route.RouteUpdateRequest.RouteStopUpdate;
 import com.safeway.tech.api.dto.route.StudentWithAddress;
 import com.safeway.tech.domain.models.Address;
+import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.Student;
+import com.safeway.tech.infra.exception.AddressNotFoundException;
 import com.safeway.tech.infra.exception.CoordinatesNotValidException;
 import com.safeway.tech.infra.exception.RouteNotFoundException;
 import com.safeway.tech.infra.exception.StudentNotFoundException;
+import com.safeway.tech.repository.GuardianRepository;
 import com.safeway.tech.repository.RouteRepository;
 import com.safeway.tech.repository.RouteStudentRepository;
+import com.safeway.tech.service.services.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +34,8 @@ public class RouteStudentService {
     private final RouteStudentRepository routeStudentRepository;
     private final RouteRepository routeRepository;
     private final StudentService studentService;
-    private final AddressService addressService;
+    private final GuardianRepository guardianRepository;
+    private final CurrentUserService currentUserService;
 
     public List<RouteStudent> findByRouteId(UUID routeId) {
         return routeStudentRepository.findByRouteId(routeId);
@@ -40,15 +46,22 @@ public class RouteStudentService {
     }
 
     @Transactional
+    public void updateGeneralOrder(UUID routeId, List<RouteStopUpdate> stops) {
+        Map<UUID, Integer> orderByStudentId = stops.stream()
+                .filter(stop -> "ALUNO".equalsIgnoreCase(stop.type()))
+                .collect(Collectors.toMap(RouteStopUpdate::id, RouteStopUpdate::generalOrder));
+        List<RouteStudent> students = routeStudentRepository.findByRouteId(routeId);
+        students.forEach(student -> student.setGeneralOrder(orderByStudentId.get(student.getStudent().getId())));
+        routeStudentRepository.saveAll(students);
+    }
+
+    @Transactional
     public void addStudent(UUID routeId, RouteStudentRequest request) {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
 
-        Student student = studentService.findById(request.studentId());
-
-        // Determinar endereço: usar request.addressId() se presente, caso contrário tentar fallback
-        // TODO: Ajustar buscar do endereço
-        Address address = addressService.findById(student.getId());
+        Student student = studentService.findByIdForCurrentTransport(request.studentId());
+        Address address = resolveStudentAddress(student, request.addressId());
 
         // Validar que o endereço tem lat/lng válidos antes de prosseguir
         if (address.getLatitude() == null || address.getLongitude() == null) {
@@ -98,11 +111,8 @@ public class RouteStudentService {
             RouteStudent ia = new RouteStudent();
             ia.setRoute(route);
 
-            Student student = studentService.findById(dto.studentId());
-
-            // Determinar endereco: prefer dto.addressId(), senão fallback para primeiro endereco de responsavel
-            // TODO: Ajustar buscar do endereço
-            Address address = addressService.findById(student.getId());
+            Student student = studentService.findByIdForCurrentTransport(dto.studentId());
+            Address address = resolveStudentAddress(student, dto.addressId());
 
             // validar lat/lng
             if (address.getLatitude() == null || address.getLongitude() == null) {
@@ -175,5 +185,30 @@ public class RouteStudentService {
                     );
                 })
                 .toList();
+    }
+
+    private Address resolveStudentAddress(Student student, UUID requestedAddressId) {
+        List<Guardian> guardians = guardianRepository.findByStudentIdAndUserId(
+                student.getId(),
+                currentUserService.getCurrentUserId());
+
+        if (requestedAddressId != null) {
+            return guardians.stream()
+                    .map(Guardian::getAddress)
+                    .filter(address -> address != null && requestedAddressId.equals(address.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new AddressNotFoundException(
+                            "Address is not associated with this student's guardian"));
+        }
+
+        return guardians.stream()
+                .map(Guardian::getAddress)
+                .filter(address -> address != null)
+                .sorted((left, right) -> Boolean.compare(
+                        Boolean.TRUE.equals(right.getPrincipal()),
+                        Boolean.TRUE.equals(left.getPrincipal())))
+                .findFirst()
+                .orElseThrow(() -> new AddressNotFoundException(
+                        "No guardian address is available for this student"));
     }
 }

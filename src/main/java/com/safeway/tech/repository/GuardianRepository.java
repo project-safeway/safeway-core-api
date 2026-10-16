@@ -14,7 +14,8 @@ public interface GuardianRepository extends JpaRepository<Guardian, UUID> {
     @Query("SELECT g FROM Guardian g WHERE g.user.id = :userId")
     List<Guardian> findByUserId(@Param("userId") UUID userId);
 
-    @Query("SELECT g FROM Guardian g JOIN GuardianStudent gs WHERE gs.student = :studentId AND g.user.id = :userId")
+    @Query("SELECT g FROM Guardian g JOIN GuardianStudent gs ON gs.guardian = g " +
+            "WHERE gs.student.id = :studentId AND g.user.id = :userId AND g.active = true")
     List<Guardian> findByStudentIdAndUserId(@Param("studentId") UUID studentId, @Param("userId") UUID userId);
 
     @Query("SELECT g FROM Guardian g WHERE g.id = :guardianId AND g.user.id = :userId")

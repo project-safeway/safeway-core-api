@@ -3,43 +3,25 @@ package com.safeway.tech.service.services;
 import com.google.maps.model.LatLng;
 import com.safeway.tech.api.dto.address.AddressRequest;
 import com.safeway.tech.domain.models.Address;
-import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.infra.exception.AddressNotFoundException;
 import com.safeway.tech.repository.AddressRepository;
-import com.safeway.tech.repository.GuardianRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AddressService {
 
     private final AddressRepository addressRepository;
-    private final GuardianRepository guardianRepository;
     private final GeocodingService geocodingService;
-    private final CurrentUserService currentUserService;
 
     public Address findById(UUID id) {
         return addressRepository.findById(id)
                 .orElseThrow(() -> new AddressNotFoundException("Endereço com ID " + id + " não encontrado"));
-    }
-
-    @Transactional(readOnly = true)
-    public List<Address> availableAddress(UUID studentId) {
-        UUID userId = currentUserService.getCurrentUserId();
-        List<Guardian> guardians = guardianRepository.findByStudentIdAndUserId(studentId, userId);
-
-        return guardians.stream()
-                .map(Guardian::getAddress)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -52,6 +34,7 @@ public class AddressService {
         return addressRepository.save(address);
     }
 
+    @Transactional
     public Address update(UUID id, AddressRequest request) {
         Address address = findById(id);
 
@@ -59,12 +42,6 @@ public class AddressService {
         calculateCoordinates(address);
 
         return addressRepository.save(address);
-    }
-
-    public void deactivate(UUID id) {
-        Address address = findById(id);
-        address.setActive(false);
-        addressRepository.save(address);
     }
 
     private void consumeData(Address address, AddressRequest request) {

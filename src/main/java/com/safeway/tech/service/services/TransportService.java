@@ -20,7 +20,7 @@ public class TransportService {
         return transportRepository.findByUserId(userId);
     }
 
-    public Transport saveTransport(TransportRequest request) {
+    public Transport create(TransportRequest request) {
         Transport transport = new Transport();
 
         applyData(transport, request);
@@ -28,7 +28,7 @@ public class TransportService {
         return transportRepository.save(transport);
     }
 
-    public Transport updateTransport(TransportRequest request) {
+    public Transport update(TransportRequest request) {
         Transport transport = getTransport();
 
         applyData(transport, request);
@@ -36,7 +36,7 @@ public class TransportService {
         return transportRepository.save(transport);
     }
 
-    public void deleteTransport() {
+    public void delete() {
         Transport transport = getTransport();
         transportRepository.delete(transport);
     }

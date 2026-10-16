@@ -45,6 +45,6 @@ public class Student extends BaseEntity {
     private School school;
 
     @ManyToOne
-    @JoinColumn(name = "transport_id")
+    @JoinColumn(name = "transport_id", nullable = false)
     private Transport transport;
 }

@@ -33,21 +33,21 @@ public class TransportController {
 
     @PostMapping
     public ResponseEntity<TransportResponse> createTransport(@RequestBody @Valid TransportRequest request) {
-        Transport transport = transportService.saveTransport(request);
+        Transport transport = transportService.create(request);
         TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping
     public ResponseEntity<TransportResponse> updateTransport(@RequestBody @Valid TransportRequest request) {
-        Transport transport = transportService.updateTransport(request);
+        Transport transport = transportService.update(request);
         TransportResponse response = TransportMapper.toResponse(transport);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping
     public ResponseEntity<Void> delete() {
-        transportService.deleteTransport();
+        transportService.delete();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

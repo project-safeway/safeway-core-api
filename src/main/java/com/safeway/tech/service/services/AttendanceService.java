@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +34,9 @@ public class AttendanceService {
                 .orElse(null);
     }
 
+    @Transactional
     public Attendance startAttendance(UUID routeId) {
-        Route route = routeService.findById(routeId);
+        Route route = routeService.findByIdForUpdate(routeId);
         Attendance attendanceExistente = findActiveByRoute(routeId);
 
         if (attendanceExistente != null) {

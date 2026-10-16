@@ -22,6 +22,13 @@ public interface RouteStudentRepository extends JpaRepository<RouteStudent, UUID
             @Param("routeId") UUID routeId,
             @Param("studentId") UUID studentId);
 
+    @Query("SELECT CASE WHEN COUNT(rs) > 0 THEN true ELSE false END FROM RouteStudent rs " +
+            "WHERE rs.route.id = :routeId AND rs.student.id = :studentId " +
+            "AND rs.active = true AND rs.route.active = true AND rs.student.active = true")
+    boolean existsActiveLink(
+            @Param("routeId") UUID routeId,
+            @Param("studentId") UUID studentId);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM RouteStudent rs WHERE rs.route.id = :routeId")

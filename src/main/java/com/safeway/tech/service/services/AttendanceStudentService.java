@@ -6,6 +6,7 @@ import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.domain.models.AttendanceStudent;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.repository.AttendanceStudentRepository;
+import com.safeway.tech.repository.RouteStudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ public class AttendanceStudentService {
     private final AttendanceStudentRepository attendanceStudentRepository;
     private final StudentService studentService;
     private final AttendanceService attendanceService;
+    private final RouteStudentRepository routeStudentRepository;
 
     @Transactional
     public void registerAttendance(Map<UUID, PresenceStatusEnum> presencas, UUID idChamada) {
@@ -30,11 +32,22 @@ public class AttendanceStudentService {
             throw new RuntimeException("Chamada não está em andamento");
         }
 
+        Map<UUID, Student> studentsById = new java.util.HashMap<>();
         for (Map.Entry<UUID, PresenceStatusEnum> entry : presencas.entrySet()) {
             UUID studentId = entry.getKey();
-            PresenceStatusEnum status = entry.getValue();
+            if (studentId == null || entry.getValue() == null) {
+                throw new IllegalArgumentException("Each attendance record requires a student and presence status");
+            }
 
-            Student student = studentService.findById(studentId);
+            Student student = studentService.findByIdForCurrentTransport(studentId);
+            if (!routeStudentRepository.existsActiveLink(attendance.getRoute().getId(), studentId)) {
+                throw new IllegalArgumentException("Student is not assigned to this route");
+            }
+            studentsById.put(studentId, student);
+        }
+
+        for (Map.Entry<UUID, PresenceStatusEnum> entry : presencas.entrySet()) {
+            Student student = studentsById.get(entry.getKey());
 
             AttendanceStudent attendanceStudent = attendanceStudentRepository
                     .findByAttendanceAndStudent(attendance, student)
@@ -45,7 +58,7 @@ public class AttendanceStudentService {
                         return newAttendanceStudent;
                     });
 
-            attendanceStudent.setPresence(status);
+            attendanceStudent.setPresence(entry.getValue());
             attendanceStudent.setDate(LocalDateTime.now());
 
             attendanceStudentRepository.save(attendanceStudent);

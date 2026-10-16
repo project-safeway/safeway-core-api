@@ -3,6 +3,7 @@ package com.safeway.tech.service.services;
 import com.safeway.tech.domain.enums.AttendanceStatusEnum;
 import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.domain.models.Route;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.AttendanceRepository;
 import com.safeway.tech.repository.specification.AttendanceSpecs;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class AttendanceService {
 
     public Attendance findById(UUID id) {
         Attendance attendance = attendanceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Chamada não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Attendance was not found"));
         routeService.findById(attendance.getRoute().getId());
         return attendance;
     }
@@ -37,10 +38,10 @@ public class AttendanceService {
     @Transactional
     public Attendance startAttendance(UUID routeId) {
         Route route = routeService.findByIdForUpdate(routeId);
-        Attendance attendanceExistente = findActiveByRoute(routeId);
+        Attendance existingAttendance = findActiveByRoute(routeId);
 
-        if (attendanceExistente != null) {
-            return attendanceExistente;
+        if (existingAttendance != null) {
+            return existingAttendance;
         }
 
         Attendance attendance = new Attendance();

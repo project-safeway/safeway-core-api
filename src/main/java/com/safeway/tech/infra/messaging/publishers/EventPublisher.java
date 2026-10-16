@@ -19,15 +19,15 @@ public class EventPublisher {
     private final RabbitTemplate rabbitTemplate;
     private final RabbitMQProperties rabbitMQProperties;
 
-    public void publicarAlunoCriado(Student student, UUID userId) {
+    public void publishStudentCreated(Student student, UUID userId) {
         publish(student, userId, "ALUNO_CRIADO", rabbitMQProperties.getRoutingKeys().getAlunoCriado());
     }
 
-    public void publicarAlunoAtualizado(Student student, UUID userId) {
+    public void publishStudentUpdated(Student student, UUID userId) {
         publish(student, userId, "ALUNO_ATUALIZADO", rabbitMQProperties.getRoutingKeys().getAlunoAtualizado());
     }
 
-    public void publicarAlunoInativado(Student student, UUID userId) {
+    public void publishStudentDeactivated(Student student, UUID userId) {
         publish(student, userId, "ALUNO_INATIVADO", rabbitMQProperties.getRoutingKeys().getAlunoInativado());
     }
 

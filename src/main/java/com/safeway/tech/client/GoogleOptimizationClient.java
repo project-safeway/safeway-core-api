@@ -37,7 +37,7 @@ public class GoogleOptimizationClient {
         try {
             this.credentials = initCredentials();
         } catch (IOException e) {
-            log.warn("Aviso: não foi possível inicializar credenciais Google. Detalhe: {}", e.getMessage());
+            log.warn("Unable to initialize Google credentials. Details: {}", e.getMessage());
             this.credentials = null;
         }
     }
@@ -50,15 +50,15 @@ public class GoogleOptimizationClient {
                 JsonNode node = mapper.readTree(content);
                 String pid = node.path("project_id").asText();
                 if (pid != null && !pid.isBlank()) {
-                    log.info("projectId extraído da service account: {}", pid);
+                    log.info("projectId extracted from service account: {}", pid);
                     return pid;
                 }
-                log.info("Service account sem project_id, usando configurado: {}", fallback);
+                log.info("Service account has no project_id; using configured value: {}", fallback);
             } catch (Exception ex) {
-                log.error("Falha ao ler project_id do arquivo: {}", ex.getMessage());
+                log.error("Failed to read project_id from file: {}", ex.getMessage());
             }
         } else {
-            log.info("Sem GOOGLE_APPLICATION_CREDENTIALS, usando projectId configurado: {}", fallback);
+            log.info("GOOGLE_APPLICATION_CREDENTIALS is not set; using configured projectId: {}", fallback);
         }
         return fallback;
     }
@@ -75,7 +75,7 @@ public class GoogleOptimizationClient {
 
     public JsonNode optimizeRoute(RouteRequest request) {
         if (projectId == null || projectId.isBlank() || "dev-local".equals(projectId)) {
-            throw new RuntimeException("projectId inválido. Configure 'google.projectId' ou defina GOOGLE_APPLICATION_CREDENTIALS com project_id.");
+            throw new RuntimeException("Invalid projectId. Set 'google.projectId' or GOOGLE_APPLICATION_CREDENTIALS with project_id.");
         }
         ObjectNode body = buildRequest(request);
         log.info("Google optimizeTours body: {}", body);
@@ -90,9 +90,9 @@ public class GoogleOptimizationClient {
                     .bodyToMono(JsonNode.class)
                     .block(Duration.ofSeconds(30));
         } catch (WebClientResponseException wcre) {
-            throw new RuntimeException("Erro na API Google: " + wcre.getResponseBodyAsString(), wcre);
+            throw new RuntimeException("Google API error: " + wcre.getResponseBodyAsString(), wcre);
         } catch (Exception ex) {
-            throw new RuntimeException("Falha inesperada ao chamar otimização Google: " + ex.getMessage(), ex);
+            throw new RuntimeException("Unexpected error while calling Google route optimization: " + ex.getMessage(), ex);
         }
     }
 
@@ -129,14 +129,14 @@ public class GoogleOptimizationClient {
 
     private ObjectNode createLocation(Location loc) {
         if (loc == null) {
-            throw new RuntimeException("Localização ausente");
+            throw new RuntimeException("Location is missing");
         }
         double lat = loc.lat();
         double lng = loc.lng();
         if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-            throw new RuntimeException("Coordenadas inválidas: " + lat + ", " + lng);
+            throw new RuntimeException("Invalid coordinates: " + lat + ", " + lng);
         }
-        // Ajuste: a API rejeitou campo latLng aninhado. Enviar diretamente latitude/longitude.
+        // The API rejects nested latLng values, so send latitude and longitude directly.
         ObjectNode location = mapper.createObjectNode();
         location.put("latitude", lat);
         location.put("longitude", lng);
@@ -153,13 +153,13 @@ public class GoogleOptimizationClient {
             if (env != null && !env.isBlank()) {
                 return env;
             }
-            throw new RuntimeException("Sem credenciais Google. Defina GOOGLE_APPLICATION_CREDENTIALS ou GOOGLE_ACCESS_TOKEN.");
+            throw new RuntimeException("Google credentials are missing. Set GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_ACCESS_TOKEN.");
         } catch (IOException e) {
             String env = System.getenv("GOOGLE_ACCESS_TOKEN");
             if (env != null && !env.isBlank()) {
                 return env;
             }
-            throw new RuntimeException("Falha ao obter token Google: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to obtain Google token: " + e.getMessage(), e);
         }
     }
 }

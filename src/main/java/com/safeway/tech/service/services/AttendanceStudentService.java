@@ -25,15 +25,15 @@ public class AttendanceStudentService {
     private final RouteStudentRepository routeStudentRepository;
 
     @Transactional
-    public void registerAttendance(Map<UUID, PresenceStatusEnum> presencas, UUID idChamada) {
-        Attendance attendance = attendanceService.findById(idChamada);
+    public void registerAttendance(Map<UUID, PresenceStatusEnum> presences, UUID attendanceId) {
+        Attendance attendance = attendanceService.findById(attendanceId);
 
         if (!AttendanceStatusEnum.IN_PROGRESS.equals(attendance.getStatus())) {
-            throw new RuntimeException("Chamada não está em andamento");
+            throw new RuntimeException("Attendance is not in progress");
         }
 
         Map<UUID, Student> studentsById = new java.util.HashMap<>();
-        for (Map.Entry<UUID, PresenceStatusEnum> entry : presencas.entrySet()) {
+        for (Map.Entry<UUID, PresenceStatusEnum> entry : presences.entrySet()) {
             UUID studentId = entry.getKey();
             if (studentId == null || entry.getValue() == null) {
                 throw new IllegalArgumentException("Each attendance record requires a student and presence status");
@@ -46,7 +46,7 @@ public class AttendanceStudentService {
             studentsById.put(studentId, student);
         }
 
-        for (Map.Entry<UUID, PresenceStatusEnum> entry : presencas.entrySet()) {
+        for (Map.Entry<UUID, PresenceStatusEnum> entry : presences.entrySet()) {
             Student student = studentsById.get(entry.getKey());
 
             AttendanceStudent attendanceStudent = attendanceStudentRepository

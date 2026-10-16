@@ -2,6 +2,7 @@ package com.safeway.tech.infra.exception.handler;
 
 import com.safeway.tech.auth.core.exception.EmailAlreadyInUseException;
 import com.safeway.tech.auth.core.exception.TransportAlreadyInUseException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.infra.exception.InvitationExpiredException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,10 +35,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.GONE).body(ex.getMessage());
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidation(MethodArgumentNotValidException ex) {
         var fieldError = ex.getBindingResult().getFieldError();
-        String message = fieldError != null ? fieldError.getDefaultMessage() : "Dados inválidos";
+        String message = fieldError != null ? fieldError.getDefaultMessage() : "Invalid data";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 
@@ -49,6 +55,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Erro interno: " + ex.getMessage());
+            .body("Internal server error: " + ex.getMessage());
     }
 }

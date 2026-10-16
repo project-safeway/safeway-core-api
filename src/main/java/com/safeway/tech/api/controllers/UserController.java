@@ -4,6 +4,7 @@ import com.safeway.tech.api.dto.user.UserFeignResponse;
 import com.safeway.tech.api.dto.user.UserProfileRequest;
 import com.safeway.tech.api.dto.user.UserResponse;
 import com.safeway.tech.domain.models.User;
+import com.safeway.tech.service.mappers.UserMapper;
 import com.safeway.tech.service.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,23 +27,23 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser() {
-        return ResponseEntity.ok(UserResponse.fromEntity(userService.findCurrentUser()));
+        return ResponseEntity.ok(UserMapper.toResponse(userService.findCurrentUser()));
     }
 
     @PutMapping("/me")
     public ResponseEntity<UserResponse> updateCurrentUser(@Valid @RequestBody UserProfileRequest request) {
-        return ResponseEntity.ok(UserResponse.fromEntity(userService.updateCurrentUser(request)));
+        return ResponseEntity.ok(UserMapper.toResponse(userService.updateCurrentUser(request)));
     }
 
     /*
 
-        MÉTODOS USADOS NO FEIGN CLIENT
+        Methods used by the Feign client.
 
      */
 
     @GetMapping("/feign/{userId}")
     public UserFeignResponse getUser(@PathVariable UUID userId) {
         User user = userService.findById(userId);
-        return UserFeignResponse.fromEntity(user);
+        return UserMapper.toFeignResponse(user);
     }
 }

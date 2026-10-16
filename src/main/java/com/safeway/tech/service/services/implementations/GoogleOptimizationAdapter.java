@@ -39,7 +39,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
 
             // Se nao for para otimizar a order, reordena de volta para a order original enviada pelo front
             if (!Boolean.TRUE.equals(request.mustOptimizeOrder())) {
-                // Mapa de order original por stopId
+                // Map original order by stopId.
                 Map<String, Integer> originalOrder = new HashMap<>();
                 int idx = 0;
                 for (StopPoint stopPoint : request.stoppingPoint()) {
@@ -64,7 +64,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
 
             return rawResponse;
         } catch (Exception e) {
-            throw new RuntimeException("Falha ao otimizar rota com Google: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to optimize route with Google: " + e.getMessage(), e);
         }
     }
 
@@ -79,7 +79,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
             throw new IllegalStateException("Google optimization returned an empty response");
         }
 
-        // Mapa de fallback para coordenadas por label
+        // Fallback map of coordinates by label.
         Map<String, Location> locationById = new HashMap<>();
         for (StopPoint stopPoint : request.stoppingPoint()) {
             locationById.put(stopPoint.id(), stopPoint.location());
@@ -109,7 +109,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
                     throw new IllegalStateException("Google optimization returned an unknown or duplicate stop");
                 }
 
-                // Horário de chegada: usar visit.startTime; se ausente, usar transitions[i].endTime
+                // Use visit.startTime for arrival; fall back to transitions[i].endTime if absent.
                 String arrivalTime = visit.path("startTime").asText("");
                 if (arrivalTime == null || arrivalTime.isBlank()) {
                     if (transition != null) {
@@ -123,7 +123,7 @@ public class GoogleOptimizationAdapter implements IOptimizerService {
                 double travelDistance = requiredNonNegativeDouble(transition, "travelDistanceMeters");
                 long travelDuration = parseDuration(transition.path("travelDuration").asText());
 
-                // Localização: tentar arrivalLocation(.latLng), se não houver, usar fallback do request por stopId
+                // Try arrivalLocation(.latLng); otherwise use the request fallback for this stopId.
                 JsonNode arrivalLocation = visit.path("arrivalLocation");
                 JsonNode latLngNode = arrivalLocation.has("latLng") ? arrivalLocation.path("latLng") : arrivalLocation;
                 boolean hasCoordinates = latLngNode.hasNonNull("latitude") && latLngNode.hasNonNull("longitude");

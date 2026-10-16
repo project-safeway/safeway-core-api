@@ -5,7 +5,7 @@ import com.safeway.tech.api.dto.route.RouteStudentRequest;
 import com.safeway.tech.api.dto.route.RouteUpdateRequest;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.Transport;
-import com.safeway.tech.infra.exception.RouteNotFoundException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.RouteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,21 +25,21 @@ public class RouteService {
     private final CurrentUserService currentUserService;
 
     public List<Route> findAll() {
-        UUID transportId = currentUserService.getCurrentTransporteId();
+        UUID transportId = currentUserService.getCurrentTransportId();
         return routeRepository.findAllByTransportId(transportId);
     }
 
     public Route findById(UUID id) {
-        UUID transportId = currentUserService.getCurrentTransporteId();
+        UUID transportId = currentUserService.getCurrentTransportId();
         return routeRepository.findByIdAndTransportId(id, transportId)
-                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Route was not found"));
     }
 
     @Transactional
     public Route findByIdForUpdate(UUID id) {
-        UUID transportId = currentUserService.getCurrentTransporteId();
+        UUID transportId = currentUserService.getCurrentTransportId();
         return routeRepository.findByIdAndTransportIdForUpdate(id, transportId)
-                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Route was not found"));
     }
 
     @Transactional

@@ -3,7 +3,7 @@ package com.safeway.tech.service.services;
 import com.google.maps.model.LatLng;
 import com.safeway.tech.api.dto.address.AddressRequest;
 import com.safeway.tech.domain.models.Address;
-import com.safeway.tech.infra.exception.AddressNotFoundException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class AddressService {
 
     public Address findById(UUID id) {
         return addressRepository.findById(id)
-                .orElseThrow(() -> new AddressNotFoundException("Endereço com ID " + id + " não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Address with ID " + id + " was not found"));
     }
 
     @Transactional

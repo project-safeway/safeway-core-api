@@ -53,7 +53,7 @@ public class AuthV2Controller {
         );
 
         registerUserUseCase.execute(command);
-        return ResponseEntity.ok("Usuário registrado com sucesso!");
+        return ResponseEntity.ok("User registered successfully!");
     }
 
     @PostMapping("/login")
@@ -74,7 +74,7 @@ public class AuthV2Controller {
     @PostMapping("/token/service")
     public ResponseEntity<ServiceTokenResponseV2> issueServiceToken(@Valid @RequestBody ServiceTokenRequestV2 request) {
         if (!serviceClientId.equals(request.clientId()) || !serviceClientSecret.equals(request.clientSecret())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais de serviço inválidas");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid service credentials");
         }
 
         var issuedToken = serviceJwtTokenIssuer.issueFor(request.clientId());

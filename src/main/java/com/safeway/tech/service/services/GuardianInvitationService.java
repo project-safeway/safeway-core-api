@@ -21,7 +21,7 @@ import com.safeway.tech.domain.models.GuardianStudent;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.GuardianNotFoundException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.infra.exception.InvitationExpiredException;
 import com.safeway.tech.repository.GuardianInvitationRepository;
 import com.safeway.tech.repository.GuardianRepository;
@@ -316,7 +316,7 @@ public class GuardianInvitationService {
 
         Guardian candidate = guardianRepository.findById(candidateId)
                 .filter(Guardian::isActive)
-                .orElseThrow(() -> new GuardianNotFoundException("Pre-registered guardian not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Pre-registered guardian was not found"));
         if (candidate.getUser() != null && candidate.getUser().getRole() != UserRole.DRIVER) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Pre-registered guardian already has an account");
         }
@@ -389,7 +389,7 @@ public class GuardianInvitationService {
         return guardianRepository.findByStudentIdAndTransportId(studentId, transportId).stream()
                 .filter(guardian -> guardian.getId().equals(guardianId))
                 .findFirst()
-                .orElseThrow(() -> new GuardianNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Guardian is not linked to the selected student"));
     }
 
@@ -431,7 +431,7 @@ public class GuardianInvitationService {
                 || user.getTransport() == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the owning driver can perform this operation");
         }
-        UUID tokenTransportId = currentUserService.getCurrentTransporteId();
+        UUID tokenTransportId = currentUserService.getCurrentTransportId();
         if (!user.getTransport().getId().equals(tokenTransportId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the owning driver can perform this operation");
         }

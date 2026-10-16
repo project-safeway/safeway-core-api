@@ -45,7 +45,7 @@ public class AuthJwtKeyConfig {
                 return new KeyPair(publicKey, privateKey);
             }
         } catch (Exception e) {
-            log.warn("Falha ao carregar chaves RSA do Auth V2 ({} / {}). Gerando chaves em memória. Detalhe: {}",
+            log.warn("Failed to load Auth V2 RSA keys ({} / {}). Generating in-memory keys. Details: {}",
                     publicKeyLocation, privateKeyLocation, e.getMessage());
         }
 
@@ -54,7 +54,7 @@ public class AuthJwtKeyConfig {
             generator.initialize(2048);
             return generator.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Falha ao gerar par de chaves RSA do Auth V2", e);
+            throw new IllegalStateException("Failed to generate Auth V2 RSA key pair", e);
         }
     }
 

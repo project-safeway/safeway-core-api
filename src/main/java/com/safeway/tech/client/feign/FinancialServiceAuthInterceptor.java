@@ -26,11 +26,11 @@ public class FinancialServiceAuthInterceptor implements RequestInterceptor {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.getPrincipal() instanceof Jwt jwt) {
-            log.debug("Repassando o token do usuário para o serviço financeiro");
+            log.debug("Forwarding the user token to the financial service");
             return jwt.getTokenValue();
         }
 
-        log.debug("Sem usuário autenticado, obtendo token de serviço para o serviço financeiro");
+        log.debug("No authenticated user; obtaining a service token for the financial service");
         return serviceTokenProvider.getServiceToken();
     }
 }

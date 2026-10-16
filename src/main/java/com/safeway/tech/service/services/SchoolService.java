@@ -3,7 +3,7 @@ package com.safeway.tech.service.services;
 import com.safeway.tech.api.dto.school.SchoolRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.School;
-import com.safeway.tech.infra.exception.SchoolNotFoundException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,15 +22,15 @@ public class SchoolService {
     private final TransportService transportService;
 
     public List<School> findAll() {
-        UUID transportId = currentUserService.getCurrentTransporteId();
+        UUID transportId = currentUserService.getCurrentTransportId();
         return schoolRepository.findAllByTransportId(transportId);
     }
 
     @Transactional(readOnly = true)
     public School findById(UUID schoolId) {
-        UUID transportId = currentUserService.getCurrentTransporteId();
+        UUID transportId = currentUserService.getCurrentTransportId();
         return schoolRepository.findByIdAndTransportId(schoolId, transportId)
-                .orElseThrow(() -> new SchoolNotFoundException("School não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("School was not found"));
     }
 
     @Transactional

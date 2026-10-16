@@ -5,7 +5,7 @@ import com.safeway.tech.auth.core.exception.EmailAlreadyInUseException;
 import com.safeway.tech.auth.core.exception.TransportAlreadyInUseException;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.UserNotFoundException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.TransportRepository;
 import com.safeway.tech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class UserService {
 
     public User findById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User was not found"));
     }
 
     public User findCurrentUser() {

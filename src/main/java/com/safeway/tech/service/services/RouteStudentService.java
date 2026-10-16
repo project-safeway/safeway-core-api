@@ -8,10 +8,8 @@ import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteStudent;
 import com.safeway.tech.domain.models.Student;
-import com.safeway.tech.infra.exception.AddressNotFoundException;
 import com.safeway.tech.infra.exception.CoordinatesNotValidException;
-import com.safeway.tech.infra.exception.RouteNotFoundException;
-import com.safeway.tech.infra.exception.StudentNotFoundException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.GuardianRepository;
 import com.safeway.tech.repository.RouteRepository;
 import com.safeway.tech.repository.RouteStudentRepository;
@@ -58,14 +56,14 @@ public class RouteStudentService {
     @Transactional
     public void addStudent(UUID routeId, RouteStudentRequest request) {
         Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Route was not found"));
 
         Student student = studentService.findByIdForCurrentTransport(request.studentId());
         Address address = resolveStudentAddress(student, request.addressId());
 
-        // Validar que o endereço tem lat/lng válidos antes de prosseguir
+        // Validate address coordinates before proceeding.
         if (address.getLatitude() == null || address.getLongitude() == null) {
-            throw new CoordinatesNotValidException("Endereço selecionado não possui latitude/longitude válidas");
+            throw new CoordinatesNotValidException("Selected address does not have valid latitude/longitude");
         }
 
         BigDecimal lat = address.getLatitude();
@@ -73,10 +71,10 @@ public class RouteStudentService {
 
         if (lat.compareTo(BigDecimal.valueOf(-90)) < 0 || lat.compareTo(BigDecimal.valueOf(90)) > 0
                 || lng.compareTo(BigDecimal.valueOf(-180)) < 0 || lng.compareTo(BigDecimal.valueOf(180)) > 0) {
-            throw new CoordinatesNotValidException("Coordenadas do endereço inválidas: " + lat + ", " + lng);
+            throw new CoordinatesNotValidException("Invalid address coordinates: " + lat + ", " + lng);
         }
 
-        // Evita duplicidade
+        // Avoid duplicates.
         Optional<RouteStudent> routeStudent = routeStudentRepository.findByRouteIdAndStudentId(routeId, student.getId());
 
         if (routeStudent.isPresent()) {
@@ -96,17 +94,17 @@ public class RouteStudentService {
     public void removeStudent(UUID routeId, UUID studentId) {
         RouteStudent entity = routeStudentRepository
                 .findByRouteIdAndStudentId(routeId, studentId)
-                .orElseThrow(() -> new StudentNotFoundException("Student não encontrado no itinerário"));
+                .orElseThrow(() -> new EntityNotFoundException("Student was not found on this route"));
 
         routeStudentRepository.delete(entity);
     }
 
     @Transactional
     public void syncStudents(Route route, List<RouteStudentRequest> newStudents) {
-        // Remove todos os vínculos anteriores
+        // Remove all previous links.
         routeStudentRepository.deleteAllByRouteId(route.getId());
 
-        // Cria novos vínculos — atribui endereco e valida se pertence ao responsável
+        // Create new links, assign addresses, and validate guardian ownership.
         List<RouteStudent> entities = newStudents.stream().map(dto -> {
             RouteStudent ia = new RouteStudent();
             ia.setRoute(route);
@@ -114,9 +112,10 @@ public class RouteStudentService {
             Student student = studentService.findByIdForCurrentTransport(dto.studentId());
             Address address = resolveStudentAddress(student, dto.addressId());
 
-            // validar lat/lng
+            // Validate coordinates.
             if (address.getLatitude() == null || address.getLongitude() == null) {
-                throw new CoordinatesNotValidException("Endereço do student (id=" + student.getId() + ") não possui latitude/longitude válidas");
+                throw new CoordinatesNotValidException("Student address (id=" + student.getId()
+                        + ") does not have valid latitude/longitude");
             }
 
             BigDecimal lat = address.getLatitude();
@@ -124,7 +123,7 @@ public class RouteStudentService {
 
             if (lat.compareTo(BigDecimal.valueOf(-90)) < 0 || lat.compareTo(BigDecimal.valueOf(90)) > 0
                     || lng.compareTo(BigDecimal.valueOf(-180)) < 0 || lng.compareTo(BigDecimal.valueOf(180)) > 0) {
-                throw new CoordinatesNotValidException("Coordenadas do endereço inválidas para student id="
+                throw new CoordinatesNotValidException("Invalid address coordinates for student id="
                         + student.getId() + ": " + lat + ", " + lng);
             }
 
@@ -159,7 +158,7 @@ public class RouteStudentService {
     @Transactional
     public List<StudentWithAddress> findStudentWithAddress(UUID routeId) {
         Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Route was not found"));
 
         return routeStudentRepository.findByRouteOrderByBoardingOrderAsc(route).stream()
                 .filter(routeStudent ->
@@ -190,14 +189,14 @@ public class RouteStudentService {
     private Address resolveStudentAddress(Student student, UUID requestedAddressId) {
         List<Guardian> guardians = guardianRepository.findByStudentIdAndTransportId(
                 student.getId(),
-                currentUserService.getCurrentTransporteId());
+                currentUserService.getCurrentTransportId());
 
         if (requestedAddressId != null) {
             return guardians.stream()
                     .map(Guardian::getAddress)
                     .filter(address -> address != null && requestedAddressId.equals(address.getId()))
                     .findFirst()
-                    .orElseThrow(() -> new AddressNotFoundException(
+                    .orElseThrow(() -> new EntityNotFoundException(
                             "Address is not associated with this student's guardian"));
         }
 
@@ -208,7 +207,7 @@ public class RouteStudentService {
                         Boolean.TRUE.equals(right.getPrincipal()),
                         Boolean.TRUE.equals(left.getPrincipal())))
                 .findFirst()
-                .orElseThrow(() -> new AddressNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "No guardian address is available for this student"));
     }
 }

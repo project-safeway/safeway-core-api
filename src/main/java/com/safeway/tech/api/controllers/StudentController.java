@@ -69,7 +69,7 @@ public class StudentController {
 
     /*
 
-        MÉTODOS USADOS NO FEIGN CLIENT
+        Methods used by the Feign client.
 
      */
 

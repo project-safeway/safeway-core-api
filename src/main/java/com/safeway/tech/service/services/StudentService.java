@@ -8,7 +8,7 @@ import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
 import com.safeway.tech.infra.exception.OperationNotAllowedException;
-import com.safeway.tech.infra.exception.StudentNotFoundException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.infra.messaging.publishers.EventPublisher;
 import com.safeway.tech.repository.StudentRepository;
 import com.safeway.tech.repository.GuardianStudentRepository;
@@ -35,7 +35,7 @@ public class StudentService {
     public Student findById(UUID studentId) {
         UUID userId = currentUserService.getCurrentUserId();
         return studentRepository.findByIdAndUserId(studentId, userId)
-                .orElseThrow(() -> new StudentNotFoundException("Student não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Student was not found"));
     }
 
     @Transactional
@@ -44,7 +44,7 @@ public class StudentService {
         User user = userService.findById(userId);
 
         if (!user.isActive()) {
-            throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
+            throw new OperationNotAllowedException("User is not allowed to perform this operation");
         }
 
         Student student = new Student();
@@ -68,7 +68,7 @@ public class StudentService {
             guardianStudentRepository.save(guardianStudent);
         }
 
-        eventPublisher.publicarAlunoCriado(student, userId);
+        eventPublisher.publishStudentCreated(student, userId);
         return student;
     }
 
@@ -78,7 +78,7 @@ public class StudentService {
         User user = userService.findById(userId);
 
         if (!user.isActive()) {
-            throw new OperationNotAllowedException("O usuário não possúi permissão para realizar esta operação");
+            throw new OperationNotAllowedException("User is not allowed to perform this operation");
         }
 
         Student student = findById(studentId);
@@ -90,7 +90,7 @@ public class StudentService {
 
         student = studentRepository.save(student);
 
-        eventPublisher.publicarAlunoAtualizado(student, userId);
+        eventPublisher.publishStudentUpdated(student, userId);
         return student;
     }
 
@@ -106,7 +106,7 @@ public class StudentService {
         applyData(student, request);
         student.setSchool(schoolService.findById(request.schoolId()));
         student = studentRepository.save(student);
-        eventPublisher.publicarAlunoAtualizado(student, userId);
+        eventPublisher.publishStudentUpdated(student, userId);
         return student;
     }
 
@@ -115,7 +115,7 @@ public class StudentService {
         Student student = findById(studentId);
         student.setActive(false);
         studentRepository.save(student);
-        eventPublisher.publicarAlunoInativado(student, currentUserService.getCurrentUserId());
+        eventPublisher.publishStudentDeactivated(student, currentUserService.getCurrentUserId());
     }
 
     @Transactional
@@ -123,7 +123,7 @@ public class StudentService {
         Student student = findByIdForCurrentTransport(studentId);
         student.setActive(false);
         studentRepository.save(student);
-        eventPublisher.publicarAlunoInativado(student, currentUserService.getCurrentUserId());
+        eventPublisher.publishStudentDeactivated(student, currentUserService.getCurrentUserId());
     }
 
 
@@ -139,14 +139,14 @@ public class StudentService {
     }
 
     public List<Student> findAllForCurrentTransport() {
-        UUID transportId = currentUserService.getCurrentTransporteId();
+        UUID transportId = currentUserService.getCurrentTransportId();
         return studentRepository.findAllByTransportIdAndActiveTrue(transportId);
     }
 
     public Student findByIdForCurrentTransport(UUID studentId) {
-        UUID transportId = currentUserService.getCurrentTransporteId();
+        UUID transportId = currentUserService.getCurrentTransportId();
         return studentRepository.findByIdAndTransportIdAndActiveTrue(studentId, transportId)
-                .orElseThrow(() -> new StudentNotFoundException("Student not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Student was not found"));
     }
 
     private void applyData(Student student, StudentRequest request) {

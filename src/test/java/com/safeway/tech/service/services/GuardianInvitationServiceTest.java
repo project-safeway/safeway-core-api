@@ -218,7 +218,7 @@ class GuardianInvitationServiceTest {
         student.setId(studentId);
 
         when(currentUserService.getCurrentUserId()).thenReturn(driverId);
-        when(currentUserService.getCurrentTransporteId()).thenReturn(transportId);
+        when(currentUserService.getCurrentTransportId()).thenReturn(transportId);
         when(userRepository.findById(driverId)).thenReturn(Optional.of(driver));
         when(invitationRepository.findActiveByIdAndTransportForUpdate(invitationId, transportId))
                 .thenReturn(Optional.of(invitation));

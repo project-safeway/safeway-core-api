@@ -18,37 +18,37 @@ public class RouteOptimizationService {
     public RouteOptimizationService(List<IOptimizerService> providers) {
         this.providers = providers;
         if (providers != null && !providers.isEmpty()) {
-            log.info("RotasCompostasService inicializado com {} provider(es)", providers.size());
+            log.info("RouteOptimizationService initialized with {} provider(s)", providers.size());
             providers.forEach(p -> System.out.println("  - " + p.providerName()));
         } else {
-            log.warn("⚠️ AVISO: Nenhum provider de rotas foi encontrado!");
+            log.warn("⚠️ WARNING: No route providers were found!");
         }
     }
 
     public RouteResponse optimizeBestRoute(RouteRequest request) {
         if (providers == null || providers.isEmpty()) {
             throw new RuntimeException(
-                    "Nenhum provider de rotas disponível. " +
-                            "Verifique se AdaptadorOtimizacaoGoogle está configurado como @Service"
+                    "No route providers are available. " +
+                            "Verify that GoogleOptimizationAdapter is configured as a @Service"
             );
         }
 
         return providers.stream()
-                .map(provedor -> {
+                .map(provider -> {
                     try {
-                        log.info("Chamando provider: {}", provedor.providerName());
+                        log.info("Calling provider: {}", provider.providerName());
                         long startTime = System.currentTimeMillis();
-                        RouteResponse response = provedor.optimizeRoute(request);
+                        RouteResponse response = provider.optimizeRoute(request);
                         long endTime = System.currentTimeMillis();
-                        log.info("Provedor {} respondeu em {}ms", provedor.providerName(), endTime - startTime);
+                        log.info("Provider {} responded in {}ms", provider.providerName(), endTime - startTime);
                         return response;
                     } catch (Exception e) {
-                        log.error("Provedor {} falhou: {}", provedor.providerName(), e.getMessage());
+                        log.error("Provider {} failed: {}", provider.providerName(), e.getMessage());
                         return null;
                     }
                 })
                 .filter(Objects::nonNull)
                 .min(Comparator.comparingDouble(RouteResponse::totalDistance))
-                .orElseThrow(() -> new RuntimeException("Nenhuma rota disponível de nenhum provider"));
+                .orElseThrow(() -> new RuntimeException("No route is available from any provider"));
     }
 }

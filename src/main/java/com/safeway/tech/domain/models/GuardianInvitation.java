@@ -47,6 +47,10 @@ public class GuardianInvitation extends BaseEntity {
     @JoinColumn(name = "student_id")
     private Student student;
 
+    @ManyToOne
+    @JoinColumn(name = "guardian_id")
+    private Guardian guardian;
+
     @Column(name = "target_email")
     private String targetEmail;
 

@@ -100,3 +100,13 @@ Duas features com nome parecido, escopo diferente:
 **Não alterar a migration inicial sem consultar o usuário antes.** A exceção já autorizada foi adicionar `active BOOLEAN NOT NULL` em `guardian_invitations`, para alinhar a tabela ao campo `active` herdado de `BaseEntity`.
 
 **Divergência técnica corrigida**: `GuardianInvitationRepository` agora declara `JpaRepository<GuardianInvitation, UUID>`, alinhado à entidade correspondente, sem mudança de migration.
+
+## 12. Cadastro por convite de responsável
+
+O motorista cria convites com validade de sete dias. Convites `STUDENT_SPECIFIC` exigem um pré-cadastro já associado ao aluno; ao aceitar, o responsável cria sua conta e o vínculo fica confirmado. Convites `GENERIC` permitem o cadastro sem aluno associado; ao aceitar, o token é consumido e a solicitação fica em `AWAITING_APPROVAL` sem expiração até o motorista aprová-la e selecionar manualmente um ou mais alunos.
+
+Email e telefone são usados para validar contatos-alvo e exibir possíveis pré-cadastros ao motorista, mas nunca transferem uma conta ou criam vínculo por conta própria. Se houver candidatos, o motorista deve selecionar explicitamente um antes de aprovar. O usuário autenticado do responsável é separado do escopo do motorista; o acesso do motorista é validado pelo transporte da solicitação ou dos alunos associados.
+
+Endpoints: `POST /guardian-invitations` cria convite; `GET /guardian-invitations/public/{token}` consulta o convite; `POST /guardian-invitations/public/{token}/accept` conclui o cadastro; `GET /guardian-invitations/pending` lista solicitações aguardando aprovação; `POST /guardian-invitations/{id}/approve` aprova e cria os vínculos manuais; `DELETE /guardian-invitations/{id}` cancela um convite ainda não aceito.
+
+As alterações de schema ficam em migrations Flyway posteriores; a migration inicial permanece como referência de negócio. Foi removida apenas uma vírgula final inválida no SQL inicial para permitir o bootstrap. No startup, schemas vazios aplicam a migration inicial; schemas já existentes sem migrations efetivamente aplicadas são baselineados em `1.0.0` para aplicar somente a forward migration. Isso também cobre um `flyway_schema_history` que contenha apenas marcadores de schema, como quando a pasta de migrations não era encontrada.

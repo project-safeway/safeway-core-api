@@ -188,9 +188,9 @@ public class RouteStudentService {
     }
 
     private Address resolveStudentAddress(Student student, UUID requestedAddressId) {
-        List<Guardian> guardians = guardianRepository.findByStudentIdAndUserId(
+        List<Guardian> guardians = guardianRepository.findByStudentIdAndTransportId(
                 student.getId(),
-                currentUserService.getCurrentUserId());
+                currentUserService.getCurrentTransporteId());
 
         if (requestedAddressId != null) {
             return guardians.stream()

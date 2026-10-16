@@ -6,10 +6,8 @@ import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Route;
 import com.safeway.tech.domain.models.RouteSchool;
 import com.safeway.tech.domain.models.School;
-import com.safeway.tech.infra.exception.AddressNotFoundException;
 import com.safeway.tech.infra.exception.CoordinatesNotValidException;
-import com.safeway.tech.infra.exception.RouteNotFoundException;
-import com.safeway.tech.infra.exception.RouteSchoolNotFound;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.RouteRepository;
 import com.safeway.tech.repository.RouteSchoolRepository;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +52,7 @@ public class RouteSchoolService {
             School school = schoolService.findById(stop.id());
             Address address = school.getAddress();
             if (address.getLatitude() == null || address.getLongitude() == null) {
-                throw new AddressNotFoundException("School address has no valid coordinates");
+                throw new CoordinatesNotValidException("School address does not have valid coordinates");
             }
             BigDecimal latitude = address.getLatitude();
             BigDecimal longitude = address.getLongitude();
@@ -80,7 +78,7 @@ public class RouteSchoolService {
     @Transactional
     public void addSchool(UUID routeId, RouteSchoolRequest request) throws BadRequestException {
         Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RouteNotFoundException("Itinerário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Route was not found"));
 
         School school = schoolService.findById(request.schoolId());
 
@@ -88,14 +86,14 @@ public class RouteSchoolService {
         if (request.addressId() != null) {
             address = school.getAddress();
             if (!request.addressId().equals(address.getId())) {
-                throw new AddressNotFoundException("Address must match the selected school's address");
+                throw new IllegalArgumentException("Address must match the selected school's address");
             }
         } else {
             address = school.getAddress();
         }
 
         if (address.getLatitude() == null || address.getLongitude() == null) {
-            throw new AddressNotFoundException("Endereço da school não possui latitude/longitude válidas");
+            throw new CoordinatesNotValidException("School address does not have valid latitude/longitude");
         }
 
         BigDecimal lat = address.getLatitude();
@@ -103,12 +101,12 @@ public class RouteSchoolService {
 
         if (lat.compareTo(BigDecimal.valueOf(-90)) < 0 || lat.compareTo(BigDecimal.valueOf(90)) > 0
                 || lng.compareTo(BigDecimal.valueOf(-180)) < 0 || lng.compareTo(BigDecimal.valueOf(180)) > 0) {
-            throw new BadRequestException("Coordenadas do endereço da school inválidas: " + lat + ", " + lng);
+            throw new BadRequestException("Invalid school address coordinates: " + lat + ", " + lng);
         }
 
         routeSchoolRepository.findByRouteIdAndSchoolId(routeId, school.getId())
                 .ifPresent(e -> {
-                    throw new RouteSchoolNotFound("School já está vinculada a este itinerário");
+                    throw new IllegalArgumentException("School is already assigned to this route");
                 });
 
         RouteSchool entity = new RouteSchool();
@@ -124,7 +122,7 @@ public class RouteSchoolService {
     public void removeSchool(UUID routeId, UUID schoolId) {
         RouteSchool entity = routeSchoolRepository
                 .findByRouteIdAndSchoolId(routeId, schoolId)
-                .orElseThrow(() -> new RuntimeException("School não encontrada no itinerário"));
+                .orElseThrow(() -> new EntityNotFoundException("School was not found on this route"));
 
         routeSchoolRepository.delete(entity);
     }

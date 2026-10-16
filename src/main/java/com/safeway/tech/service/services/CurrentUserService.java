@@ -13,37 +13,36 @@ public class CurrentUserService {
     public UUID getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
-            throw new IllegalStateException("Usuário não autenticado");
+            throw new IllegalStateException("User is not authenticated");
         }
         Object principal = auth.getPrincipal();
         if (principal instanceof Jwt jwt) {
             String sub = jwt.getSubject();
             return UUID.fromString(sub);
         }
-        // Fallback: em alguns providers, getName() é o subject
+        // Some providers use getName() as the subject.
         String name = auth.getName();
         return UUID.fromString(name);
     }
 
-    public UUID getCurrentTransporteId() {
+    public UUID getCurrentTransportId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
-            throw new IllegalStateException("Usuário não autenticado");
+            throw new IllegalStateException("User is not authenticated");
         }
 
         Object principal = auth.getPrincipal();
 
         if (principal instanceof Jwt jwt) {
-            Object transporteClaim = jwt.getClaim("transport");
+            Object transportClaim = jwt.getClaim("transport");
 
-            if (transporteClaim == null) {
-                throw new IllegalStateException("Claim 'transport' não encontrada no token");
+            if (transportClaim == null) {
+                throw new IllegalStateException("Claim 'transport' was not found in the token");
             }
 
-            return UUID.fromString(transporteClaim.toString());
+            return UUID.fromString(transportClaim.toString());
         }
 
-        throw new IllegalStateException("Token JWT não encontrado no authentication principal");
+        throw new IllegalStateException("JWT token was not found in the authentication principal");
     }
 }
-

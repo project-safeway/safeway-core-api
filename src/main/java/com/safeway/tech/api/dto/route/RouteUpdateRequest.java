@@ -21,10 +21,10 @@ public record RouteUpdateRequest(
         List<RouteStopUpdate> stops
 ) {
     public record RouteStopUpdate(
-            String type,      // "ALUNO" ou "ESCOLA"
-            UUID id,          // studentId ou schoolId
+            String type,      // "ALUNO" or "ESCOLA"
+            UUID id,          // studentId or schoolId
             Integer generalOrder,
-            Integer specificOrder // boardingOrder ou ordemVisita
+            Integer specificOrder // boardingOrder or visitOrder
     ) {
     }
 }

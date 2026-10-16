@@ -4,7 +4,7 @@ import com.safeway.tech.api.dto.guardian.GuardianRequest;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Guardian;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.GuardianNotFoundException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.GuardianRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,14 +24,14 @@ public class GuardianService {
 
     public Guardian findById(UUID id) {
         UUID userId = currentUserService.getCurrentUserId();
-        UUID transportId = currentUserService.getCurrentTransporteId();
+        UUID transportId = currentUserService.getCurrentTransportId();
         return guardianRepository.findByGuardianIdAndOwnerOrTransport(id, userId, transportId)
-                .orElseThrow(() -> new GuardianNotFoundException("O responsável com ID " + id + "não foi encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Guardian with ID " + id + " was not found"));
     }
 
     public List<Guardian> listGuardians() {
         UUID userId = currentUserService.getCurrentUserId();
-        UUID transportId = currentUserService.getCurrentTransporteId();
+        UUID transportId = currentUserService.getCurrentTransportId();
         return guardianRepository.findByOwnerOrTransport(userId, transportId);
     }
 

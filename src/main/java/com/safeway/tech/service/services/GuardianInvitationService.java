@@ -7,7 +7,6 @@ import com.safeway.tech.api.dto.guardian.GuardianInvitationCreateRequest;
 import com.safeway.tech.api.dto.guardian.GuardianInvitationCreatedResponse;
 import com.safeway.tech.api.dto.guardian.GuardianInvitationRegistrationResponse;
 import com.safeway.tech.api.dto.guardian.GuardianInvitationResponse;
-import com.safeway.tech.api.dto.guardian.GuardianResponse;
 import com.safeway.tech.api.dto.guardian.PendingGuardianInvitationResponse;
 import com.safeway.tech.auth.core.port.PasswordHasherPort;
 import com.safeway.tech.auth.core.port.PasswordVerifierPort;
@@ -21,7 +20,7 @@ import com.safeway.tech.domain.models.GuardianStudent;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
 import com.safeway.tech.domain.models.User;
-import com.safeway.tech.infra.exception.GuardianNotFoundException;
+import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.infra.exception.InvitationExpiredException;
 import com.safeway.tech.repository.GuardianInvitationRepository;
 import com.safeway.tech.repository.GuardianRepository;
@@ -112,10 +111,9 @@ public class GuardianInvitationService {
         return toPublicResponse(invitation);
     }
 
+    @SuppressWarnings("MethodLength")
     @Transactional(noRollbackFor = InvitationExpiredException.class)
-    public GuardianInvitationRegistrationResponse accept(
-            String token,
-            GuardianInvitationAcceptRequest request) {
+    public GuardianInvitationRegistrationResponse accept(String token, GuardianInvitationAcceptRequest request) {
         GuardianInvitation invitation = invitationRepository.findActiveByTokenForUpdate(token)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invitation not found"));
         expireIfNeeded(invitation);
@@ -144,11 +142,8 @@ public class GuardianInvitationService {
             if (guardian.getUser() != null && guardian.getUser().getRole() != UserRole.DRIVER) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "This guardian already has an account");
             }
-            user = createGuardianUser(
-                    guardian.getName(),
-                    email,
-                    normalizePhone(guardian.getPrimaryPhoneNumber()),
-                    request.password());
+            user = createGuardianUser(guardian.getName(), email,
+                    normalizePhone(guardian.getPrimaryPhoneNumber()), request.password());
             guardian.setEmail(email);
             guardian.setUser(user);
             guardianRepository.save(guardian);
@@ -165,11 +160,7 @@ public class GuardianInvitationService {
                 validatePhoneNumber(request.secondaryPhoneNumber());
             }
             Address address = addressService.create(request.address());
-            user = createGuardianUser(
-                    request.name().trim(),
-                    email,
-                    normalizePhone(request.primaryPhoneNumber()),
-                    request.password());
+            user = createGuardianUser(request.name().trim(), email, normalizePhone(request.primaryPhoneNumber()), request.password());
             guardian = new Guardian();
             guardian.setName(request.name().trim());
             guardian.setPrimaryPhoneNumber(normalizePhone(request.primaryPhoneNumber()));
@@ -186,9 +177,7 @@ public class GuardianInvitationService {
         }
 
         invitationRepository.save(invitation);
-        return new GuardianInvitationRegistrationResponse(
-                guardian.getId(),
-                invitation.getStatus(),
+        return new GuardianInvitationRegistrationResponse(guardian.getId(), invitation.getStatus(),
                 invitation.getStatus() == InvitationStatusEnum.AWAITING_APPROVAL);
     }
 
@@ -316,7 +305,7 @@ public class GuardianInvitationService {
 
         Guardian candidate = guardianRepository.findById(candidateId)
                 .filter(Guardian::isActive)
-                .orElseThrow(() -> new GuardianNotFoundException("Pre-registered guardian not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Pre-registered guardian was not found"));
         if (candidate.getUser() != null && candidate.getUser().getRole() != UserRole.DRIVER) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Pre-registered guardian already has an account");
         }
@@ -389,7 +378,7 @@ public class GuardianInvitationService {
         return guardianRepository.findByStudentIdAndTransportId(studentId, transportId).stream()
                 .filter(guardian -> guardian.getId().equals(guardianId))
                 .findFirst()
-                .orElseThrow(() -> new GuardianNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Guardian is not linked to the selected student"));
     }
 
@@ -431,7 +420,7 @@ public class GuardianInvitationService {
                 || user.getTransport() == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the owning driver can perform this operation");
         }
-        UUID tokenTransportId = currentUserService.getCurrentTransporteId();
+        UUID tokenTransportId = currentUserService.getCurrentTransportId();
         if (!user.getTransport().getId().equals(tokenTransportId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the owning driver can perform this operation");
         }

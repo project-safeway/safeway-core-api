@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -218,7 +217,7 @@ class GuardianInvitationServiceTest {
         student.setId(studentId);
 
         when(currentUserService.getCurrentUserId()).thenReturn(driverId);
-        when(currentUserService.getCurrentTransporteId()).thenReturn(transportId);
+        when(currentUserService.getCurrentTransportId()).thenReturn(transportId);
         when(userRepository.findById(driverId)).thenReturn(Optional.of(driver));
         when(invitationRepository.findActiveByIdAndTransportForUpdate(invitationId, transportId))
                 .thenReturn(Optional.of(invitation));

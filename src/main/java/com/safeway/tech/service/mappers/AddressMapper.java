@@ -5,21 +5,21 @@ import com.safeway.tech.domain.models.Address;
 
 public class AddressMapper {
 
-    public static AddressResponse toResponse(Address school) {
+    public static AddressResponse toResponse(Address address) {
         return new AddressResponse(
-                school.getId(),
-                school.getStreet(),
-                school.getNumber(),
-                school.getAdditionalDetails(),
-                school.getNeighborhood(),
-                school.getCity(),
-                school.getFederalUnit(),
-                school.getZipCode(),
-                school.getLatitude(),
-                school.getLongitude(),
-                school.getType(),
-                school.isActive(),
-                school.getPrincipal()
+                address.getId(),
+                address.getStreet(),
+                address.getNumber(),
+                address.getAdditionalDetails(),
+                address.getNeighborhood(),
+                address.getCity(),
+                address.getFederalUnit(),
+                address.getZipCode(),
+                address.getLatitude(),
+                address.getLongitude(),
+                address.getType(),
+                address.isActive(),
+                address.getPrincipal()
         );
     }
 

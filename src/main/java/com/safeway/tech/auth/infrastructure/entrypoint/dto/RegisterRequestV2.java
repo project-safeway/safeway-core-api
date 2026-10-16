@@ -6,22 +6,21 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record RegisterRequestV2(
-        @NotBlank(message = "Nome é obrigatório")
+        @NotBlank(message = "Name is required")
         String name,
 
-        @NotBlank(message = "Email é obrigatório")
-        @Email(message = "Email inválido")
+        @NotBlank(message = "Email is required")
+        @Email(message = "Email is invalid")
         String email,
 
-        @NotBlank(message = "Senha é obrigatória")
+        @NotBlank(message = "Password is required")
         String password,
 
-        @NotBlank(message = "Telefone é obrigatório")
+        @NotBlank(message = "Phone number is required")
         String phoneNumber,
 
         @Valid
-        @NotNull(message = "Dados do transport são obrigatórios")
-        TransporteRequestV2 transport
+        @NotNull(message = "Transport details are required")
+        TransportRequestV2 transport
 ) {
 }
-

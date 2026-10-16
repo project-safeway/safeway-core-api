@@ -29,7 +29,7 @@ public class StudentService {
     private final TransportService transportService;
     private final EventPublisher eventPublisher;
     private final CurrentUserService currentUserService;
-    private final ResponsavelService responsavelService;
+    private final GuardianService guardianService;
     private final GuardianStudentRepository guardianStudentRepository;
 
     public Student findById(UUID studentId) {
@@ -61,7 +61,7 @@ public class StudentService {
         student = studentRepository.save(student);
 
         for (var guardianRequest : request.guardian()) {
-            Guardian guardian = responsavelService.createGuardian(guardianRequest);
+            Guardian guardian = guardianService.createGuardian(guardianRequest);
             GuardianStudent guardianStudent = new GuardianStudent();
             guardianStudent.setGuardian(guardian);
             guardianStudent.setStudent(student);

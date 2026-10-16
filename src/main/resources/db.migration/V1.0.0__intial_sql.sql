@@ -19,7 +19,7 @@ CREATE TABLE users (
     secondary_phone_number CHAR(15),
 
     PRIMARY KEY (id),
-    UNIQUE KEY uk_users_email (email),
+    UNIQUE KEY uk_users_email (email)
 );
 
 

@@ -28,7 +28,7 @@ public class LoadAuthUserJpaAdapter implements LoadAuthUserPort {
                 user.getEmail(),
                 user.getPasswordHash(),
                 user.getRole().name(),
-                user.getTransport().getId()
+                user.getTransport() == null ? null : user.getTransport().getId()
         );
     }
 }

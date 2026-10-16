@@ -61,7 +61,7 @@ public class StudentService {
         student = studentRepository.save(student);
 
         for (var guardianRequest : request.guardian()) {
-            Guardian guardian = guardianService.createGuardian(guardianRequest);
+            Guardian guardian = guardianService.createPreRegistrationGuardian(guardianRequest);
             GuardianStudent guardianStudent = new GuardianStudent();
             guardianStudent.setGuardian(guardian);
             guardianStudent.setStudent(student);

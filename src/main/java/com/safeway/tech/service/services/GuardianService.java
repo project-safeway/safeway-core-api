@@ -24,26 +24,39 @@ public class GuardianService {
 
     public Guardian findById(UUID id) {
         UUID userId = currentUserService.getCurrentUserId();
-        return guardianRepository.findByGuardianIdAndUserId(id, userId)
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        return guardianRepository.findByGuardianIdAndOwnerOrTransport(id, userId, transportId)
                 .orElseThrow(() -> new GuardianNotFoundException("O responsável com ID " + id + "não foi encontrado"));
     }
 
     public List<Guardian> listGuardians() {
         UUID userId = currentUserService.getCurrentUserId();
-        return guardianRepository.findByUserId(userId);
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        return guardianRepository.findByOwnerOrTransport(userId, transportId);
     }
 
     @Transactional
     public Guardian createGuardian(GuardianRequest request) {
+        return createGuardian(request, true);
+    }
+
+    @Transactional
+    public Guardian createPreRegistrationGuardian(GuardianRequest request) {
+        return createGuardian(request, false);
+    }
+
+    private Guardian createGuardian(GuardianRequest request, boolean attachToCurrentUser) {
         Guardian guardian = new Guardian();
         applyData(guardian, request);
 
         Address address = addressService.create(request.address());
         guardian.setAddress(address);
 
-        UUID userId = currentUserService.getCurrentUserId();
-        User user = userService.findById(userId);
-        guardian.setUser(user);
+        if (attachToCurrentUser) {
+            UUID userId = currentUserService.getCurrentUserId();
+            User user = userService.findById(userId);
+            guardian.setUser(user);
+        }
 
         return guardianRepository.save(guardian);
     }

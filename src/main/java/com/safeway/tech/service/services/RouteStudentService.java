@@ -13,7 +13,6 @@ import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.GuardianRepository;
 import com.safeway.tech.repository.RouteRepository;
 import com.safeway.tech.repository.RouteStudentRepository;
-import com.safeway.tech.service.services.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,14 +34,6 @@ public class RouteStudentService {
     private final StudentService studentService;
     private final GuardianRepository guardianRepository;
     private final CurrentUserService currentUserService;
-
-    public List<RouteStudent> findByRouteId(UUID routeId) {
-        return routeStudentRepository.findByRouteId(routeId);
-    }
-
-    public void saveAll(List<RouteStudent> students) {
-        routeStudentRepository.saveAll(students);
-    }
 
     @Transactional
     public void updateGeneralOrder(UUID routeId, List<RouteStopUpdate> stops) {
@@ -202,7 +194,7 @@ public class RouteStudentService {
 
         return guardians.stream()
                 .map(Guardian::getAddress)
-                .filter(address -> address != null)
+                .filter(Objects::nonNull)
                 .sorted((left, right) -> Boolean.compare(
                         Boolean.TRUE.equals(right.getPrincipal()),
                         Boolean.TRUE.equals(left.getPrincipal())))

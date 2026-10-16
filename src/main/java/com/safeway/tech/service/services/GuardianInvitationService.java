@@ -7,7 +7,6 @@ import com.safeway.tech.api.dto.guardian.GuardianInvitationCreateRequest;
 import com.safeway.tech.api.dto.guardian.GuardianInvitationCreatedResponse;
 import com.safeway.tech.api.dto.guardian.GuardianInvitationRegistrationResponse;
 import com.safeway.tech.api.dto.guardian.GuardianInvitationResponse;
-import com.safeway.tech.api.dto.guardian.GuardianResponse;
 import com.safeway.tech.api.dto.guardian.PendingGuardianInvitationResponse;
 import com.safeway.tech.auth.core.port.PasswordHasherPort;
 import com.safeway.tech.auth.core.port.PasswordVerifierPort;
@@ -112,10 +111,9 @@ public class GuardianInvitationService {
         return toPublicResponse(invitation);
     }
 
+    @SuppressWarnings("MethodLength")
     @Transactional(noRollbackFor = InvitationExpiredException.class)
-    public GuardianInvitationRegistrationResponse accept(
-            String token,
-            GuardianInvitationAcceptRequest request) {
+    public GuardianInvitationRegistrationResponse accept(String token, GuardianInvitationAcceptRequest request) {
         GuardianInvitation invitation = invitationRepository.findActiveByTokenForUpdate(token)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invitation not found"));
         expireIfNeeded(invitation);
@@ -144,11 +142,8 @@ public class GuardianInvitationService {
             if (guardian.getUser() != null && guardian.getUser().getRole() != UserRole.DRIVER) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "This guardian already has an account");
             }
-            user = createGuardianUser(
-                    guardian.getName(),
-                    email,
-                    normalizePhone(guardian.getPrimaryPhoneNumber()),
-                    request.password());
+            user = createGuardianUser(guardian.getName(), email,
+                    normalizePhone(guardian.getPrimaryPhoneNumber()), request.password());
             guardian.setEmail(email);
             guardian.setUser(user);
             guardianRepository.save(guardian);
@@ -165,11 +160,7 @@ public class GuardianInvitationService {
                 validatePhoneNumber(request.secondaryPhoneNumber());
             }
             Address address = addressService.create(request.address());
-            user = createGuardianUser(
-                    request.name().trim(),
-                    email,
-                    normalizePhone(request.primaryPhoneNumber()),
-                    request.password());
+            user = createGuardianUser(request.name().trim(), email, normalizePhone(request.primaryPhoneNumber()), request.password());
             guardian = new Guardian();
             guardian.setName(request.name().trim());
             guardian.setPrimaryPhoneNumber(normalizePhone(request.primaryPhoneNumber()));
@@ -186,9 +177,7 @@ public class GuardianInvitationService {
         }
 
         invitationRepository.save(invitation);
-        return new GuardianInvitationRegistrationResponse(
-                guardian.getId(),
-                invitation.getStatus(),
+        return new GuardianInvitationRegistrationResponse(guardian.getId(), invitation.getStatus(),
                 invitation.getStatus() == InvitationStatusEnum.AWAITING_APPROVAL);
     }
 

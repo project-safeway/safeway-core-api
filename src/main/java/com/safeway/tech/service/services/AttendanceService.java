@@ -22,8 +22,10 @@ public class AttendanceService {
     private final RouteService routeService;
 
     public Attendance findById(UUID id) {
-        return attendanceRepository.findById(id)
+        Attendance attendance = attendanceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Chamada não encontrada"));
+        routeService.findById(attendance.getRoute().getId());
+        return attendance;
     }
 
     public Attendance findActiveByRoute(UUID routeId) {
@@ -32,13 +34,12 @@ public class AttendanceService {
     }
 
     public Attendance startAttendance(UUID routeId) {
+        Route route = routeService.findById(routeId);
         Attendance attendanceExistente = findActiveByRoute(routeId);
 
         if (attendanceExistente != null) {
             return attendanceExistente;
         }
-
-        Route route = routeService.findById(routeId);
 
         Attendance attendance = new Attendance();
         attendance.setRoute(route);
@@ -49,20 +50,18 @@ public class AttendanceService {
         return attendance;
     }
 
-    public Attendance updateAttendance(UUID routeId, AttendanceStatusEnum statusChamada) {
-        Attendance attendance = findActiveByRoute(routeId);
-        if (attendance == null) {
-            throw new RuntimeException("Nenhuma chamada em andamento encontrada para este itinerário");
+    public Attendance updateAttendanceById(UUID attendanceId, AttendanceStatusEnum status) {
+        Attendance attendance = findById(attendanceId);
+        if (!AttendanceStatusEnum.IN_PROGRESS.equals(attendance.getStatus())) {
+            throw new RuntimeException("Attendance is not in progress");
         }
 
-        attendance.setStatus(statusChamada);
-
-        attendance = attendanceRepository.save(attendance);
-
-        return attendance;
+        attendance.setStatus(status);
+        return attendanceRepository.save(attendance);
     }
 
     public Page<Attendance> findAttendanceHistory(UUID routeId, List<AttendanceStatusEnum> status, Pageable pageable) {
+        routeService.findById(routeId);
         Specification<Attendance> specs = Specification.allOf(
                 AttendanceSpecs.withRouteId(routeId),
                 AttendanceSpecs.withStatus(status)

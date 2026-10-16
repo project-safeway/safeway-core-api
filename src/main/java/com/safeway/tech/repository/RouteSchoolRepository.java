@@ -2,8 +2,10 @@ package com.safeway.tech.repository;
 
 import com.safeway.tech.domain.models.RouteSchool;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,5 +18,9 @@ public interface RouteSchoolRepository extends JpaRepository<RouteSchool, UUID> 
 
     @Query("SELECT rs FROM RouteSchool rs WHERE rs.route.id = :routeId")
     List<RouteSchool> findByRouteId(@Param("routeId") UUID routeId);
-}
 
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM RouteSchool rs WHERE rs.route.id = :routeId")
+    void deleteAllByRouteId(@Param("routeId") UUID routeId);
+}

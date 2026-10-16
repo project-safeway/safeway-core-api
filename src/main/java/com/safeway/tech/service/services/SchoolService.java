@@ -19,6 +19,7 @@ public class SchoolService {
     private final SchoolRepository schoolRepository;
     private final AddressService addressService;
     private final CurrentUserService currentUserService;
+    private final TransportService transportService;
 
     public List<School> findAll() {
         UUID transportId = currentUserService.getCurrentTransporteId();
@@ -40,6 +41,7 @@ public class SchoolService {
 
         Address address = addressService.create(request.address());
         school.setAddress(address);
+        school.setTransport(transportService.getTransport());
 
         return schoolRepository.save(school);
     }

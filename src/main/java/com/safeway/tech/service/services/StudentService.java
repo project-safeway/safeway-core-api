@@ -1,6 +1,8 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.student.StudentRequest;
+import com.safeway.tech.domain.models.Guardian;
+import com.safeway.tech.domain.models.GuardianStudent;
 import com.safeway.tech.domain.models.School;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.domain.models.Transport;
@@ -9,6 +11,7 @@ import com.safeway.tech.infra.exception.OperationNotAllowedException;
 import com.safeway.tech.infra.exception.StudentNotFoundException;
 import com.safeway.tech.infra.messaging.publishers.EventPublisher;
 import com.safeway.tech.repository.StudentRepository;
+import com.safeway.tech.repository.GuardianStudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,8 @@ public class StudentService {
     private final TransportService transportService;
     private final EventPublisher eventPublisher;
     private final CurrentUserService currentUserService;
+    private final ResponsavelService responsavelService;
+    private final GuardianStudentRepository guardianStudentRepository;
 
     public Student findById(UUID studentId) {
         UUID userId = currentUserService.getCurrentUserId();
@@ -55,6 +60,14 @@ public class StudentService {
 
         student = studentRepository.save(student);
 
+        for (var guardianRequest : request.guardian()) {
+            Guardian guardian = responsavelService.createGuardian(guardianRequest);
+            GuardianStudent guardianStudent = new GuardianStudent();
+            guardianStudent.setGuardian(guardian);
+            guardianStudent.setStudent(student);
+            guardianStudentRepository.save(guardianStudent);
+        }
+
         eventPublisher.publicarAlunoCriado(student, userId);
         return student;
     }
@@ -82,8 +95,32 @@ public class StudentService {
     }
 
     @Transactional
+    public Student updateForCurrentTransport(UUID studentId, StudentRequest request) {
+        UUID userId = currentUserService.getCurrentUserId();
+        User user = userService.findById(userId);
+        if (!user.isActive()) {
+            throw new OperationNotAllowedException("User is not allowed to perform this operation");
+        }
+
+        Student student = findByIdForCurrentTransport(studentId);
+        applyData(student, request);
+        student.setSchool(schoolService.findById(request.schoolId()));
+        student = studentRepository.save(student);
+        eventPublisher.publicarAlunoAtualizado(student, userId);
+        return student;
+    }
+
+    @Transactional
     public void delete(UUID studentId) {
         Student student = findById(studentId);
+        student.setActive(false);
+        studentRepository.save(student);
+        eventPublisher.publicarAlunoInativado(student, currentUserService.getCurrentUserId());
+    }
+
+    @Transactional
+    public void deleteForCurrentTransport(UUID studentId) {
+        Student student = findByIdForCurrentTransport(studentId);
         student.setActive(false);
         studentRepository.save(student);
         eventPublisher.publicarAlunoInativado(student, currentUserService.getCurrentUserId());
@@ -99,6 +136,17 @@ public class StudentService {
     public List<Student> findAllActive() {
         UUID userId = currentUserService.getCurrentUserId();
         return studentRepository.findAllByActiveTrueAndUserId(userId);
+    }
+
+    public List<Student> findAllForCurrentTransport() {
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        return studentRepository.findAllByTransportIdAndActiveTrue(transportId);
+    }
+
+    public Student findByIdForCurrentTransport(UUID studentId) {
+        UUID transportId = currentUserService.getCurrentTransporteId();
+        return studentRepository.findByIdAndTransportIdAndActiveTrue(studentId, transportId)
+                .orElseThrow(() -> new StudentNotFoundException("Student not found"));
     }
 
     private void applyData(Student student, StudentRequest request) {

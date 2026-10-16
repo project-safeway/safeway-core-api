@@ -1,5 +1,7 @@
 package com.safeway.tech.infra.exception.handler;
 
+import com.safeway.tech.auth.core.exception.EmailAlreadyInUseException;
+import com.safeway.tech.auth.core.exception.TransportAlreadyInUseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler({EmailAlreadyInUseException.class, TransportAlreadyInUseException.class})
+    public ResponseEntity<String> handleConflict(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentials(BadCredentialsException ex) {
@@ -33,4 +40,3 @@ public class GlobalExceptionHandler {
             .body("Erro interno: " + ex.getMessage());
     }
 }
-

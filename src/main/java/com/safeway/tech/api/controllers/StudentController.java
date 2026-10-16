@@ -37,9 +37,17 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping
+    public ResponseEntity<List<StudentResponse>> findAll() {
+        List<StudentResponse> response = studentService.findAllForCurrentTransport().stream()
+                .map(StudentMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{studentId}")
     public ResponseEntity<StudentResponse> findById(@PathVariable UUID studentId) {
-        StudentResponse response = StudentMapper.toResponse(studentService.findById(studentId));
+        StudentResponse response = StudentMapper.toResponse(studentService.findByIdForCurrentTransport(studentId));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -48,13 +56,14 @@ public class StudentController {
             @PathVariable UUID studentId,
             @RequestBody @Valid StudentRequest request
     ) {
-        StudentResponse response = StudentMapper.toResponse(studentService.update(studentId, request));
+        StudentResponse response = StudentMapper.toResponse(
+                studentService.updateForCurrentTransport(studentId, request));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{studentId}")
     public ResponseEntity<Void> delete(@PathVariable UUID studentId) {
-        studentService.delete(studentId);
+        studentService.deleteForCurrentTransport(studentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

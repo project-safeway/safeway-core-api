@@ -24,4 +24,13 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
     @Query("SELECT s FROM Student s JOIN GuardianStudent gs ON gs.student = s " +
             "WHERE s.id = :studentId AND gs.guardian.user.id = :userId AND s.active = true")
     Optional<Student> findByIdAndUserId(@Param("studentId") UUID studentId, @Param("userId") UUID userId);
+
+    @Query("SELECT s FROM Student s WHERE s.transport.id = :transportId AND s.active = true")
+    List<Student> findAllByTransportIdAndActiveTrue(@Param("transportId") UUID transportId);
+
+    @Query("SELECT s FROM Student s WHERE s.id = :studentId " +
+            "AND s.transport.id = :transportId AND s.active = true")
+    Optional<Student> findByIdAndTransportIdAndActiveTrue(
+            @Param("studentId") UUID studentId,
+            @Param("transportId") UUID transportId);
 }

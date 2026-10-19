@@ -82,11 +82,12 @@ CREATE TABLE transports (
 -- =========================================================
 
 ALTER TABLE users
-    ADD COLUMN transport_id CHAR(36),
+    ADD COLUMN transport_id CHAR(36);
+
+ALTER TABLE users
     ADD CONSTRAINT fk_users_transport
         FOREIGN KEY (transport_id)
-        REFERENCES transports(id);
-
+            REFERENCES transports(id);
 
 -- =========================================================
 -- GUARDIANS

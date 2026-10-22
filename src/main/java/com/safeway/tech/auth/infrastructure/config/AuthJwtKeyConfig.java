@@ -4,8 +4,6 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,15 +17,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 @Configuration
 public class AuthJwtKeyConfig {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthJwtKeyConfig.class);
 
     @Value("${jwt.public.key:}")
     private String publicKeyLocation;
@@ -37,24 +31,23 @@ public class AuthJwtKeyConfig {
 
     @Bean("authV2RsaKeyPair")
     public KeyPair authV2RsaKeyPair() {
-        try {
-            if (publicKeyLocation != null && !publicKeyLocation.isBlank()
-                    && privateKeyLocation != null && !privateKeyLocation.isBlank()) {
-                RSAPublicKey publicKey = RsaKeyConverters.x509().convert(loadInputStream(publicKeyLocation));
-                RSAPrivateKey privateKey = RsaKeyConverters.pkcs8().convert(loadInputStream(privateKeyLocation));
-                return new KeyPair(publicKey, privateKey);
-            }
-        } catch (Exception e) {
-            log.warn("Failed to load Auth V2 RSA keys ({} / {}). Generating in-memory keys. Details: {}",
-                    publicKeyLocation, privateKeyLocation, e.getMessage());
+        if (publicKeyLocation == null || publicKeyLocation.isBlank()
+                || privateKeyLocation == null || privateKeyLocation.isBlank()) {
+            throw new IllegalStateException("jwt.public.key and jwt.private.key must be configured");
         }
 
-        try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(2048);
-            return generator.generateKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Failed to generate Auth V2 RSA key pair", e);
+        try (InputStream publicKeyStream = loadInputStream(publicKeyLocation);
+                InputStream privateKeyStream = loadInputStream(privateKeyLocation)) {
+            RSAPublicKey publicKey = RsaKeyConverters.x509().convert(publicKeyStream);
+            RSAPrivateKey privateKey = RsaKeyConverters.pkcs8().convert(privateKeyStream);
+            if (publicKey == null || privateKey == null
+                    || !publicKey.getModulus().equals(privateKey.getModulus())) {
+                throw new IllegalStateException("jwt.public.key and jwt.private.key must be a matching RSA key pair");
+            }
+            return new KeyPair(publicKey, privateKey);
+        } catch (IOException | IllegalArgumentException e) {
+            throw new IllegalStateException(
+                    "Failed to load JWT RSA keys; configure jwt.public.key (X.509) and jwt.private.key (PKCS#8)", e);
         }
     }
 

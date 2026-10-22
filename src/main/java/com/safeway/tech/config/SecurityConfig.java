@@ -88,8 +88,10 @@ public class SecurityConfig {
             throw new IllegalStateException("jwt.public.key deve ser configurada para validar tokens JWT");
         }
 
-        RSAPublicKey publicKey = RsaKeyConverters.x509().convert(loadInputStream(publicKeyLocation));
-        return NimbusJwtDecoder.withPublicKey(publicKey).build();
+        try (InputStream publicKeyStream = loadInputStream(publicKeyLocation)) {
+            RSAPublicKey publicKey = RsaKeyConverters.x509().convert(publicKeyStream);
+            return NimbusJwtDecoder.withPublicKey(publicKey).build();
+        }
     }
 
     @Bean

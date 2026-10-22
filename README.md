@@ -75,7 +75,7 @@ src/main/java/com/safeway/tech/
 ## ⚙ Configuração
 
 ```properties
-# JWT — chaves RSA (já inclusas em src/main/resources/keys/)
+# JWT — configure um par RSA local (nao versionar a chave privada)
 jwt.public.key=classpath:keys/pub.key
 jwt.private.key=classpath:keys/pri.key
 # Banco de dados (H2 para dev ou MySQL para produção)
@@ -137,6 +137,19 @@ POST /auth/login
 `users` · `students` · `schools` · `addresses` · `transports` · `guardians` · `chamadas` ·
 `routes` · `mensalidades_aluno` · `pagamentos`
 
+### UUIDs no H2 e MySQL
+
+As migracoes usam `CHAR(36)` para IDs e chaves estrangeiras. O `BaseEntity`
+mapeia UUIDs explicitamente como texto, preservando o formato
+`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` nas gravacoes e consultas.
+
+Registros gravados antes dessa correcao podem conter IDs corrompidos no H2.
+Em desenvolvimento com H2 em memoria (`jdbc:h2:mem:...`), encerrar e iniciar
+a API novamente recria o banco vazio e perde todos os dados dessa instancia.
+Depois disso, cadastre o usuario, faca login e substitua o token no Swagger.
+Em bancos persistentes, preserve os dados e avalie uma migracao antes de alterar
+registros existentes; a mudanca de mapeamento nao repara IDs antigos.
+
 ---
 
 ## 🐇 Mensageria (RabbitMQ)
@@ -178,13 +191,27 @@ O módulo de rotas utiliza as APIs do Google para:
 
 ## Configurar chaves para JWT
 
-1. Gerar a chave privada
+O login e a validacao de tokens usam `jwt.private.key` e `jwt.public.key`.
+As duas chaves devem pertencer ao mesmo par RSA. A aplicacao recusa a inicializacao
+se uma chave estiver ausente, invalida ou nao corresponder ao par; nao gera chaves temporarias.
+As propriedades `auth.v2.jwt.*` nao sao usadas para carregar as chaves.
 
-    ```bashopenssl genrsa -out pri.key 2048```
+Para criar um novo par local, sem sobrescrever chaves de um ambiente existente:
 
-2. Extrair a chave pública
+```powershell
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out pri.key
+openssl pkey -in pri.key -pubout -out pub.key
+```
 
-   ```bashopenssl rsa -in pri.key -pubout -out pub.key```
+Configure `jwt.private.key` e `jwt.public.key` com os caminhos desses arquivos,
+ou coloque-os em `src/main/resources/keys/` para os caminhos `classpath:` do exemplo.
+Nao versione a chave privada.
+
+Se `/users/me` retornar `401` com `Invalid signature`, confira se o token veio
+do mesmo ambiente e se o login e a API usam o mesmo par. Depois de corrigir as
+chaves, reinicie a API e faca login novamente: tokens assinados com a chave anterior
+nao serao aceitos. No **Authorize** do Swagger, informe apenas o JWT, sem o prefixo
+`Bearer` (o Swagger adiciona esse prefixo).
 
 ---
 

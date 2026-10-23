@@ -3,6 +3,8 @@ package com.safeway.tech.domain.models;
 import com.safeway.tech.domain.enums.RouteTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -27,6 +29,7 @@ public class Route extends BaseEntity {
     @Column(name = "end_time")
     private Time endTime;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "route_type", nullable = false)
     private RouteTypeEnum routeType;
 

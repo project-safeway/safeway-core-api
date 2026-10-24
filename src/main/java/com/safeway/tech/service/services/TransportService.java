@@ -20,14 +20,6 @@ public class TransportService {
         return transportRepository.findByUserId(userId);
     }
 
-    public Transport create(TransportRequest request) {
-        Transport transport = new Transport();
-
-        applyData(transport, request);
-
-        return transportRepository.save(transport);
-    }
-
     public Transport update(TransportRequest request) {
         Transport transport = getTransport();
 

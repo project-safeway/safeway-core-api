@@ -130,6 +130,30 @@ POST /auth/login
 
 ---
 
+### Vincular um responsavel existente a um aluno
+
+O `POST /guardians` cadastra um responsavel avulso. Para vincula-lo a um aluno
+ja cadastrado, use os IDs retornados pela API:
+
+```http
+PUT /students/{studentId}/guardians/{guardianId}
+Authorization: Bearer <token>
+```
+
+Nao ha corpo na requisicao. O retorno e `204 No Content`. Repetir a chamada
+nao duplica o vinculo; um vinculo anteriormente removido e reativado.
+O aluno deve estar ativo no transporte atual, e o responsavel deve estar ativo
+e acessivel ao usuario autenticado (proprio ou ja vinculado ao transporte).
+
+| Metodo | Rota | Descricao |
+|--------|------|-----------|
+| `GET` | `/students/{studentId}/guardians` | Listar responsaveis ativos vinculados |
+| `DELETE` | `/students/{studentId}/guardians/{guardianId}` | Remover somente o vinculo, sem excluir o responsavel |
+
+Os endpoints exigem autenticacao. Recursos fora do escopo retornam `404`.
+O cadastro de aluno continua aceitando novos responsaveis pelo campo `guardian`;
+para reutilizar um cadastro existente em outro aluno, use o `PUT` acima.
+
 ## 🗄 Banco de dados
 
 ### Principais tabelas

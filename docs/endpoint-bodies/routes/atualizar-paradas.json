@@ -1,0 +1,27 @@
+{
+  "name": "Ida Alcina - Manha",
+  "startTime": "06:00:00",
+  "endTime": "07:00:00",
+  "routeType": "TO_SCHOOL",
+  "active": true,
+  "stops": [
+    {
+      "type": "ALUNO",
+      "id": "{{studentId1}}",
+      "generalOrder": 1,
+      "specificOrder": 1
+    },
+    {
+      "type": "ALUNO",
+      "id": "{{studentId2}}",
+      "generalOrder": 2,
+      "specificOrder": 2
+    },
+    {
+      "type": "ESCOLA",
+      "id": "{{schoolId}}",
+      "generalOrder": 3,
+      "specificOrder": 1
+    }
+  ]
+}

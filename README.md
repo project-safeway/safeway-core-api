@@ -97,6 +97,12 @@ google.maps.api.key=SEU_API_KEY
 
 ## 🔗 Endpoints principais
 
+Bodies JSON para todos os endpoints que recebem corpo, ordem sugerida de
+execucao e lista dos endpoints sem body estao em
+[docs/endpoint-bodies/README.md](docs/endpoint-bodies/README.md).
+Os exemplos usam enderecos reais de Sao Caetano do Sul/SP e dados pessoais
+ficticios; substitua os placeholders pelos IDs retornados pela sua instancia.
+
 ### Autenticação (`/auth`) — acesso público
 
 | Método | Rota             | Descrição                    |
@@ -110,10 +116,15 @@ POST /auth/register
 
 ```json
 {
-  "nome": "Usuario Teste",
-  "email": "user@teste.com",
-  "senha": "senha123",
-  "tel1": "11999999999"
+  "name": "Motorista Teste Safeway",
+  "email": "motorista.safeway@example.com",
+  "password": "TesteLocal2026!",
+  "phoneNumber": "11900000001",
+  "transport": {
+    "licensePlate": "TST1A23",
+    "model": "Mercedes-Benz Sprinter",
+    "capacity": 20
+  }
 }
 ```
 
@@ -123,8 +134,8 @@ POST /auth/login
 
 ```json
 {
-  "email": "user@teste.com",
-  "senha": "senha123"
+  "email": "motorista.safeway@example.com",
+  "password": "TesteLocal2026!"
 }
 ```
 

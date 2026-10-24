@@ -1,0 +1,29 @@
+{
+  "name": "Aluno Teste Um Atualizado",
+  "professor": "Professor Teste Um",
+  "birthdate": "2010-03-15",
+  "grade": 1,
+  "classroom": "B",
+  "monthlyFee": 470.0,
+  "dueDate": 12,
+  "guardian": [
+    {
+      "name": "Responsavel Teste Um",
+      "primaryPhoneNumber": "11900000004",
+      "secondaryPhoneNumber": null,
+      "email": "responsavel.um@example.com",
+      "address": {
+        "street": "Alameda Conde de Porto Alegre",
+        "number": "840",
+        "additionalDetails": null,
+        "neighborhood": "Santa Maria",
+        "city": "São Caetano do Sul",
+        "federalUnit": "SP",
+        "zipCode": "09561-000",
+        "type": "PONTO_DE_ENCONTRO",
+        "principal": true
+      }
+    }
+  ],
+  "schoolId": "{{schoolId}}"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Ida Alcina - Manha Atualizada",
+  "startTime": "06:10:00",
+  "endTime": "07:10:00",
+  "routeType": "TO_SCHOOL",
+  "active": true,
+  "students": [
+    {
+      "studentId": "{{studentId1}}",
+      "boardingOrder": 1,
+      "addressId": null
+    },
+    {
+      "studentId": "{{studentId2}}",
+      "boardingOrder": 2,
+      "addressId": null
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "vehicle": {
+    "id": "{{transportId}}",
+    "intialLocation": {
+      "lat": -23.6327,
+      "lng": -46.55657
+    },
+    "finalLocation": {
+      "lat": -23.6368,
+      "lng": -46.5542
+    }
+  },
+  "stoppingPoint": [
+    {
+      "id": "{{studentId1}}",
+      "location": {
+        "lat": -23.6327,
+        "lng": -46.55657
+      },
+      "order": 1
+    },
+    {
+      "id": "{{schoolId}}",
+      "location": {
+        "lat": -23.6368,
+        "lng": -46.5542
+      },
+      "order": 2
+    }
+  ],
+  "mustOptimizeOrder": true
+}

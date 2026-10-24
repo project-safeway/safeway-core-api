@@ -1,0 +1,7 @@
+{
+  "type": "STUDENT_SPECIFIC",
+  "studentId": "{{studentId1}}",
+  "guardianId": "{{guardianId1}}",
+  "targetEmail": "responsavel.um@example.com",
+  "targetPhoneNumber": "11900000004"
+}

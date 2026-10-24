@@ -1,0 +1,18 @@
+{
+  "email": "responsavel.convite@example.com",
+  "password": "TesteResponsavel2026!",
+  "name": "Responsavel Convite Teste",
+  "primaryPhoneNumber": "11900000006",
+  "secondaryPhoneNumber": null,
+  "address": {
+    "street": "Alameda Conde de Porto Alegre",
+    "number": "840",
+    "additionalDetails": null,
+    "neighborhood": "Santa Maria",
+    "city": "São Caetano do Sul",
+    "federalUnit": "SP",
+    "zipCode": "09561-000",
+    "type": "PONTO_DE_ENCONTRO",
+    "principal": true
+  }
+}

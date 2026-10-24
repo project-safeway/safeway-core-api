@@ -97,6 +97,12 @@ google.maps.api.key=SEU_API_KEY
 
 ## 🔗 Endpoints principais
 
+Bodies JSON para todos os endpoints que recebem corpo, ordem sugerida de
+execucao e lista dos endpoints sem body estao em
+[docs/endpoint-bodies/README.md](docs/endpoint-bodies/README.md).
+Os exemplos usam enderecos reais de Sao Caetano do Sul/SP e dados pessoais
+ficticios; substitua os placeholders pelos IDs retornados pela sua instancia.
+
 ### Autenticação (`/auth`) — acesso público
 
 | Método | Rota             | Descrição                    |
@@ -110,10 +116,15 @@ POST /auth/register
 
 ```json
 {
-  "nome": "Usuario Teste",
-  "email": "user@teste.com",
-  "senha": "senha123",
-  "tel1": "11999999999"
+  "name": "Motorista Teste Safeway",
+  "email": "motorista.safeway@example.com",
+  "password": "TesteLocal2026!",
+  "phoneNumber": "11900000001",
+  "transport": {
+    "licensePlate": "TST1A23",
+    "model": "Mercedes-Benz Sprinter",
+    "capacity": 20
+  }
 }
 ```
 
@@ -123,12 +134,36 @@ POST /auth/login
 
 ```json
 {
-  "email": "user@teste.com",
-  "senha": "senha123"
+  "email": "motorista.safeway@example.com",
+  "password": "TesteLocal2026!"
 }
 ```
 
 ---
+
+### Vincular um responsavel existente a um aluno
+
+O `POST /guardians` cadastra um responsavel avulso. Para vincula-lo a um aluno
+ja cadastrado, use os IDs retornados pela API:
+
+```http
+PUT /students/{studentId}/guardians/{guardianId}
+Authorization: Bearer <token>
+```
+
+Nao ha corpo na requisicao. O retorno e `204 No Content`. Repetir a chamada
+nao duplica o vinculo; um vinculo anteriormente removido e reativado.
+O aluno deve estar ativo no transporte atual, e o responsavel deve estar ativo
+e acessivel ao usuario autenticado (proprio ou ja vinculado ao transporte).
+
+| Metodo | Rota | Descricao |
+|--------|------|-----------|
+| `GET` | `/students/{studentId}/guardians` | Listar responsaveis ativos vinculados |
+| `DELETE` | `/students/{studentId}/guardians/{guardianId}` | Remover somente o vinculo, sem excluir o responsavel |
+
+Os endpoints exigem autenticacao. Recursos fora do escopo retornam `404`.
+O cadastro de aluno continua aceitando novos responsaveis pelo campo `guardian`;
+para reutilizar um cadastro existente em outro aluno, use o `PUT` acima.
 
 ## 🗄 Banco de dados
 

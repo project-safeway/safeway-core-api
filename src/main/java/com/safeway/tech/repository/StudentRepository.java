@@ -14,15 +14,18 @@ import java.util.UUID;
 public interface StudentRepository extends JpaRepository<Student, UUID> {
 
     @Query("SELECT s FROM Student s JOIN GuardianStudent gs ON gs.student = s " +
-            "WHERE s.id IN :ids AND gs.guardian.user.id = :userId")
+            "WHERE s.id IN :ids AND gs.guardian.user.id = :userId " +
+            "AND s.active = true AND gs.active = true AND gs.guardian.active = true")
     List<Student> findByIdInAndUserId(@Param("ids") List<UUID> ids, @Param("userId") UUID userId);
 
     @Query("SELECT s FROM Student s JOIN GuardianStudent gs ON gs.student = s " +
-            "WHERE s.active = true AND gs.guardian.user.id = :userId")
+            "WHERE s.active = true AND gs.guardian.user.id = :userId " +
+            "AND gs.active = true AND gs.guardian.active = true")
     List<Student> findAllByActiveTrueAndUserId(@Param("userId") UUID userId);
 
     @Query("SELECT s FROM Student s JOIN GuardianStudent gs ON gs.student = s " +
-            "WHERE s.id = :studentId AND gs.guardian.user.id = :userId AND s.active = true")
+            "WHERE s.id = :studentId AND gs.guardian.user.id = :userId AND s.active = true " +
+            "AND gs.active = true AND gs.guardian.active = true")
     Optional<Student> findByIdAndUserId(@Param("studentId") UUID studentId, @Param("userId") UUID userId);
 
     @Query("SELECT s FROM Student s WHERE s.transport.id = :transportId AND s.active = true")

@@ -1,7 +1,7 @@
 services:
-  mysql1:
+  core_db:
     image: mysql
-    container_name: safeway_core
+    container_name: safeway_core_db
     ports:
       - "3306:3306"
     expose:
@@ -12,9 +12,9 @@ services:
       - MYSQL_DATABASE=safeway_core
       - MYSQL_ROOT_PASSWORD=urubu100
 
-  mysql2:
+  financial_db:
     image: mysql
-    container_name: safeway_financial
+    container_name: safeway_financial_db
     ports:
       - "3307:3306"
     expose:
@@ -24,6 +24,20 @@ services:
       - MYSQL_PASSWORD=urubu100
       - MYSQL_DATABASE=safeway_financial
       - MYSQL_ROOT_PASSWORD=urubu100
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: safeway-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+
   redis:
     image: redis:7-alpine
     container_name: redis
@@ -54,3 +68,4 @@ networks:
 volumes:
   redis_data:
   redisinsight_data:
+  rabbitmq_data:

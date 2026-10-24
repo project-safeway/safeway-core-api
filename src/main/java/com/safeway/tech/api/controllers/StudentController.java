@@ -3,10 +3,12 @@ package com.safeway.tech.api.controllers;
 import com.safeway.tech.api.dto.student.StudentFeignResponse;
 import com.safeway.tech.api.dto.student.StudentRequest;
 import com.safeway.tech.api.dto.student.StudentResponse;
+import com.safeway.tech.api.dto.guardian.GuardianResponse;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.service.mappers.StudentMapper;
-import com.safeway.tech.service.services.GuardianService;
+import com.safeway.tech.service.mappers.GuardianMapper;
 import com.safeway.tech.service.services.StudentService;
+import com.safeway.tech.service.services.GuardianService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -66,6 +68,26 @@ public class StudentController {
     public ResponseEntity<Void> delete(@PathVariable UUID studentId) {
         studentService.deleteForCurrentTransport(studentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/{studentId}/guardians")
+    public ResponseEntity<List<GuardianResponse>> findGuardians(@PathVariable UUID studentId) {
+        List<GuardianResponse> response = studentService.findGuardians(studentId).stream()
+                .map(GuardianMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{studentId}/guardians/{guardianId}")
+    public ResponseEntity<Void> addGuardian(@PathVariable UUID studentId, @PathVariable UUID guardianId) {
+        studentService.addGuardian(studentId, guardianId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{studentId}/guardians/{guardianId}")
+    public ResponseEntity<Void> removeGuardian(@PathVariable UUID studentId, @PathVariable UUID guardianId) {
+        studentService.removeGuardian(studentId, guardianId);
+        return ResponseEntity.noContent().build();
     }
 
     /*

@@ -1,0 +1,17 @@
+{
+  "name": "Responsavel Avulso Teste",
+  "primaryPhoneNumber": "11900000003",
+  "secondaryPhoneNumber": null,
+  "email": "responsavel.avulso@example.com",
+  "address": {
+    "street": "Avenida Goiás",
+    "number": "3400",
+    "additionalDetails": null,
+    "neighborhood": "Barcelona",
+    "city": "São Caetano do Sul",
+    "federalUnit": "SP",
+    "zipCode": "09550-051",
+    "type": "PONTO_DE_ENCONTRO",
+    "principal": true
+  }
+}

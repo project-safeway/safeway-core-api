@@ -11,11 +11,13 @@ import com.safeway.tech.infra.exception.OperationNotAllowedException;
 import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.infra.messaging.publishers.EventPublisher;
 import com.safeway.tech.repository.StudentRepository;
+import com.safeway.tech.repository.GuardianRepository;
 import com.safeway.tech.repository.GuardianStudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +33,7 @@ public class StudentService {
     private final CurrentUserService currentUserService;
     private final GuardianService guardianService;
     private final GuardianStudentRepository guardianStudentRepository;
+    private final GuardianRepository guardianRepository;
 
     public Student findById(UUID studentId) {
         UUID userId = currentUserService.getCurrentUserId();
@@ -62,10 +65,7 @@ public class StudentService {
 
         for (var guardianRequest : request.guardian()) {
             Guardian guardian = guardianService.createPreRegistrationGuardian(guardianRequest);
-            GuardianStudent guardianStudent = new GuardianStudent();
-            guardianStudent.setGuardian(guardian);
-            guardianStudent.setStudent(student);
-            guardianStudentRepository.save(guardianStudent);
+            linkGuardian(guardian, student);
         }
 
         eventPublisher.publishStudentCreated(student, userId);
@@ -147,6 +147,44 @@ public class StudentService {
         UUID transportId = currentUserService.getCurrentTransportId();
         return studentRepository.findByIdAndTransportIdAndActiveTrue(studentId, transportId)
                 .orElseThrow(() -> new EntityNotFoundException("Student was not found"));
+    }
+
+    public List<Guardian> findGuardians(UUID studentId) {
+        Student student = findByIdForCurrentTransport(studentId);
+        return guardianRepository.findByStudentIdAndTransportId(
+                student.getId(), student.getTransport().getId());
+    }
+
+    @Transactional
+    public void addGuardian(UUID studentId, UUID guardianId) {
+        Student student = findByIdForCurrentTransport(studentId);
+        Guardian guardian = guardianService.findById(guardianId);
+        linkGuardian(guardian, student);
+    }
+
+    @Transactional
+    public void removeGuardian(UUID studentId, UUID guardianId) {
+        findByIdForCurrentTransport(studentId);
+        GuardianStudent link = guardianStudentRepository.findByGuardianIdAndStudentId(guardianId, studentId)
+                .filter(GuardianStudent::isActive)
+                .orElseThrow(() -> new EntityNotFoundException("Guardian link was not found"));
+        link.setActive(false);
+        link.setDeletedAt(Instant.now());
+        guardianStudentRepository.save(link);
+    }
+
+    private void linkGuardian(Guardian guardian, Student student) {
+        GuardianStudent link = guardianStudentRepository
+                .findByGuardianIdAndStudentId(guardian.getId(), student.getId())
+                .orElseGet(() -> {
+                    GuardianStudent newLink = new GuardianStudent();
+                    newLink.setGuardian(guardian);
+                    newLink.setStudent(student);
+                    return newLink;
+                });
+        link.setActive(true);
+        link.setDeletedAt(null);
+        guardianStudentRepository.save(link);
     }
 
     private void applyData(Student student, StudentRequest request) {

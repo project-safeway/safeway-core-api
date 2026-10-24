@@ -1,6 +1,7 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.route.RouteSchoolRequest;
+import com.safeway.tech.api.dto.route.RouteStopResponse;
 import com.safeway.tech.api.dto.route.RouteUpdateRequest.RouteStopUpdate;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Route;
@@ -10,6 +11,7 @@ import com.safeway.tech.infra.exception.CoordinatesNotValidException;
 import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.RouteRepository;
 import com.safeway.tech.repository.RouteSchoolRepository;
+import com.safeway.tech.service.mappers.RouteMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,14 @@ public class RouteSchoolService {
 
     public void saveAll(List<RouteSchool> schools) {
         routeSchoolRepository.saveAll(schools);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RouteStopResponse> findStops(UUID routeId) {
+        return routeSchoolRepository.findByRouteId(routeId).stream()
+                .filter(routeSchool -> routeSchool.isActive() && routeSchool.getSchool().isActive())
+                .map(RouteMapper::toStopResponse)
+                .toList();
     }
 
     @Transactional

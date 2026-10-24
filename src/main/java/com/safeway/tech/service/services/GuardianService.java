@@ -35,6 +35,10 @@ public class GuardianService {
         return guardianRepository.findByOwnerOrTransport(userId, transportId);
     }
 
+    public List<Guardian> listByStudent(UUID studentId) {
+        return guardianRepository.findByStudentIdAndTransportId(studentId, currentUserService.getCurrentTransportId());
+    }
+
     @Transactional
     public Guardian createGuardian(GuardianRequest request) {
         return createGuardian(request, true);

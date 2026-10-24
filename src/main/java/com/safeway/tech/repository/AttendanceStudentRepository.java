@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,4 +17,7 @@ public interface AttendanceStudentRepository extends JpaRepository<AttendanceStu
     Optional<AttendanceStudent> findByAttendanceAndStudent(
             @Param("attendance") Attendance attendance,
             @Param("student") Student student);
+
+    @Query("SELECT ca FROM AttendanceStudent ca WHERE ca.attendance.id = :attendanceId ORDER BY ca.date ASC")
+    List<AttendanceStudent> findByAttendanceId(@Param("attendanceId") UUID attendanceId);
 }

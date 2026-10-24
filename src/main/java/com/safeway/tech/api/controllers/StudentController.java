@@ -5,6 +5,7 @@ import com.safeway.tech.api.dto.student.StudentRequest;
 import com.safeway.tech.api.dto.student.StudentResponse;
 import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.service.mappers.StudentMapper;
+import com.safeway.tech.service.services.GuardianService;
 import com.safeway.tech.service.services.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,26 +29,27 @@ import java.util.UUID;
 public class StudentController {
 
     private final StudentService studentService;
+    private final GuardianService guardianService;
 
     @PostMapping
     public ResponseEntity<StudentResponse> create(
             @RequestBody @Valid StudentRequest request
     ) {
-        StudentResponse response = StudentMapper.toResponse(studentService.create(request));
+        StudentResponse response = toResponse(studentService.create(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<StudentResponse>> findAll() {
         List<StudentResponse> response = studentService.findAllForCurrentTransport().stream()
-                .map(StudentMapper::toResponse)
+                .map(this::toResponse)
                 .toList();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{studentId}")
     public ResponseEntity<StudentResponse> findById(@PathVariable UUID studentId) {
-        StudentResponse response = StudentMapper.toResponse(studentService.findByIdForCurrentTransport(studentId));
+        StudentResponse response = toResponse(studentService.findByIdForCurrentTransport(studentId));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -56,8 +58,7 @@ public class StudentController {
             @PathVariable UUID studentId,
             @RequestBody @Valid StudentRequest request
     ) {
-        StudentResponse response = StudentMapper.toResponse(
-                studentService.updateForCurrentTransport(studentId, request));
+        StudentResponse response = toResponse(studentService.updateForCurrentTransport(studentId, request));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -92,5 +93,9 @@ public class StudentController {
         List<Student> students = studentService.batchFindById(ids);
         List<StudentFeignResponse> response = students.stream().map(StudentMapper::toFeignResponse).toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    private StudentResponse toResponse(Student student) {
+        return StudentMapper.toResponse(student, guardianService.listByStudent(student.getId()));
     }
 }

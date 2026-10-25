@@ -8,6 +8,7 @@ import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.service.mappers.StudentMapper;
 import com.safeway.tech.service.mappers.GuardianMapper;
 import com.safeway.tech.service.services.StudentService;
+import com.safeway.tech.service.services.StudentFinancialService;
 import com.safeway.tech.service.services.GuardianService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class StudentController {
 
     private final StudentService studentService;
     private final GuardianService guardianService;
+    private final StudentFinancialService studentFinancialService;
 
     @PostMapping
     public ResponseEntity<StudentResponse> create(
@@ -98,22 +100,19 @@ public class StudentController {
 
     @GetMapping("/feign/{studentId}")
     public ResponseEntity<StudentFeignResponse> findByIdFeign(@PathVariable UUID studentId) {
-        Student student = studentService.findById(studentId);
-        StudentFeignResponse response = StudentMapper.toFeignResponse(student);
+        StudentFeignResponse response = studentFinancialService.findById(studentId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/ativos")
     public ResponseEntity<List<StudentFeignResponse>> findAllActive() {
-        List<Student> students = studentService.findAllActive();
-        List<StudentFeignResponse> response = students.stream().map(StudentMapper::toFeignResponse).toList();
+        List<StudentFeignResponse> response = studentFinancialService.findAllActive();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/lote")
     public ResponseEntity<List<StudentFeignResponse>> batchFindById(@RequestBody List<UUID> ids) {
-        List<Student> students = studentService.batchFindById(ids);
-        List<StudentFeignResponse> response = students.stream().map(StudentMapper::toFeignResponse).toList();
+        List<StudentFeignResponse> response = studentFinancialService.batchFindById(ids);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

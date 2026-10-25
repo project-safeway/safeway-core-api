@@ -1,11 +1,13 @@
 package com.safeway.tech.api.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.UUID;
 
 public record UserFeignResponse(
         UUID id,
-        String name,
+        @JsonProperty("nome") String name,
         String email,
-        Boolean active
+        @JsonProperty("ativo") Boolean active
 ) {
 }

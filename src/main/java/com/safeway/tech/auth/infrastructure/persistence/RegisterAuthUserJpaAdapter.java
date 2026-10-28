@@ -4,10 +4,10 @@ import com.safeway.tech.auth.core.model.RegisterAuthUserData;
 import com.safeway.tech.auth.core.model.RegisteredAuthUser;
 import com.safeway.tech.auth.core.port.RegisterAuthUserPort;
 import com.safeway.tech.domain.enums.UserRole;
-import com.safeway.tech.domain.models.Transporte;
-import com.safeway.tech.domain.models.Usuario;
-import com.safeway.tech.repository.TransporteRepository;
-import com.safeway.tech.repository.UsuarioRepository;
+import com.safeway.tech.domain.models.Transport;
+import com.safeway.tech.domain.models.User;
+import com.safeway.tech.repository.TransportRepository;
+import com.safeway.tech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,38 +16,39 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RegisterAuthUserJpaAdapter implements RegisterAuthUserPort {
 
-    private final UsuarioRepository usuarioRepository;
-    private final TransporteRepository transporteRepository;
+    private final UserRepository userRepository;
+    private final TransportRepository transportRepository;
 
     @Override
     public boolean existsByEmail(String email) {
-        return usuarioRepository.existsByEmail(email);
+        return userRepository.existsByEmail(email);
     }
 
     @Override
-    public boolean existsByPlaca(String placa) {
-        return transporteRepository.findByPlaca(placa).isPresent();
+    public boolean existsByLicensePlate(String licensePlate) {
+        return transportRepository.findByLicensePlate(licensePlate).isPresent();
     }
 
     @Override
     @Transactional
     public RegisteredAuthUser create(RegisterAuthUserData data) {
-        Usuario usuario = new Usuario();
-        usuario.setNome(data.nome());
-        usuario.setEmail(data.email());
-        usuario.setPasswordHash(data.passwordHash());
-        usuario.setRole(UserRole.COMMON);
-        usuario.setTel1(data.telefone());
-        Usuario savedUser = usuarioRepository.save(usuario);
 
-        Transporte transporte = new Transporte();
-        transporte.setPlaca(data.transportePlaca());
-        transporte.setModelo(data.transporteModelo());
-        transporte.setCapacidade(data.transporteCapacidade());
-        transporte.setUsuario(savedUser);
-        Transporte savedTransporte = transporteRepository.save(transporte);
+        Transport transport = new Transport();
+        transport.setLicensePlate(data.transportLicensePlate());
+        transport.setModel(data.transportModel());
+        transport.setCapacity(data.transportCapacity());
+        Transport savedTransport = transportRepository.save(transport);
 
-        return new RegisteredAuthUser(savedUser.getId(), savedTransporte.getId());
+        User user = new User();
+        user.setName(data.name());
+        user.setEmail(data.email());
+        user.setPasswordHash(data.passwordHash());
+        user.setRole(UserRole.DRIVER);
+        user.setPrimaryPhoneNumber(data.phoneNumber());
+        user.setTransport(savedTransport);
+        User savedUser = userRepository.save(user);
+
+        return new RegisteredAuthUser(savedUser.getId(), savedTransport.getId());
     }
 }
 

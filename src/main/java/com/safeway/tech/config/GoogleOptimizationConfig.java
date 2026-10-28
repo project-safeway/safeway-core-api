@@ -23,7 +23,7 @@ public class GoogleOptimizationConfig {
     @Bean
     public GeoApiContext geoApiContext() {
         if (apiKey == null || apiKey.isEmpty() || apiKey.equals("${google.maps.api.key}")) {
-            throw new IllegalStateException("Google Maps API Key não configurada corretamente no application.properties!");
+            throw new IllegalStateException("Google Maps API key is not configured correctly in application.properties!");
         }
 
         return new GeoApiContext.Builder()

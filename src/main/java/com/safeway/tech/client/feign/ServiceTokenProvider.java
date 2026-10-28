@@ -33,11 +33,11 @@ public class ServiceTokenProvider {
     public synchronized String getServiceToken() {
 
         if (cachedToken != null && tokenExpiration != null && Instant.now().isBefore(tokenExpiration)) {
-            log.debug("Usando token de serviço em cache, expira em: {}", tokenExpiration);
+            log.debug("Using cached service token, expires at: {}", tokenExpiration);
             return cachedToken;
         }
 
-        log.info("Solicitando novo token de serviço ao Auth V2");
+        log.info("Requesting a new service token from Auth V2");
 
         WebClient client = webClientBuilder.baseUrl(authServiceBaseUrl).build();
         ServiceTokenResponse response = client.post()
@@ -48,19 +48,14 @@ public class ServiceTokenProvider {
                 .block();
 
         if (response == null || response.accessToken() == null || response.expiresIn() == null) {
-            throw new IllegalStateException("Resposta inválida ao solicitar token de serviço no Auth V2");
+            throw new IllegalStateException("Invalid response when requesting a service token from Auth V2");
         }
 
         cachedToken = response.accessToken();
         tokenExpiration = Instant.now().plusSeconds(response.expiresIn()).minusSeconds(60);
 
-        log.info("Token de serviço gerado, expira em: {}", tokenExpiration);
+        log.info("Service token generated, expires at: {}", tokenExpiration);
         return cachedToken;
-    }
-
-    public synchronized void invalidateToken() {
-        cachedToken = null;
-        tokenExpiration = null;
     }
 
     private record ServiceTokenRequest(String clientId, String clientSecret) {

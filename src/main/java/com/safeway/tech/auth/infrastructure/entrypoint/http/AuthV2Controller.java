@@ -3,7 +3,7 @@ package com.safeway.tech.auth.infrastructure.entrypoint.http;
 import com.safeway.tech.auth.core.application.LoginCommand;
 import com.safeway.tech.auth.core.application.LoginResult;
 import com.safeway.tech.auth.core.application.LoginUseCase;
-import com.safeway.tech.auth.core.application.RegisterTransporteCommand;
+import com.safeway.tech.auth.core.application.RegisterTransportCommand;
 import com.safeway.tech.auth.core.application.RegisterUserCommand;
 import com.safeway.tech.auth.core.application.RegisterUserUseCase;
 import com.safeway.tech.auth.infrastructure.entrypoint.dto.AuthResponseV2;
@@ -41,31 +41,31 @@ public class AuthV2Controller {
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequestV2 request) {
         RegisterUserCommand command = new RegisterUserCommand(
-                request.nome(),
+                request.name(),
                 request.email(),
-                request.senha(),
-                request.telefone(),
-                new RegisterTransporteCommand(
-                        request.transporte().placa(),
-                        request.transporte().modelo(),
-                        request.transporte().capacidade()
+                request.password(),
+                request.phoneNumber(),
+                new RegisterTransportCommand(
+                        request.transport().licensePlate(),
+                        request.transport().model(),
+                        request.transport().capacity()
                 )
         );
 
         registerUserUseCase.execute(command);
-        return ResponseEntity.ok("Usuário registrado com sucesso!");
+        return ResponseEntity.ok("User registered successfully!");
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseV2> login(@Valid @RequestBody LoginRequestV2 request) {
-        LoginResult result = loginUseCase.execute(new LoginCommand(request.email(), request.senha()));
+        LoginResult result = loginUseCase.execute(new LoginCommand(request.email(), request.password()));
 
         AuthResponseV2 response = new AuthResponseV2(
                 result.accessToken(),
                 result.expiresIn(),
-                result.nomeUsuario(),
+                result.username(),
                 result.userId(),
-                result.idTransporte()
+                result.transportId()
         );
 
         return ResponseEntity.ok(response);
@@ -74,7 +74,7 @@ public class AuthV2Controller {
     @PostMapping("/token/service")
     public ResponseEntity<ServiceTokenResponseV2> issueServiceToken(@Valid @RequestBody ServiceTokenRequestV2 request) {
         if (!serviceClientId.equals(request.clientId()) || !serviceClientSecret.equals(request.clientSecret())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais de serviço inválidas");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid service credentials");
         }
 
         var issuedToken = serviceJwtTokenIssuer.issueFor(request.clientId());

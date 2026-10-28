@@ -1,0 +1,4 @@
+{
+  "clientId": "{{serviceClientId}}",
+  "clientSecret": "{{serviceClientSecret}}"
+}

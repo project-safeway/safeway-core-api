@@ -1,0 +1,29 @@
+{
+  "name": "Aluno Teste Dois",
+  "professor": "Professor Teste Dois",
+  "birthdate": "2009-08-20",
+  "grade": 2,
+  "classroom": "B",
+  "monthlyFee": 480.0,
+  "dueDate": 15,
+  "guardian": [
+    {
+      "name": "Responsavel Teste Dois",
+      "primaryPhoneNumber": "11900000005",
+      "secondaryPhoneNumber": null,
+      "email": "responsavel.dois@example.com",
+      "address": {
+        "street": "Avenida Goiás",
+        "number": "3400",
+        "additionalDetails": null,
+        "neighborhood": "Barcelona",
+        "city": "São Caetano do Sul",
+        "federalUnit": "SP",
+        "zipCode": "09550-051",
+        "type": "PONTO_DE_ENCONTRO",
+        "principal": true
+      }
+    }
+  ],
+  "schoolId": "{{schoolId}}"
+}

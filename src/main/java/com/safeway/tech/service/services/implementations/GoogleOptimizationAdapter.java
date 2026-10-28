@@ -1,13 +1,15 @@
 package com.safeway.tech.service.services.implementations;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.safeway.tech.api.dto.route.google.Location;
+import com.safeway.tech.api.dto.route.google.RouteMetrics;
+import com.safeway.tech.api.dto.route.google.OptimizedStop;
+import com.safeway.tech.api.dto.route.google.RouteRequest;
+import com.safeway.tech.api.dto.route.google.RouteResponse;
+import com.safeway.tech.api.dto.route.google.StopPoint;
+import com.safeway.tech.api.dto.route.google.Vehicle;
 import com.safeway.tech.client.GoogleOptimizationClient;
-import com.safeway.tech.api.dto.rotas.Localizacao;
-import com.safeway.tech.api.dto.rotas.MetricasRota;
-import com.safeway.tech.api.dto.rotas.ParadaOtimizada;
-import com.safeway.tech.api.dto.rotas.RotasRequest;
-import com.safeway.tech.api.dto.rotas.RotasResponse;
-import com.safeway.tech.service.services.RotasService;
+import com.safeway.tech.service.services.IOptimizerService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,140 +17,203 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service("googleOptimization")
-public class GoogleOptimizationAdapter implements RotasService {
+public class GoogleOptimizationAdapter implements IOptimizerService {
 
-    private final GoogleOptimizationClient cliente;
+    private final GoogleOptimizationClient client;
 
-    public GoogleOptimizationAdapter(GoogleOptimizationClient cliente) {
-        this.cliente = cliente;
+    public GoogleOptimizationAdapter(GoogleOptimizationClient client) {
+        this.client = client;
     }
 
     @Override
     @SuppressWarnings("MethodLength")
-    public RotasResponse otimizarRota(RotasRequest request) {
+    public RouteResponse optimizeRoute(RouteRequest request) {
         try {
-            JsonNode response = cliente.otimizarRotas(request);
-            RotasResponse bruto = parseResposta(response, request);
+            validateRequest(request);
+            JsonNode response = client.optimizeRoute(request);
+            RouteResponse rawResponse = parseResponse(response, request);
 
-            // Se nao for para otimizar a ordem, reordena de volta para a ordem original enviada pelo front
-            if (!Boolean.TRUE.equals(request.otimizarOrdem())) {
-                // Mapa de ordem original por idParada
-                Map<String, Integer> ordemOriginal = new HashMap<>();
+            // Se nao for para otimizar a order, reordena de volta para a order original enviada pelo front
+            if (!Boolean.TRUE.equals(request.mustOptimizeOrder())) {
+                // Map original order by stopId.
+                Map<String, Integer> originalOrder = new HashMap<>();
                 int idx = 0;
-                for (var p : request.pontosParada()) {
-                    // se o request tiver campo ordem, use-o; caso contrario, use o indice
-                    int ordem = p.ordem() != null ? p.ordem() : idx;
-                    ordemOriginal.put(p.id(), ordem);
+                for (StopPoint stopPoint : request.stoppingPoint()) {
+                    // se o request tiver campo order, use-o; caso contrario, use o indice
+                    int order = stopPoint.order() != null ? stopPoint.order() : idx;
+                    originalOrder.put(stopPoint.id(), order);
                     idx++;
                 }
 
-                List<ParadaOtimizada> reordenadas = new ArrayList<>(bruto.paradas());
-                reordenadas.sort(Comparator.comparingInt(p -> ordemOriginal.getOrDefault(p.idParada(), Integer.MAX_VALUE)));
+                List<OptimizedStop> reordered = new ArrayList<>(rawResponse.stops());
+                reordered.sort(Comparator.comparingInt(optimizedStop ->
+                        originalOrder.getOrDefault(optimizedStop.stopId(), Integer.MAX_VALUE)));
 
-                return new RotasResponse(
-                        bruto.distanciaTotal(),
-                        bruto.tempoTotal(),
-                        reordenadas,
-                        bruto.metricas(),
-                        bruto.provedor()
+                return new RouteResponse(
+                        rawResponse.totalDistance(),
+                        rawResponse.totalTime(),
+                        reordered,
+                        rawResponse.metrics(),
+                        rawResponse.provider()
                 );
             }
 
-            return bruto;
+            return rawResponse;
         } catch (Exception e) {
-            throw new RuntimeException("Falha ao otimizar rota com Google: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to optimize route with Google: " + e.getMessage(), e);
         }
     }
 
     @SuppressWarnings("MethodLength")
-    private RotasResponse parseResposta(JsonNode response, RotasRequest request) {
-        List<ParadaOtimizada> paradas = new ArrayList<>();
-        List<MetricasRota> metricas = new ArrayList<>();
-        double distanciaTotal = 0D;
-        long tempoTotal = 0L;
+    private RouteResponse parseResponse(JsonNode response, RouteRequest request) {
+        List<OptimizedStop> stops = new ArrayList<>();
+        List<RouteMetrics> metrics = new ArrayList<>();
+        double totalDistance = 0D;
+        long totalTime = 0L;
 
-        // Mapa de fallback para coordenadas por label
-        Map<String, Localizacao> locaisPorId = new HashMap<>();
-        for (var p : request.pontosParada()) {
-            locaisPorId.put(p.id(), p.localizacao());
+        if (response == null || response.isNull()) {
+            throw new IllegalStateException("Google optimization returned an empty response");
+        }
+
+        // Fallback map of coordinates by label.
+        Map<String, Location> locationById = new HashMap<>();
+        for (StopPoint stopPoint : request.stoppingPoint()) {
+            locationById.put(stopPoint.id(), stopPoint.location());
         }
 
         JsonNode routes = response.path("routes");
+        if (!routes.isArray() || routes.isEmpty()) {
+            throw new IllegalStateException("Google optimization returned no routes");
+        }
+        Set<String> optimizedStopIds = new HashSet<>();
         for (JsonNode rota : routes) {
-            String idVeiculo = rota.path("vehicleLabel").asText("vehicle-1");
+            String vehicleId = rota.path("vehicleLabel").asText("vehicle-1");
             JsonNode visits = rota.path("visits");
             JsonNode transitions = rota.path("transitions");
+            JsonNode routeMetrics = rota.path("metrics");
+            if (!visits.isArray() || !transitions.isArray() || routeMetrics.isMissingNode()) {
+                throw new IllegalStateException("Google optimization returned incomplete route data");
+            }
             for (int i = 0; i < visits.size(); i++) {
                 JsonNode visit = visits.get(i);
-                JsonNode transition = (transitions != null && i < transitions.size()) ? transitions.get(i) : null;
-                String idParada = visit.path("shipmentLabel").asText();
+                if (i >= transitions.size()) {
+                    throw new IllegalStateException("Google optimization omitted a stop transition");
+                }
+                JsonNode transition = transitions.get(i);
+                String stopId = visit.path("shipmentLabel").asText();
+                if (stopId.isBlank() || !locationById.containsKey(stopId) || !optimizedStopIds.add(stopId)) {
+                    throw new IllegalStateException("Google optimization returned an unknown or duplicate stop");
+                }
 
-                // Horário de chegada: usar visit.startTime; se ausente, usar transitions[i].endTime
-                String horarioChegada = visit.path("startTime").asText("");
-                if (horarioChegada == null || horarioChegada.isBlank()) {
+                // Use visit.startTime for arrival; fall back to transitions[i].endTime if absent.
+                String arrivalTime = visit.path("startTime").asText("");
+                if (arrivalTime == null || arrivalTime.isBlank()) {
                     if (transition != null) {
                         String endTime = transition.path("endTime").asText("");
                         if (endTime != null && !endTime.isBlank()) {
-                            horarioChegada = endTime;
+                            arrivalTime = endTime;
                         }
                     }
                 }
 
-                double distanciaAteAqui = 0D;
-                long tempoViagem = 0L;
-                if (transition != null) {
-                    distanciaAteAqui = transition.path("travelDistanceMeters").asDouble(0D);
-                    tempoViagem = parseDuracao(transition.path("travelDuration").asText());
-                }
+                double travelDistance = requiredNonNegativeDouble(transition, "travelDistanceMeters");
+                long travelDuration = parseDuration(transition.path("travelDuration").asText());
 
-                // Localização: tentar arrivalLocation(.latLng), se não houver, usar fallback do request por idParada
+                // Try arrivalLocation(.latLng); otherwise use the request fallback for this stopId.
                 JsonNode arrivalLocation = visit.path("arrivalLocation");
                 JsonNode latLngNode = arrivalLocation.has("latLng") ? arrivalLocation.path("latLng") : arrivalLocation;
-                boolean temCoordsResposta = latLngNode.has("latitude") && latLngNode.has("longitude");
-                double lat = temCoordsResposta ? latLngNode.path("latitude").asDouble() : Double.NaN;
-                double lng = temCoordsResposta ? latLngNode.path("longitude").asDouble() : Double.NaN;
+                boolean hasCoordinates = latLngNode.hasNonNull("latitude") && latLngNode.hasNonNull("longitude");
+                double lat = hasCoordinates ? latLngNode.path("latitude").asDouble(Double.NaN) : Double.NaN;
+                double lng = hasCoordinates ? latLngNode.path("longitude").asDouble(Double.NaN) : Double.NaN;
 
-                if (Double.isNaN(lat) || Double.isNaN(lng)) {
-                    Localizacao fallback = locaisPorId.get(idParada);
-                    if (fallback != null) {
-                        lat = fallback.lat();
-                        lng = fallback.lng();
-                    } else {
-                        // último recurso: 0,0 (evitar NPEs)
-                        lat = 0D;
-                        lng = 0D;
+                if (!isValidCoordinate(lat, lng)) {
+                    Location fallback = locationById.get(stopId);
+                    if (fallback == null || !isValidCoordinate(fallback.lat(), fallback.lng())) {
+                        throw new IllegalStateException("Google optimization returned invalid stop coordinates");
                     }
+                    lat = fallback.lat();
+                    lng = fallback.lng();
                 }
 
-                paradas.add(new ParadaOtimizada(idParada, new Localizacao(lat, lng), horarioChegada, distanciaAteAqui, tempoViagem));
+                stops.add(new OptimizedStop(stopId, new Location(lat, lng), arrivalTime, travelDistance, travelDuration));
             }
-            JsonNode m = rota.path("metrics");
-            double distRota = m.path("travelDistanceMeters").asDouble(0D);
-            long durRota = parseDuracao(m.path("travelDuration").asText());
-            metricas.add(new MetricasRota(idVeiculo, distRota, durRota, m.path("performedShipmentCount").asInt(0)));
-            distanciaTotal += distRota;
-            tempoTotal += durRota;
+            double routeDistance = requiredNonNegativeDouble(routeMetrics, "travelDistanceMeters");
+            long routeDuration = parseDuration(routeMetrics.path("travelDuration").asText());
+            JsonNode performedShipmentCount = routeMetrics.path("performedShipmentCount");
+            if (!performedShipmentCount.canConvertToInt() || performedShipmentCount.asInt() < 0) {
+                throw new IllegalStateException("Google optimization returned invalid performed stop count");
+            }
+            metrics.add(new RouteMetrics(
+                    vehicleId, routeDistance, routeDuration, performedShipmentCount.asInt()));
+            totalDistance += routeDistance;
+            totalTime += routeDuration;
         }
-        return new RotasResponse(distanciaTotal, tempoTotal, paradas, metricas, "Google");
+        if (optimizedStopIds.size() != locationById.size()) {
+            throw new IllegalStateException("Google optimization did not return every requested stop");
+        }
+        return new RouteResponse(totalDistance, totalTime, stops, metrics, "Google");
     }
 
-    private long parseDuracao(String dur) {
-        if (dur == null || dur.isEmpty()) {
-            return 0L;
+    private long parseDuration(String duration) {
+        if (duration == null || duration.isEmpty()) {
+            throw new IllegalStateException("Google optimization returned no duration");
         }
-        if (dur.endsWith("s")) {
+        if (duration.endsWith("s")) {
             try {
-                return Long.parseLong(dur.substring(0, dur.length() - 1));
-            } catch (NumberFormatException ignore) {
+                long seconds = Long.parseLong(duration.substring(0, duration.length() - 1));
+                if (seconds < 0) {
+                    throw new IllegalStateException("Google optimization returned a negative duration");
+                }
+                return seconds;
+            } catch (NumberFormatException exception) {
+                throw new IllegalStateException("Google optimization returned an invalid duration", exception);
             }
         }
-        return 0L;
+        throw new IllegalStateException("Google optimization returned an invalid duration");
+    }
+
+    private void validateRequest(RouteRequest request) {
+        if (request == null || request.stoppingPoint() == null || request.stoppingPoint().isEmpty()) {
+            throw new IllegalArgumentException("At least one route stop is required");
+        }
+        Vehicle vehicle = request.vehicle();
+        if (vehicle == null || vehicle.id() == null || vehicle.id().isBlank()
+                || vehicle.intialLocation() == null || vehicle.finalLocation() == null
+                || !isValidCoordinate(vehicle.intialLocation().lat(), vehicle.intialLocation().lng())
+                || !isValidCoordinate(vehicle.finalLocation().lat(), vehicle.finalLocation().lng())) {
+            throw new IllegalArgumentException("A vehicle with valid start and end coordinates is required");
+        }
+        Set<String> stopIds = new HashSet<>();
+        for (StopPoint stop : request.stoppingPoint()) {
+            if (stop == null || stop.id() == null || stop.id().isBlank()
+                    || !stopIds.add(stop.id())
+                    || stop.location() == null
+                    || !isValidCoordinate(stop.location().lat(), stop.location().lng())) {
+                throw new IllegalArgumentException("Route stops require unique ids and valid coordinates");
+            }
+        }
+    }
+
+    private double requiredNonNegativeDouble(JsonNode node, String field) {
+        JsonNode value = node.path(field);
+        if (!value.isNumber() || !Double.isFinite(value.asDouble()) || value.asDouble() < 0) {
+            throw new IllegalStateException("Google optimization returned invalid " + field);
+        }
+        return value.asDouble();
+    }
+
+    private boolean isValidCoordinate(double latitude, double longitude) {
+        return Double.isFinite(latitude) && Double.isFinite(longitude)
+                && latitude >= -90 && latitude <= 90
+                && longitude >= -180 && longitude <= 180;
     }
 
     @Override
-    public String nomeProvedor() {
+    public String providerName() {
         return "Google";
     }
 }

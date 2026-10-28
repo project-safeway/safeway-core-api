@@ -5,9 +5,9 @@ import java.util.UUID;
 public record LoginResult(
         String accessToken,
         long expiresIn,
-        String nomeUsuario,
+        String username,
         UUID userId,
-        UUID idTransporte
+        UUID transportId
 ) {
 }
 

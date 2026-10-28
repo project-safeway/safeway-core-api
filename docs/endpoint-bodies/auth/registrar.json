@@ -1,0 +1,11 @@
+{
+  "name": "Motorista Teste Safeway",
+  "email": "motorista.safeway@example.com",
+  "password": "TesteLocal2026!",
+  "phoneNumber": "11900000001",
+  "transport": {
+    "licensePlate": "TST1A23",
+    "model": "Mercedes-Benz Sprinter",
+    "capacity": 20
+  }
+}

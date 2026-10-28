@@ -30,7 +30,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public TopicExchange alunoExchange() {
+    public TopicExchange studentExchange() {
         return new TopicExchange(rabbitMQProperties.getExchanges().getAluno());
     }
 }

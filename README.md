@@ -19,7 +19,6 @@ otimização de rotas com Google Maps, e muito mais.
 | **Itinerários**  | Criação de itinerários com alunos e escolas associados          |
 | **Rotas**        | Otimização de rotas via Google Maps / Route Optimization API    |
 | **Transportes**  | Cadastro de veículos (modelo, placa, capacidade)                |
-| **Eventos**      | Agenda de eventos com prioridade e tipo                         |
 | **Endereços**    | Gerenciamento de endereços com geocodificação                   |
 | **Financeiro**   | Mensalidades, pagamentos de funcionários e controle de despesas |
 | **Usuários**     | Gestão de contas e perfis de acesso                             |
@@ -76,7 +75,7 @@ src/main/java/com/safeway/tech/
 ## ⚙ Configuração
 
 ```properties
-# JWT — chaves RSA (já inclusas em src/main/resources/keys/)
+# JWT — configure um par RSA local (nao versionar a chave privada)
 jwt.public.key=classpath:keys/pub.key
 jwt.private.key=classpath:keys/pri.key
 # Banco de dados (H2 para dev ou MySQL para produção)
@@ -98,6 +97,12 @@ google.maps.api.key=SEU_API_KEY
 
 ## 🔗 Endpoints principais
 
+Bodies JSON para todos os endpoints que recebem corpo, ordem sugerida de
+execucao e lista dos endpoints sem body estao em
+[docs/endpoint-bodies/README.md](docs/endpoint-bodies/README.md).
+Os exemplos usam enderecos reais de Sao Caetano do Sul/SP e dados pessoais
+ficticios; substitua os placeholders pelos IDs retornados pela sua instancia.
+
 ### Autenticação (`/auth`) — acesso público
 
 | Método | Rota             | Descrição                    |
@@ -111,10 +116,15 @@ POST /auth/register
 
 ```json
 {
-  "nome": "Usuario Teste",
-  "email": "usuario@teste.com",
-  "senha": "senha123",
-  "tel1": "11999999999"
+  "name": "Motorista Teste Safeway",
+  "email": "motorista.safeway@example.com",
+  "password": "TesteLocal2026!",
+  "phoneNumber": "11900000001",
+  "transport": {
+    "licensePlate": "TST1A23",
+    "model": "Mercedes-Benz Sprinter",
+    "capacity": 20
+  }
 }
 ```
 
@@ -124,19 +134,56 @@ POST /auth/login
 
 ```json
 {
-  "email": "usuario@teste.com",
-  "senha": "senha123"
+  "email": "motorista.safeway@example.com",
+  "password": "TesteLocal2026!"
 }
 ```
 
 ---
 
+### Vincular um responsavel existente a um aluno
+
+O `POST /guardians` cadastra um responsavel avulso. Para vincula-lo a um aluno
+ja cadastrado, use os IDs retornados pela API:
+
+```http
+PUT /students/{studentId}/guardians/{guardianId}
+Authorization: Bearer <token>
+```
+
+Nao ha corpo na requisicao. O retorno e `204 No Content`. Repetir a chamada
+nao duplica o vinculo; um vinculo anteriormente removido e reativado.
+O aluno deve estar ativo no transporte atual, e o responsavel deve estar ativo
+e acessivel ao usuario autenticado (proprio ou ja vinculado ao transporte).
+
+| Metodo | Rota | Descricao |
+|--------|------|-----------|
+| `GET` | `/students/{studentId}/guardians` | Listar responsaveis ativos vinculados |
+| `DELETE` | `/students/{studentId}/guardians/{guardianId}` | Remover somente o vinculo, sem excluir o responsavel |
+
+Os endpoints exigem autenticacao. Recursos fora do escopo retornam `404`.
+O cadastro de aluno continua aceitando novos responsaveis pelo campo `guardian`;
+para reutilizar um cadastro existente em outro aluno, use o `PUT` acima.
+
 ## 🗄 Banco de dados
 
 ### Principais tabelas
 
-`usuarios` · `alunos` · `escolas` · `enderecos` · `transportes` · `responsaveis` · `chamadas` · `eventos` ·
-`itinerarios` · `mensalidades_aluno` · `pagamentos`
+`users` · `students` · `schools` · `addresses` · `transports` · `guardians` · `chamadas` ·
+`routes` · `mensalidades_aluno` · `pagamentos`
+
+### UUIDs no H2 e MySQL
+
+As migracoes usam `CHAR(36)` para IDs e chaves estrangeiras. O `BaseEntity`
+mapeia UUIDs explicitamente como texto, preservando o formato
+`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` nas gravacoes e consultas.
+
+Registros gravados antes dessa correcao podem conter IDs corrompidos no H2.
+Em desenvolvimento com H2 em memoria (`jdbc:h2:mem:...`), encerrar e iniciar
+a API novamente recria o banco vazio e perde todos os dados dessa instancia.
+Depois disso, cadastre o usuario, faca login e substitua o token no Swagger.
+Em bancos persistentes, preserve os dados e avalie uma migracao antes de alterar
+registros existentes; a mudanca de mapeamento nao repara IDs antigos.
 
 ---
 
@@ -179,13 +226,27 @@ O módulo de rotas utiliza as APIs do Google para:
 
 ## Configurar chaves para JWT
 
-1. Gerar a chave privada
+O login e a validacao de tokens usam `jwt.private.key` e `jwt.public.key`.
+As duas chaves devem pertencer ao mesmo par RSA. A aplicacao recusa a inicializacao
+se uma chave estiver ausente, invalida ou nao corresponder ao par; nao gera chaves temporarias.
+As propriedades `auth.v2.jwt.*` nao sao usadas para carregar as chaves.
 
-    ```bashopenssl genrsa -out pri.key 2048```
+Para criar um novo par local, sem sobrescrever chaves de um ambiente existente:
 
-2. Extrair a chave pública
+```powershell
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out pri.key
+openssl pkey -in pri.key -pubout -out pub.key
+```
 
-   ```bashopenssl rsa -in pri.key -pubout -out pub.key```
+Configure `jwt.private.key` e `jwt.public.key` com os caminhos desses arquivos,
+ou coloque-os em `src/main/resources/keys/` para os caminhos `classpath:` do exemplo.
+Nao versione a chave privada.
+
+Se `/users/me` retornar `401` com `Invalid signature`, confira se o token veio
+do mesmo ambiente e se o login e a API usam o mesmo par. Depois de corrigir as
+chaves, reinicie a API e faca login novamente: tokens assinados com a chave anterior
+nao serao aceitos. No **Authorize** do Swagger, informe apenas o JWT, sem o prefixo
+`Bearer` (o Swagger adiciona esse prefixo).
 
 ---
 
@@ -202,8 +263,6 @@ back-end/
 │   │       ├── application.properties
 │   │       └── keys/               # Chaves RSA (pub.key, pri.key)
 │   └── test/                       # Testes
-├── schema.sql                      # Schema completo do banco
-├── teste-endpoints.md              # Exemplos de teste dos endpoints
 ├── pom.xml                         # Dependências Maven
 ├── mvnw / mvnw.cmd                 # Maven Wrapper
 └── README.md

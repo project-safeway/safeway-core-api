@@ -1,0 +1,15 @@
+{
+  "name": "EME Professora Alcina Dantas Feijao",
+  "educationLevel": "HIGH_SCHOOL",
+  "address": {
+    "street": "Rua Capivari",
+    "number": "500",
+    "additionalDetails": null,
+    "neighborhood": "Nova Gerty",
+    "city": "São Caetano do Sul",
+    "federalUnit": "SP",
+    "zipCode": "09580-370",
+    "type": "ESCOLA",
+    "principal": true
+  }
+}

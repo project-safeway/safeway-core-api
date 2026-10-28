@@ -1,0 +1,7 @@
+{
+  "type": "GENERIC",
+  "studentId": null,
+  "guardianId": null,
+  "targetEmail": "responsavel.convite@example.com",
+  "targetPhoneNumber": "11900000006"
+}

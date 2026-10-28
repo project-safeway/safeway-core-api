@@ -1,0 +1,11 @@
+{
+  "name": "Motorista Teste Safeway Atualizado",
+  "email": "motorista.safeway@example.com",
+  "primaryPhoneNumber": "11900000001",
+  "secondaryPhoneNumber": "11900000002",
+  "transport": {
+    "licensePlate": "TST1A23",
+    "model": "Mercedes-Benz Sprinter",
+    "capacity": 20
+  }
+}

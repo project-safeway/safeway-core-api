@@ -1,0 +1,7 @@
+{
+  "studentIds": [
+    "{{studentId1}}",
+    "{{studentId2}}"
+  ],
+  "preRegistrationGuardianId": null
+}

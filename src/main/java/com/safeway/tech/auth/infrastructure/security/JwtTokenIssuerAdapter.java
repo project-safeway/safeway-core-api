@@ -30,10 +30,12 @@ public class JwtTokenIssuerAdapter implements TokenIssuerPort {
         JwtClaimsSet.Builder claimsBuilder = JwtClaimsSet.builder()
                 .issuer(ISSUER)
                 .subject(authUser.id().toString())
-                .claim("transporte", authUser.idTransporte().toString())
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(EXPIRES_IN_SECONDS))
                 .claim("role", authUser.role());
+        if (authUser.transportId() != null) {
+            claimsBuilder.claim("transport", authUser.transportId().toString());
+        }
 
         String jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claimsBuilder.build())).getTokenValue();
 

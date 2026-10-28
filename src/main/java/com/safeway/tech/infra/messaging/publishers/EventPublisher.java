@@ -1,8 +1,8 @@
 package com.safeway.tech.infra.messaging.publishers;
 
+import com.safeway.tech.domain.models.Student;
 import com.safeway.tech.infra.messaging.config.RabbitMQProperties;
-import com.safeway.tech.infra.messaging.event.AlunoEvent;
-import com.safeway.tech.domain.models.Aluno;
+import com.safeway.tech.infra.messaging.event.StudentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,88 +19,37 @@ public class EventPublisher {
     private final RabbitTemplate rabbitTemplate;
     private final RabbitMQProperties rabbitMQProperties;
 
-    public void publicarAlunoCriado(Aluno aluno) {
-        log.info("Publicando evento de aluno criado: {}", aluno.getId());
-
-        try {
-            AlunoEvent event = new AlunoEvent(
-                    UUID.randomUUID(),
-                    aluno.getId(),
-                    aluno.getUsuario().getId(),
-                    aluno.getNome(),
-                    aluno.getValorMensalidade(),
-                    aluno.getDiaVencimento(),
-                    aluno.getAtivo(),
-                    "ALUNO_CRIADO",
-                    LocalDateTime.now()
-            );
-
-            rabbitTemplate.convertAndSend(
-                    rabbitMQProperties.getExchanges().getAluno(),
-                    rabbitMQProperties.getRoutingKeys().getAlunoCriado(),
-                    event
-            );
-
-            log.info("Evento de aluno criado publicado com sucesso: {}", event.alunoId());
-        } catch (Exception e) {
-            log.error("Erro ao publicar evento de aluno criado", e);
-        }
+    public void publishStudentCreated(Student student, UUID userId) {
+        publish(student, userId, "ALUNO_CRIADO", rabbitMQProperties.getRoutingKeys().getAlunoCriado());
     }
 
-    public void publicarAlunoAtualizado(Aluno aluno) {
-        log.info("Publicando evento de aluno atualizado: {}", aluno.getId());
-
-        try {
-            AlunoEvent event = new AlunoEvent(
-                    UUID.randomUUID(),
-                    aluno.getId(),
-                    aluno.getUsuario().getId(),
-                    aluno.getNome(),
-                    aluno.getValorMensalidade(),
-                    aluno.getDiaVencimento(),
-                    aluno.getAtivo(),
-                    "ALUNO_ATUALIZADO",
-                    LocalDateTime.now()
-            );
-
-            rabbitTemplate.convertAndSend(
-                    rabbitMQProperties.getExchanges().getAluno(),
-                    rabbitMQProperties.getRoutingKeys().getAlunoAtualizado(),
-                    event
-            );
-
-            log.info("Evento de aluno atualizado publicado com sucesso: {}", event.alunoId());
-        } catch (Exception e) {
-            log.error("Erro ao publicar evento de aluno atualizado", e);
-        }
+    public void publishStudentUpdated(Student student, UUID userId) {
+        publish(student, userId, "ALUNO_ATUALIZADO", rabbitMQProperties.getRoutingKeys().getAlunoAtualizado());
     }
 
-    public void publicarAlunoInativado(Aluno aluno) {
-        log.info("Publicando evento de aluno inativado: {}", aluno.getId());
+    public void publishStudentDeactivated(Student student, UUID userId) {
+        publish(student, userId, "ALUNO_INATIVADO", rabbitMQProperties.getRoutingKeys().getAlunoInativado());
+    }
 
-        try {
-            AlunoEvent event = new AlunoEvent(
-                    UUID.randomUUID(),
-                    aluno.getId(),
-                    aluno.getUsuario().getId(),
-                    aluno.getNome(),
-                    aluno.getValorMensalidade(),
-                    aluno.getDiaVencimento(),
-                    aluno.getAtivo(),
-                    "ALUNO_INATIVADO",
-                    LocalDateTime.now()
-            );
-
-            rabbitTemplate.convertAndSend(
-                    rabbitMQProperties.getExchanges().getAluno(),
-                    rabbitMQProperties.getRoutingKeys().getAlunoInativado(),
-                    event
-            );
-
-            log.info("Evento de aluno inativado publicado com sucesso: {}", event.alunoId());
-        } catch (Exception e) {
-            log.error("Erro ao publicar evento de aluno inativado", e);
+    private void publish(Student student, UUID userId, String eventType, String routingKey) {
+        String exchange = rabbitMQProperties.getExchanges().getAluno();
+        if (exchange == null || exchange.isBlank() || routingKey == null || routingKey.isBlank()) {
+            throw new IllegalStateException("Student event exchange and routing key must be configured");
         }
+
+        StudentEvent event = new StudentEvent(
+                UUID.randomUUID(),
+                student.getId(),
+                userId,
+                student.getName(),
+                student.getMonthlyFee(),
+                student.getDueDate(),
+                student.isActive(),
+                eventType,
+                LocalDateTime.now()
+        );
+        log.info("Publishing student event {} for student {}", eventType, student.getId());
+        rabbitTemplate.convertAndSend(exchange, routingKey, event);
     }
 
 }

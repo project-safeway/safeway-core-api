@@ -55,6 +55,7 @@ public class SecurityConfig {
                             "/auth/register",
                             "/auth/token/service"
                     ).permitAll()
+                    .requestMatchers("/guardian-invitations/public/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
                     .anyRequest().authenticated()
                 )
@@ -87,11 +88,11 @@ public class SecurityConfig {
             throw new IllegalStateException("jwt.public.key deve ser configurada para validar tokens JWT");
         }
 
-        RSAPublicKey publicKey = RsaKeyConverters.x509().convert(loadInputStream(publicKeyLocation));
-        return NimbusJwtDecoder.withPublicKey(publicKey).build();
+        try (InputStream publicKeyStream = loadInputStream(publicKeyLocation)) {
+            RSAPublicKey publicKey = RsaKeyConverters.x509().convert(publicKeyStream);
+            return NimbusJwtDecoder.withPublicKey(publicKey).build();
+        }
     }
-
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

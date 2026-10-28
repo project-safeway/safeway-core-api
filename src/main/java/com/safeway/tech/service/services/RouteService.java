@@ -1,6 +1,7 @@
 package com.safeway.tech.service.services;
 
 import com.safeway.tech.api.dto.route.RouteRequest;
+import com.safeway.tech.api.dto.route.RouteStopResponse;
 import com.safeway.tech.api.dto.route.RouteStudentRequest;
 import com.safeway.tech.api.dto.route.RouteUpdateRequest;
 import com.safeway.tech.domain.models.Route;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +36,19 @@ public class RouteService {
         UUID transportId = currentUserService.getCurrentTransportId();
         return routeRepository.findByIdAndTransportId(id, transportId)
                 .orElseThrow(() -> new EntityNotFoundException("Route was not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<RouteStopResponse> findStops(UUID id) {
+        Route route = findById(id);
+
+        List<RouteStopResponse> stops = new ArrayList<>(routeStudentService.findStops(route.getId()));
+        stops.addAll(routeSchoolService.findStops(route.getId()));
+        stops.sort(Comparator
+                .comparing(RouteStopResponse::generalOrder, Comparator.nullsLast(Comparator.<Integer>naturalOrder()))
+                .thenComparing(stop -> "ESCOLA".equals(stop.type()))
+                .thenComparing(RouteStopResponse::specificOrder, Comparator.nullsLast(Comparator.<Integer>naturalOrder())));
+        return stops;
     }
 
     @Transactional

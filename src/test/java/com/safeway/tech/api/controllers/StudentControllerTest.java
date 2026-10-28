@@ -1,8 +1,11 @@
 package com.safeway.tech.api.controllers;
 
+import com.safeway.tech.api.dto.student.StudentFeignResponse;
 import com.safeway.tech.domain.models.Address;
 import com.safeway.tech.domain.models.Guardian;
+import com.safeway.tech.service.services.GuardianService;
 import com.safeway.tech.service.services.StudentService;
+import com.safeway.tech.service.services.StudentFinancialService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,13 +31,20 @@ class StudentControllerTest {
     @Mock
     private StudentService studentService;
 
+    @Mock
+    private GuardianService guardianService;
+
+    @Mock
+    private StudentFinancialService studentFinancialService;
+
     private MockMvc mockMvc;
     private final UUID studentId = UUID.randomUUID();
     private final UUID guardianId = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new StudentController(studentService)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(
+                new StudentController(studentService, guardianService, studentFinancialService)).build();
     }
 
     @Test
@@ -65,5 +75,24 @@ class StudentControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(studentService).removeGuardian(studentId, guardianId);
+    }
+
+    @Test
+    void returnsFinancialContractWithoutGuardianOwnership() throws Exception {
+        UUID transportId = UUID.randomUUID();
+        UUID driverId = UUID.randomUUID();
+        when(studentFinancialService.findById(studentId)).thenReturn(new StudentFeignResponse(
+                studentId, "Student", 500.0, 15, true, transportId, driverId));
+
+        mockMvc.perform(get("/students/feign/{studentId}", studentId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Student"))
+                .andExpect(jsonPath("$.valorMensalidade").value(500.0))
+                .andExpect(jsonPath("$.diaVencimento").value(15))
+                .andExpect(jsonPath("$.ativo").value(true))
+                .andExpect(jsonPath("$.transportId").value(transportId.toString()))
+                .andExpect(jsonPath("$.motoristaId").value(driverId.toString()));
+
+        verify(studentFinancialService).findById(studentId);
     }
 }

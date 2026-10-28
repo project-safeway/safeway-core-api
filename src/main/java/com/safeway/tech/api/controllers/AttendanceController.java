@@ -47,6 +47,7 @@ public class AttendanceController {
 
     private ResponseEntity<AttendanceResponse> updateStatus(UUID attendanceId, AttendanceStatusEnum status) {
         Attendance attendance = attendanceService.updateAttendanceById(attendanceId, status);
-        return ResponseEntity.ok(AttendanceMapper.toResponse(attendance));
+        return ResponseEntity.ok(AttendanceMapper.toResponse(
+                attendance, attendanceStudentService.findByAttendanceId(attendance.getId())));
     }
 }

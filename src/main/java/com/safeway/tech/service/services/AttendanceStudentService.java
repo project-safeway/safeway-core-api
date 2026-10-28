@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,6 +24,11 @@ public class AttendanceStudentService {
     private final StudentService studentService;
     private final AttendanceService attendanceService;
     private final RouteStudentRepository routeStudentRepository;
+
+    @Transactional(readOnly = true)
+    public List<AttendanceStudent> findByAttendanceId(UUID attendanceId) {
+        return attendanceStudentRepository.findByAttendanceId(attendanceId);
+    }
 
     @Transactional
     public void registerAttendance(Map<UUID, PresenceStatusEnum> presences, UUID attendanceId) {

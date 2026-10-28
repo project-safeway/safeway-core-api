@@ -1,5 +1,6 @@
 package com.safeway.tech.repository;
 
+import com.safeway.tech.api.dto.student.StudentFeignResponse;
 import com.safeway.tech.domain.models.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,23 @@ import java.util.UUID;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, UUID> {
+
+    @Query("SELECT new com.safeway.tech.api.dto.student.StudentFeignResponse(" +
+            "s.id, s.name, s.monthlyFee, s.dueDate, s.active, s.transport.id, u.id) " +
+            "FROM Student s JOIN User u ON u.transport = s.transport " +
+            "WHERE s.active = true AND s.transport.active = true AND u.active = true " +
+            "AND u.role = com.safeway.tech.domain.enums.UserRole.DRIVER " +
+            "AND (:transportId IS NULL OR s.transport.id = :transportId)")
+    List<StudentFeignResponse> findFinancialStudents(@Param("transportId") UUID transportId);
+
+    @Query("SELECT new com.safeway.tech.api.dto.student.StudentFeignResponse(" +
+            "s.id, s.name, s.monthlyFee, s.dueDate, s.active, s.transport.id, u.id) " +
+            "FROM Student s JOIN User u ON u.transport = s.transport " +
+            "WHERE s.id IN :ids AND s.active = true AND s.transport.active = true AND u.active = true " +
+            "AND u.role = com.safeway.tech.domain.enums.UserRole.DRIVER " +
+            "AND s.transport.id = :transportId")
+    List<StudentFeignResponse> findFinancialStudentsByIds(
+            @Param("ids") List<UUID> ids, @Param("transportId") UUID transportId);
 
     @Query("SELECT s FROM Student s JOIN GuardianStudent gs ON gs.student = s " +
             "WHERE s.id IN :ids AND gs.guardian.user.id = :userId " +

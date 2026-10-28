@@ -18,6 +18,7 @@ public class SchoolMapper {
 
     public static SchoolResumeResponse toResumeResponse(School school) {
         return new SchoolResumeResponse(
+                school.getId(),
                 school.getName(),
                 school.getEducationLevel(),
                 AddressMapper.toResponse(school.getAddress())

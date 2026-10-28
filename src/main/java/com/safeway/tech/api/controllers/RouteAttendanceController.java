@@ -5,6 +5,7 @@ import com.safeway.tech.domain.enums.AttendanceStatusEnum;
 import com.safeway.tech.domain.models.Attendance;
 import com.safeway.tech.service.mappers.AttendanceMapper;
 import com.safeway.tech.service.services.AttendanceService;
+import com.safeway.tech.service.services.AttendanceStudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,11 +29,12 @@ import java.util.UUID;
 public class RouteAttendanceController {
 
     private final AttendanceService attendanceService;
+    private final AttendanceStudentService attendanceStudentService;
 
     @PostMapping
     public ResponseEntity<AttendanceResponse> startAttendance(@PathVariable UUID routeId) {
         Attendance attendance = attendanceService.startAttendance(routeId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(AttendanceMapper.toResponse(attendance));
+        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(attendance));
     }
 
     @GetMapping
@@ -50,7 +52,11 @@ public class RouteAttendanceController {
 
         Page<AttendanceResponse> response = attendanceService
                 .findAttendanceHistory(routeId, status, pageable)
-                .map(AttendanceMapper::toResponse);
+                .map(this::toResponse);
         return ResponseEntity.ok(response);
+    }
+
+    private AttendanceResponse toResponse(Attendance attendance) {
+        return AttendanceMapper.toResponse(attendance, attendanceStudentService.findByAttendanceId(attendance.getId()));
     }
 }

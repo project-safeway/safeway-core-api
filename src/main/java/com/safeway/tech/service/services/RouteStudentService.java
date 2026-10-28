@@ -1,5 +1,6 @@
 package com.safeway.tech.service.services;
 
+import com.safeway.tech.api.dto.route.RouteStopResponse;
 import com.safeway.tech.api.dto.route.RouteStudentRequest;
 import com.safeway.tech.api.dto.route.RouteUpdateRequest.RouteStopUpdate;
 import com.safeway.tech.api.dto.route.StudentWithAddress;
@@ -13,6 +14,7 @@ import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.GuardianRepository;
 import com.safeway.tech.repository.RouteRepository;
 import com.safeway.tech.repository.RouteStudentRepository;
+import com.safeway.tech.service.mappers.RouteMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -145,6 +147,25 @@ public class RouteStudentService {
         }
 
         routeStudentRepository.saveAll(actualOrder);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RouteStopResponse> findStops(UUID routeId) {
+        UUID transportId = currentUserService.getCurrentTransportId();
+
+        return routeStudentRepository.findByRouteId(routeId).stream()
+                .filter(routeStudent -> routeStudent.isActive() && routeStudent.getStudent().isActive())
+                .map(routeStudent -> {
+                    List<Guardian> guardians = guardianRepository.findByStudentIdAndTransportId(
+                            routeStudent.getStudent().getId(), transportId);
+                    Guardian guardian = guardians.stream()
+                            .filter(candidate -> candidate.getAddress() != null
+                                    && candidate.getAddress().getId().equals(routeStudent.getAddress().getId()))
+                            .findFirst()
+                            .orElse(guardians.isEmpty() ? null : guardians.getFirst());
+                    return RouteMapper.toStopResponse(routeStudent, guardian);
+                })
+                .toList();
     }
 
     @Transactional

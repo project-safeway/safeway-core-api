@@ -3,6 +3,7 @@ package com.safeway.tech.api.controllers;
 import com.safeway.tech.api.dto.route.RouteRequest;
 import com.safeway.tech.api.dto.route.RouteResponse;
 import com.safeway.tech.api.dto.route.RouteSchoolRequest;
+import com.safeway.tech.api.dto.route.RouteStopResponse;
 import com.safeway.tech.api.dto.route.RouteStudentRequest;
 import com.safeway.tech.api.dto.route.RouteUpdateRequest;
 import com.safeway.tech.api.dto.route.StudentWithAddress;
@@ -66,6 +67,11 @@ public class RouteController {
         routeService.findById(id);
         List<StudentWithAddress> students = routeStudentService.findStudentWithAddress(id);
         return ResponseEntity.status(HttpStatus.OK).body(students);
+    }
+
+    @GetMapping("/{id}/stops")
+    public ResponseEntity<List<RouteStopResponse>> findStops(@PathVariable UUID id) {
+        return ResponseEntity.ok(routeService.findStops(id));
     }
 
     @PutMapping("/{id}")

@@ -32,6 +32,23 @@ jobs:
           java-version: "21"
           cache: maven
 
+      - name: Configure test JWT keys
+        env:
+          JWT_TEST_PUBLIC_KEY: ${{ secrets.JWT_TEST_PUBLIC_KEY }}
+          JWT_TEST_PRIVATE_KEY: ${{ secrets.JWT_TEST_PRIVATE_KEY }}
+        run: |
+          set -euo pipefall
+          
+          mkdir -p src/test/resources/keys
+          
+          printf '%s\n' "$JWT_TEST_PUBLIC_KEY" \
+            > src/test/resources/keys/pub.key
+          
+          printf '%s\n' "$JWT_TEST_PRIVATE_KEY" \
+            > src/test/resources/keys/pri.key
+          
+          chmod 600 src/test/resources/keys/pri.key
+
       - name: Build (compile/package)
         run: ./mvnw -DskipTests package
 

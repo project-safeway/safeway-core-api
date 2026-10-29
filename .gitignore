@@ -37,3 +37,5 @@ build/
 /.idea/
 /src/main/resources/keys/
 /src/main/resources/angelic-ivy-453823-i0-cfbdce20a33c.json
+/src/test/resources/keys/pri.key
+/src/test/resources/keys/pub.key

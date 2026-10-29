@@ -37,7 +37,7 @@ jobs:
           JWT_TEST_PUBLIC_KEY: ${{ secrets.JWT_TEST_PUBLIC_KEY }}
           JWT_TEST_PRIVATE_KEY: ${{ secrets.JWT_TEST_PRIVATE_KEY }}
         run: |
-          set -euo pipefall
+          set -euo pipefail
           
           mkdir -p src/test/resources/keys
           

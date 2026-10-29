@@ -15,6 +15,7 @@ concurrency:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: safeway-core
+  AWS_DEPLOY_ENABLE: "false"
 
 jobs:
   build_test_docker:
@@ -59,14 +60,14 @@ jobs:
         run: docker build -t local/${{ env.ECR_REPOSITORY }}:${{ github.sha }} .
 
       - name: Configure AWS credentials (OIDC)
-        if: ${{ github.event_name == 'push' && vars.AWS_AUTH_METHOD == 'oidc' }}
+        if: ${{ env.AWS_DEPLOY_ENABLE == 'true' && github.event_name == 'push' && vars.AWS_AUTH_METHOD == 'oidc' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
 
       - name: Configure AWS credentials (access keys)
-        if: ${{ github.event_name == 'push' && vars.AWS_AUTH_METHOD != 'oidc' }}
+        if: ${{ env.AWS_DEPLOY_ENABLE == 'true' && github.event_name == 'push' && vars.AWS_AUTH_METHOD != 'oidc' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
@@ -75,12 +76,12 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 
       - name: Login to Amazon ECR
-        if: github.event_name == 'push'
+        if: ${{ env.AWS_DEPLOY_ENABLE == 'true' && github.event_name == 'push' }}
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Push image to ECR (sha tag)
-        if: github.event_name == 'push'
+        if: ${{ env.AWS_DEPLOY_ENABLE == 'true' && github.event_name == 'push'}}
         env:
           ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
           SHA_SHORT: ${{ github.sha }}

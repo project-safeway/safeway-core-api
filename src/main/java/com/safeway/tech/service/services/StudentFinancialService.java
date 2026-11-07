@@ -7,6 +7,7 @@ import com.safeway.tech.infra.exception.EntityNotFoundException;
 import com.safeway.tech.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,12 +31,14 @@ public class StudentFinancialService {
     @Value("${auth.v2.service-token.client-id:safeway-core}")
     private String serviceClientId;
 
+    @Cacheable(cacheNames = "students", key = "#studentId")
     public StudentFeignResponse findById(UUID studentId) {
         return studentRepository.findFinancialStudentsByIds(List.of(studentId), requireDriverTransport())
                 .stream().findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Student was not found"));
     }
 
+    @Cacheable(cacheNames = "students")
     public List<StudentFeignResponse> findAllActive() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()
@@ -47,6 +50,7 @@ public class StudentFinancialService {
         return studentRepository.findFinancialStudents(requireDriverTransport());
     }
 
+    @Cacheable(cacheNames = "students", key = "#ids")
     public List<StudentFeignResponse> batchFindById(List<UUID> ids) {
         UUID transportId = requireDriverTransport();
         if (ids.isEmpty()) {

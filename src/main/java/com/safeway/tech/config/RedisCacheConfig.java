@@ -24,7 +24,7 @@ public class RedisCacheConfig {
         redisObjectMapper.registerModule(new Hibernate6Module());
         redisObjectMapper.activateDefaultTyping(
                 redisObjectMapper.getPolymorphicTypeValidator(),
-                ObjectMapper.DefaultTyping.EVERYTHING,
+                ObjectMapper.DefaultTyping.NON_FINAL_AND_ENUMS,
                 JsonTypeInfo.As.PROPERTY
         );
 
@@ -37,8 +37,7 @@ public class RedisCacheConfig {
                 .entryTtl(Duration.ofMinutes(5));
 
         Map<String, RedisCacheConfiguration> perCache = Map.of(
-                "eventos", defaults.entryTtl(Duration.ofMinutes(10)),
-                "alunos", defaults.entryTtl(Duration.ofMinutes(10))
+                "students", defaults.entryTtl(Duration.ofMinutes(10))
         );
 
         return RedisCacheManager.builder(redisConnectionFactory)

@@ -14,6 +14,9 @@ import com.safeway.tech.repository.StudentRepository;
 import com.safeway.tech.repository.GuardianRepository;
 import com.safeway.tech.repository.GuardianStudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,7 @@ public class StudentService {
     private final GuardianStudentRepository guardianStudentRepository;
     private final GuardianRepository guardianRepository;
 
+    @Cacheable(cacheNames = "students", key = "#studentId")
     public Student findById(UUID studentId) {
         UUID userId = currentUserService.getCurrentUserId();
         return studentRepository.findByIdAndUserId(studentId, userId)
@@ -73,6 +77,7 @@ public class StudentService {
     }
 
     @Transactional
+    @CachePut(cacheNames = "students", key = "#studentId")
     public Student update(UUID studentId, StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
         User user = userService.findById(userId);
@@ -95,6 +100,7 @@ public class StudentService {
     }
 
     @Transactional
+    @CachePut(cacheNames = "students", key = "#studentId")
     public Student updateForCurrentTransport(UUID studentId, StudentRequest request) {
         UUID userId = currentUserService.getCurrentUserId();
         User user = userService.findById(userId);
@@ -111,6 +117,7 @@ public class StudentService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "students", key = "#studentId")
     public void delete(UUID studentId) {
         Student student = findById(studentId);
         student.setActive(false);
@@ -119,6 +126,7 @@ public class StudentService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "students", key = "#studentId")
     public void deleteForCurrentTransport(UUID studentId) {
         Student student = findByIdForCurrentTransport(studentId);
         student.setActive(false);
@@ -138,17 +146,20 @@ public class StudentService {
         return studentRepository.findAllByActiveTrueAndUserId(userId);
     }
 
+    @Cacheable(cacheNames = "students", key = "#studentId")
     public List<Student> findAllForCurrentTransport() {
         UUID transportId = currentUserService.getCurrentTransportId();
         return studentRepository.findAllByTransportIdAndActiveTrue(transportId);
     }
 
+    @Cacheable(cacheNames = "students", key = "#studentId")
     public Student findByIdForCurrentTransport(UUID studentId) {
         UUID transportId = currentUserService.getCurrentTransportId();
         return studentRepository.findByIdAndTransportIdAndActiveTrue(studentId, transportId)
                 .orElseThrow(() -> new EntityNotFoundException("Student was not found"));
     }
 
+    @Cacheable(cacheNames = "students", key = "#studentId")
     public List<Guardian> findGuardians(UUID studentId) {
         Student student = findByIdForCurrentTransport(studentId);
         return guardianRepository.findByStudentIdAndTransportId(
@@ -156,6 +167,7 @@ public class StudentService {
     }
 
     @Transactional
+    @CachePut(cacheNames = "students", key = "#studentId")
     public void addGuardian(UUID studentId, UUID guardianId) {
         Student student = findByIdForCurrentTransport(studentId);
         Guardian guardian = guardianService.findById(guardianId);
@@ -163,6 +175,7 @@ public class StudentService {
     }
 
     @Transactional
+    @CachePut(cacheNames = "students", key = "#studentId")
     public void removeGuardian(UUID studentId, UUID guardianId) {
         findByIdForCurrentTransport(studentId);
         GuardianStudent link = guardianStudentRepository.findByGuardianIdAndStudentId(guardianId, studentId)

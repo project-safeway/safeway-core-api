@@ -1,19 +1,17 @@
 package com.safeway.tech.api.controllers;
 
+import com.safeway.tech.api.dto.guardian.GuardianResponse;
 import com.safeway.tech.api.dto.student.StudentFeignResponse;
 import com.safeway.tech.api.dto.student.StudentRequest;
 import com.safeway.tech.api.dto.student.StudentResponse;
-import com.safeway.tech.api.dto.guardian.GuardianResponse;
 import com.safeway.tech.domain.models.Student;
-import com.safeway.tech.service.mappers.StudentMapper;
 import com.safeway.tech.service.mappers.GuardianMapper;
-import com.safeway.tech.service.services.StudentService;
-import com.safeway.tech.service.services.StudentFinancialService;
+import com.safeway.tech.service.mappers.StudentMapper;
 import com.safeway.tech.service.services.GuardianService;
+import com.safeway.tech.service.services.StudentFinancialService;
+import com.safeway.tech.service.services.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -60,7 +58,6 @@ public class StudentController {
     }
 
     @PutMapping("/{studentId}")
-    @CachePut(cacheNames = "students", key = "#studentId")
     public ResponseEntity<StudentResponse> update(
             @PathVariable UUID studentId,
             @RequestBody @Valid StudentRequest request
@@ -70,7 +67,6 @@ public class StudentController {
     }
 
     @DeleteMapping("/{studentId}")
-    @CacheEvict(cacheNames = "students", key = "#studentId")
     public ResponseEntity<Void> delete(@PathVariable UUID studentId) {
         studentService.deleteForCurrentTransport(studentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

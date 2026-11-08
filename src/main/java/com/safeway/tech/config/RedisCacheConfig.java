@@ -37,7 +37,10 @@ public class RedisCacheConfig {
                 .entryTtl(Duration.ofMinutes(5));
 
         Map<String, RedisCacheConfiguration> perCache = Map.of(
-                "students", defaults.entryTtl(Duration.ofMinutes(10))
+                "studentsByUser", defaults.entryTtl(Duration.ofMinutes(10)),
+                "studentsByTransport", defaults.entryTtl(Duration.ofMinutes(10)),
+                "studentsByTransportList", defaults.entryTtl(Duration.ofMinutes(10)),
+                "studentGuardians", defaults.entryTtl(Duration.ofMinutes(10))
         );
 
         return RedisCacheManager.builder(redisConnectionFactory)

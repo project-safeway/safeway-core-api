@@ -6,7 +6,7 @@ import com.safeway.tech.domain.models.User;
 
 public class UserMapper {
 
-    public static UserResponse toResponse(User user) {
+    public static UserResponse toResponse(User user, boolean hasProfilePhoto) {
         return new UserResponse(
                 user.getId(),
                 user.getName(),
@@ -14,7 +14,8 @@ public class UserMapper {
                 user.getPrimaryPhoneNumber(),
                 user.getSecondaryPhoneNumber(),
                 user.getTransport() != null ? TransportMapper.toResponse(user.getTransport()) : null,
-                user.getRole() != null ? user.getRole().name() : null
+                user.getRole() != null ? user.getRole().name() : null,
+                hasProfilePhoto
         );
     }
 

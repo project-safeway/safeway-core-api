@@ -11,6 +11,7 @@ public record UserResponse(
         String primaryPhoneNumber,
         String secondaryPhoneNumber,
         TransportResponse transport,
-        String role
+        String role,
+        boolean hasProfilePhoto
 ) {
 }

@@ -3,12 +3,15 @@ package com.safeway.tech.auth.infrastructure.entrypoint.http;
 import com.safeway.tech.auth.core.application.LoginCommand;
 import com.safeway.tech.auth.core.application.LoginResult;
 import com.safeway.tech.auth.core.application.LoginUseCase;
+import com.safeway.tech.auth.core.application.PasswordResetUseCase;
 import com.safeway.tech.auth.core.application.RegisterTransportCommand;
 import com.safeway.tech.auth.core.application.RegisterUserCommand;
 import com.safeway.tech.auth.core.application.RegisterUserUseCase;
 import com.safeway.tech.auth.infrastructure.entrypoint.dto.AuthResponseV2;
+import com.safeway.tech.auth.infrastructure.entrypoint.dto.ForgotPasswordRequestV2;
 import com.safeway.tech.auth.infrastructure.entrypoint.dto.LoginRequestV2;
 import com.safeway.tech.auth.infrastructure.entrypoint.dto.RegisterRequestV2;
+import com.safeway.tech.auth.infrastructure.entrypoint.dto.ResetPasswordRequestV2;
 import com.safeway.tech.auth.infrastructure.entrypoint.dto.ServiceTokenRequestV2;
 import com.safeway.tech.auth.infrastructure.entrypoint.dto.ServiceTokenResponseV2;
 import com.safeway.tech.auth.infrastructure.security.ServiceJwtTokenIssuer;
@@ -30,6 +33,7 @@ public class AuthV2Controller {
 
     private final LoginUseCase loginUseCase;
     private final RegisterUserUseCase registerUserUseCase;
+    private final PasswordResetUseCase passwordResetUseCase;
     private final ServiceJwtTokenIssuer serviceJwtTokenIssuer;
 
     @Value("${auth.v2.service-token.client-id:safeway-core}")
@@ -69,6 +73,18 @@ public class AuthV2Controller {
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequestV2 request) {
+        passwordResetUseCase.requestReset(request.email());
+        return ResponseEntity.ok("Se o e-mail estiver cadastrado, enviamos um código de recuperação.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequestV2 request) {
+        passwordResetUseCase.resetPassword(request.email(), request.code(), request.newPassword());
+        return ResponseEntity.ok("Senha redefinida com sucesso!");
     }
 
     @PostMapping("/token/service")

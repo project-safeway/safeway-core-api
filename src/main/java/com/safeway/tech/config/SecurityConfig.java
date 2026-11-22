@@ -50,9 +50,13 @@ public class SecurityConfig {
                     .requestMatchers(
                             "/auth/v2/login",
                             "/auth/v2/register",
+                            "/auth/v2/forgot-password",
+                            "/auth/v2/reset-password",
                             "/auth/v2/token/service",
                             "/auth/login",
                             "/auth/register",
+                            "/auth/forgot-password",
+                            "/auth/reset-password",
                             "/auth/token/service"
                     ).permitAll()
                     .requestMatchers("/guardian-invitations/public/**").permitAll()

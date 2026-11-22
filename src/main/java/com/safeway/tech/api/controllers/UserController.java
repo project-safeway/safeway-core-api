@@ -6,6 +6,7 @@ import com.safeway.tech.api.dto.user.UserResponse;
 import com.safeway.tech.domain.models.User;
 import com.safeway.tech.service.mappers.UserMapper;
 import com.safeway.tech.service.services.UserService;
+import com.safeway.tech.service.services.UserPhotoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,15 +25,16 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final UserPhotoService photoService;
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser() {
-        return ResponseEntity.ok(UserMapper.toResponse(userService.findCurrentUser()));
+        return ResponseEntity.ok(UserMapper.toResponse(userService.findCurrentUser(), photoService.hasCurrentUserPhoto()));
     }
 
     @PutMapping("/me")
     public ResponseEntity<UserResponse> updateCurrentUser(@Valid @RequestBody UserProfileRequest request) {
-        return ResponseEntity.ok(UserMapper.toResponse(userService.updateCurrentUser(request)));
+        return ResponseEntity.ok(UserMapper.toResponse(userService.updateCurrentUser(request), photoService.hasCurrentUserPhoto()));
     }
 
     /*

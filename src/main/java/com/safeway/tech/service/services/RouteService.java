@@ -105,7 +105,7 @@ public class RouteService {
 
             List<RouteStudentRequest> studentStops = request.stops().stream()
                     .filter(stop -> "ALUNO".equalsIgnoreCase(stop.type()))
-                    .map(stop -> new RouteStudentRequest(stop.id(), stop.specificOrder(), null))
+                    .map(stop -> new RouteStudentRequest(stop.id(), stop.specificOrder(), stop.addressId()))
                     .toList();
             routeStudentService.syncStudents(route, studentStops);
             routeStudentService.updateGeneralOrder(route.getId(), request.stops());

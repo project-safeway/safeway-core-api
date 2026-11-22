@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -37,9 +38,18 @@ public class AddressService {
     @Transactional
     public Address update(UUID id, AddressRequest request) {
         Address address = findById(id);
+        boolean addressTextChanged = !Objects.equals(address.getStreet(), request.street())
+                || !Objects.equals(address.getNumber(), request.number())
+                || !Objects.equals(address.getNeighborhood(), request.neighborhood())
+                || !Objects.equals(address.getCity(), request.city())
+                || !Objects.equals(address.getFederalUnit(), request.federalUnit())
+                || !Objects.equals(address.getZipCode(), request.zipCode());
+        boolean missingCoordinates = address.getLatitude() == null || address.getLongitude() == null;
 
         consumeData(address, request);
-        calculateCoordinates(address);
+        if (addressTextChanged || missingCoordinates) {
+            calculateCoordinates(address);
+        }
 
         return addressRepository.save(address);
     }
@@ -53,6 +63,9 @@ public class AddressService {
         address.setFederalUnit(request.federalUnit());
         address.setZipCode(request.zipCode());
         address.setType(request.type());
+        if (request.principal() != null) {
+            address.setPrincipal(request.principal());
+        }
     }
 
     private void calculateCoordinates(Address address) {

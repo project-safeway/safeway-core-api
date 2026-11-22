@@ -24,7 +24,11 @@ public record RouteUpdateRequest(
             String type,      // "ALUNO" or "ESCOLA"
             UUID id,          // studentId or schoolId
             Integer generalOrder,
-            Integer specificOrder // boardingOrder or visitOrder
+            Integer specificOrder, // boardingOrder or visitOrder
+            UUID addressId    // optional guardian address for "ALUNO" stops
     ) {
+        public RouteStopUpdate(String type, UUID id, Integer generalOrder, Integer specificOrder) {
+            this(type, id, generalOrder, specificOrder, null);
+        }
     }
 }
